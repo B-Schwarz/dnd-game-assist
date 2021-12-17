@@ -4,6 +4,9 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import App from "./App";
 import { ChakraProvider } from '@chakra-ui/react';
+import axios from "axios";
+
+axios.defaults.withCredentials = true
 
 ReactDOM.render(
   <React.StrictMode>
