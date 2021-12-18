@@ -7,7 +7,7 @@ import {
     AlertDialogOverlay,
     Button,
     Center,
-    Heading
+    Heading, HStack, Text
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
 import {Divider} from "@chakra-ui/layout";
@@ -93,10 +93,16 @@ const App = () => {
                     <Center key={item['_id']}>
                         <Button key={item['_id']} borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
                                 width={"85%"} onClick={() => openCharacter(item['_id'])}>
-                            Name: {(item['character'] && item['character']['name']) || 'N/A'},
-                            Klasse: {(item['character'] && item['character']['classLevel']) || 'N/A'},
-                            Rasse: {(item['character'] && item['character']['race']) || 'N/A'},
-                            Player: {(item['character'] && item['character']['playerName']) || 'N/A'}
+                            <HStack>
+                            <Text color='gray'>Name:</Text>
+                            <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                            <Text color='gray'>Klasse:</Text>
+                            <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
+                            <Text color='gray'>Rasse:</Text>
+                            <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
+                            <Text color='gray'>Player:</Text>
+                            <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                            </HStack>
                         </Button>
                         <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
                                 marginLeft='0.25rem' onClick={() => {
@@ -130,10 +136,16 @@ const App = () => {
                             <Center key={item['_id']}>
                                 <Button key={item['_id']} borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
                                         width={"85%"} onClick={() => openCharacter(item['_id'])}>
-                                    Name: {item['character']['name'] || 'N/A'},
-                                    Klasse: {item['character']['classLevel'] || 'N/A'},
-                                    Rasse: {item['character']['race'] || 'N/A'},
-                                    Player: {item['character']['playerName'] || 'N/A'}
+                                    <HStack>
+                                        <Text color='gray'>Name:</Text>
+                                        <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                                        <Text color='gray'>Klasse:</Text>
+                                        <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
+                                        <Text color='gray'>Rasse:</Text>
+                                        <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
+                                        <Text color='gray'>Player:</Text>
+                                        <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                    </HStack>
                                 </Button>
                                 <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
                                         marginLeft='0.25rem' onClick={() => {
