@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Button} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
 import {Divider} from "@chakra-ui/layout";
 import {useNavigate} from "react-router-dom";
-import {SettingsIcon} from "@chakra-ui/icons";
+import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
+import axios from "axios";
 
 const Menu = (props: { selected: SelectedEnum; }) => {
 
@@ -21,13 +22,29 @@ const Menu = (props: { selected: SelectedEnum; }) => {
             selected: SelectedEnum.SETTINGS
         }]
 
+    const adminBtn = {
+        name: 'Admin',
+        icon: <WarningTwoIcon/>,
+        color: 'red',
+        selected: SelectedEnum.ADMIN
+    }
+
+    const [buttons, setButtons] = useState(btn)
+
+    useEffect(() => {
+        axios.get('http://localhost:4000/api/me/admin')
+            .then(() => {
+                setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
+            })
+    }, [])
+
     const navigate = useNavigate()
 
     return (
         <>
             <Box padding='0.2rem'>
                 {
-                    btn.map((b) => (
+                    buttons.map((b) => (
                         <Button key={b.selected} colorScheme={b.color || 'gray'} leftIcon={b.icon || <></>}
                                 variant={props.selected === b.selected ? 'solid' : 'ghost'}
                                 onClick={() => {

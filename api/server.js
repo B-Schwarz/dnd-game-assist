@@ -10,7 +10,7 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const {isMaster, getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, isMasterOrAdmin, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter
+    deleteOwnCharacter, isAdmin
 } = require("./character");
 
 const port = 4000;
@@ -91,6 +91,10 @@ app.post('/api/char/me', isAuth, saveOwnCharacter)
 
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
+
+app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
+    res.sendStatus(200)
+})
 
 const start = async () => {
     try {

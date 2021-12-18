@@ -1,5 +1,5 @@
-const { User } = require('../db/models/user.model')
-const { Character } = require('../db/models/character.model')
+const {User} = require('../db/models/user.model')
+const {Character} = require('../db/models/character.model')
 const _ = require('lodash')
 const mongoose = require('mongoose')
 
@@ -46,13 +46,17 @@ const createCharacter = async (req, res) => {
 // REQUIRES MASTER OR ADMIN
 const getCharacter = async (req, res) => {
     if (req.params.id) {
-        const char = await Character.findOne({
-            _id: req.params.id
-        })
+        try {
+            const char = await Character.findOne({
+                _id: req.params.id
+            })
 
-        if (char) {
-            res.send(filterCharacter(char))
-        } else {
+            if (char) {
+                res.send(filterCharacter(char))
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (_) {
             res.sendStatus(404)
         }
     } else {
@@ -63,13 +67,17 @@ const getCharacter = async (req, res) => {
 const getOwnCharacter = async (req, res) => {
     if (req.params.id) {
         if (isOwnedByUser(req.user.character, req.params.id)) {
-            const char = await Character.findOne({
-                _id: req.params.id
-            })
+            try {
+                const char = await Character.findOne({
+                    _id: req.params.id
+                })
 
-            if (char) {
-                res.send(filterCharacter(char))
-            } else {
+                if (char) {
+                    res.send(filterCharacter(char))
+                } else {
+                    res.sendStatus(404)
+                }
+            } catch (_) {
                 res.sendStatus(404)
             }
         } else {
@@ -100,13 +108,15 @@ const getOwnCharacterList = async (req, res) => {
 const deleteCharacter = async (req, res) => {
     const charID = req.params.id
 
-    User.updateOne({ character: mongoose.Types.ObjectId(charID) }, {
+    User.updateOne({character: mongoose.Types.ObjectId(charID)}, {
         $pullAll: {
             character: [mongoose.Types.ObjectId(charID)]
         }
-    }, () => {})
+    }, () => {
+    })
 
-    Character.deleteOne({_id: charID}, () => {})
+    Character.deleteOne({_id: charID}, () => {
+    })
 
     res.sendStatus(200)
 }
@@ -114,13 +124,15 @@ const deleteCharacter = async (req, res) => {
 const deleteOwnCharacter = async (req, res) => {
     const charID = req.params.id
 
-    User.updateOne({ _id: req.user._id, character: mongoose.Types.ObjectId(charID) }, {
+    User.updateOne({_id: req.user._id, character: mongoose.Types.ObjectId(charID)}, {
         $pullAll: {
             character: [mongoose.Types.ObjectId(charID)]
         }
-    }, () => {})
+    }, () => {
+    })
 
-    Character.deleteOne({_id: charID}, () => {})
+    Character.deleteOne({_id: charID}, () => {
+    })
 
     res.sendStatus(200)
 }
@@ -132,7 +144,7 @@ const filterCharacterListe = (liste) => {
 }
 
 const filterCharacter = (char) => {
-    return _.pick(char, ['_id','character'])
+    return _.pick(char, ['_id', 'character'])
 }
 
 const isOwnedByUser = (character, id) => {
@@ -141,6 +153,14 @@ const isOwnedByUser = (character, id) => {
 
 const isMaster = (req, res, next) => {
     if (req.user.master) {
+        next()
+    } else {
+        res.sendStatus(401)
+    }
+}
+
+const isAdmin = (req, res, next) => {
+    if (req.user.admin) {
         next()
     } else {
         res.sendStatus(401)
@@ -166,5 +186,6 @@ module.exports = {
     deleteCharacter,
     deleteOwnCharacter,
     isMaster,
+    isAdmin,
     isMasterOrAdmin
 }
