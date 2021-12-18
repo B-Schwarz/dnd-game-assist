@@ -4,7 +4,7 @@ const {connectDB} = require('./db')
 const {mongoose} = require('mongoose')
 const {Character} = require('./db/models/character.model')
 const {User} = require('./db/models/user.model')
-const {login, isAuth} = require('./auth')
+const {login, logout, isAuth, register} = require('./auth')
 
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
@@ -51,32 +51,11 @@ const sess = session({
 
 app.use(sess)
 
-app.post('/api/auth/register', async (req, res) => {
-    if (req.body.username && req.body.password) {
-        let newUser = new User({
-            name: req.body.username,
-            password: req.body.password,
-            master: false,
-            admin: false
-        })
-        await newUser.save()
-            .catch(() => {
-                res.sendStatus(400)
-            })
-            .then(() => {
-                res.sendStatus(200)
-            })
-    } else {
-        res.sendStatus(400)
-    }
-})
+app.post('/api/auth/register', register)
 
 app.post('/api/auth/login', login)
 
-app.get('/api/auth/logout', (req, res) => {
-    req.logout()
-    res.redirect('/')
-})
+app.get('/api/auth/logout', isAuth, logout)
 
 app.get('/api/charlist', isAuth, isMasterOrAdmin, getCharacterList)
 app.get('/api/charlist/me', isAuth, getOwnCharacterList)

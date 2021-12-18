@@ -26,6 +26,39 @@ const login = (req, res) => {
     }
 }
 
+const register = async (req, res) => {
+    if (req.body.username && req.body.password) {
+        let newUser = new User({
+            name: req.body.username,
+            password: req.body.password,
+            master: false,
+            admin: false
+        })
+        await newUser.save()
+            .then(() => {
+                res.sendStatus(200)
+            })
+            .catch((e) => {
+                console.log(e)
+                res.sendStatus(400)
+            })
+    } else {
+        res.sendStatus(400)
+    }
+}
+
+const logout = async (req, res) => {
+    await User.updateOne({_id: req.user._id}, {
+        $pull: {
+            session: {token: req.session.token}
+        }
+    })
+    await req.user.save()
+
+    req.session.destroy()
+    res.sendStatus(200)
+}
+
 const isAuth = (req, res, next) => {
     if (req.session.token) {
         User.findOne({
@@ -45,5 +78,7 @@ const isAuth = (req, res, next) => {
 
 module.exports = {
     login,
+    logout,
+    register,
     isAuth
 }
