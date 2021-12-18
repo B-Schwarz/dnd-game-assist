@@ -26,3 +26,7 @@ everytime they're changed.
 
 [ ] Create custom encounters with saved enemies for quickly loading them
 
+## Settings
+
+[ ] A user should be able to change their password  
+[ ] A user should be able to delete their account + all characters
