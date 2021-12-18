@@ -55,7 +55,7 @@ const Login: React.FC<LoginProps> = () => {
                         })
 
                         if (res.status === 200) {
-                            navigate('/character/123')
+                            navigate('/character')
                         }
                         } catch(e) {
                             actions.setErrors({

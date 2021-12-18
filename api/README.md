@@ -19,5 +19,6 @@ running ``npm run start``
 | /api/char/:id        | `DELETE` |                   `none`                    | `admin`<br/>`master` | Deletes someones character sheet                          | `none`                                  |
 | /api/char/me/:id     | `DELETE` |                   `none`                    |        `user`        | Deletes one of my character sheets                        | `none`                                  |
 | /api/me/admin        |  `GET`   |                   `none`                    |       `admin`        | Gets if user is admin                                     | `none`                                  |
+| /api/me              |  `GET`   |                   `none`                    |        `user`        | Gets if user is logged in                                 | `none`                                  |
 | /api/me/delete       | `DELETE` |                   `none`                    |        `user`        | Deletes your own user account + all your character sheets | `none`                                  |
 | /api/account/delete  | `DELETE` |              `userID:ObjectID`              |       `admin`        | Deletes an account with all their character sheets        | `none`                                  |

@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import {DeleteIcon} from "@chakra-ui/icons";
+import WithAuth from "../login/withAuth";
 
 const App = () => {
 
@@ -66,4 +67,4 @@ const App = () => {
     )
 }
 
-export default App
+export default WithAuth(App)

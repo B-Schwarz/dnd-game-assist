@@ -75,6 +75,9 @@ app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 app.delete('/api/me/delete', isAuth, deleteOwnAccount)
 app.delete('/api/account/delete', isAuth, isAdmin, deleteAccount)
 
+app.get('/api/me', isAuth, (req, res) => {
+    res.sendStatus(200)
+})
 app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
     res.sendStatus(200)
 })

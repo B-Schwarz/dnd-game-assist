@@ -5,13 +5,14 @@ import {
     AlertDialog, AlertDialogBody,
     AlertDialogContent, AlertDialogFooter, AlertDialogHeader,
     AlertDialogOverlay,
-    Button,
+    Button, ButtonGroup,
     Center,
     Heading, HStack, Text
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
 import {Divider} from "@chakra-ui/layout";
 import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
+import WithAuth from "../login/withAuth";
 
 const App = () => {
 
@@ -91,36 +92,38 @@ const App = () => {
             {
                 ownCharData.map((item) => (
                     <Center key={item['_id']}>
-                        <Button key={item['_id']} borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
-                                width={"85%"} onClick={() => openCharacter(item['_id'])}>
-                            <HStack>
-                            <Text color='gray'>Name:</Text>
-                            <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
-                            <Text color='gray'>Klasse:</Text>
-                            <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                            <Text color='gray'>Rasse:</Text>
-                            <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                            <Text color='gray'>Player:</Text>
-                            <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
-                            </HStack>
-                        </Button>
-                        <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
-                                marginLeft='0.25rem' onClick={() => {
-                            setDeleteID(item['_id'])
-                            setIsOwn(true)
-                            setIsOpen(true)
-                        }}>
-                            <DeleteIcon/>
-                        </Button>
+                        <ButtonGroup isAttached width='85%'>
+                            <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
+                                    onClick={() => openCharacter(item['_id'])}>
+                                <HStack>
+                                    <Text color='gray'>Name:</Text>
+                                    <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                                    <Text color='gray'>Klasse:</Text>
+                                    <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
+                                    <Text color='gray'>Rasse:</Text>
+                                    <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
+                                    <Text color='gray'>Player:</Text>
+                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                </HStack>
+                            </Button>
+                            <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
+                                    onClick={() => {
+                                        setDeleteID(item['_id'])
+                                        setIsOwn(true)
+                                        setIsOpen(true)
+                                    }}>
+                                <DeleteIcon/>
+                            </Button>
+                        </ButtonGroup>
                     </Center>
                 ))
             }
             <Center>
-                <Button width='88%' marginBlock='0.25rem' colorScheme='blue' onClick={async () => {
+                <Button width='85%' marginBlock='0.25rem' colorScheme='blue' onClick={async () => {
                     const id = await createCharacter()
                     openCharacter(id)
                 }}>
-                    <AddIcon marginRight='0.25rem' /> Neuer Charakter
+                    <AddIcon marginRight='0.25rem'/> Neuer Charakter
                 </Button>
             </Center>
             {charData.length > 0 &&
@@ -134,27 +137,30 @@ const App = () => {
                     {
                         charData.map((item) => (
                             <Center key={item['_id']}>
-                                <Button key={item['_id']} borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
-                                        width={"85%"} onClick={() => openCharacter(item['_id'])}>
-                                    <HStack>
-                                        <Text color='gray'>Name:</Text>
-                                        <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
-                                        <Text color='gray'>Klasse:</Text>
-                                        <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                                        <Text color='gray'>Rasse:</Text>
-                                        <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                                        <Text color='gray'>Player:</Text>
-                                        <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
-                                    </HStack>
-                                </Button>
-                                <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
-                                        marginLeft='0.25rem' onClick={() => {
-                                    setDeleteID(item['_id'])
-                                    setIsOwn(false)
-                                    setIsOpen(true)
-                                }}>
-                                    <DeleteIcon/>
-                                </Button>
+                                <ButtonGroup isAttached width='85%'>
+                                    <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
+                                            onClick={() => openCharacter(item['_id'])}>
+                                        <HStack>
+                                            <Text color='gray'>Name:</Text>
+                                            <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                                            <Text color='gray'>Klasse:</Text>
+                                            <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
+                                            <Text color='gray'>Rasse:</Text>
+                                            <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
+                                            <Text color='gray'>Player:</Text>
+                                            <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                        </HStack>
+                                    </Button>
+                                    <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg'
+                                            colorScheme='red'
+                                            onClick={() => {
+                                                setDeleteID(item['_id'])
+                                                setIsOwn(true)
+                                                setIsOpen(true)
+                                            }}>
+                                        <DeleteIcon/>
+                                    </Button>
+                                </ButtonGroup>
                             </Center>
                         ))
                     }
@@ -191,4 +197,4 @@ const App = () => {
     )
 }
 
-export default App
+export default WithAuth(App)

@@ -8,9 +8,9 @@ import {
 } from 'dnd-character-sheets'
 import 'dnd-character-sheets/dist/index.css'
 
-import {Button} from "@chakra-ui/react";
 import axios from "axios";
 import {useParams} from "react-router-dom";
+import WithAuth from "../login/withAuth";
 
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
@@ -55,12 +55,10 @@ const App = () => {
         setCharacter(character)
         localStorage.setItem('dnd-character-data', JSON.stringify(character))
         setChange(true)
-        console.log(change)
     }
 
     async function send() {
         const data = {character: character, charID: id}
-        console.log(data)
         await axios.post('http://localhost:4000/api/char', data, {
             withCredentials: true,
             headers: {
@@ -86,7 +84,7 @@ const App = () => {
                         .then((data) => {
                             updateCharacter(data.data.character)
                         })
-                        .catch((e) => {
+                        .catch(() => {
                         })
                 }
             })
@@ -116,4 +114,4 @@ const App = () => {
 }
 
 
-export default App
+export default WithAuth(App)

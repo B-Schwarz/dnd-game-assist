@@ -5,6 +5,7 @@ import {Divider} from "@chakra-ui/layout";
 import {useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
+import WithAuth from "../login/withAuth";
 
 const Menu = (props: { selected: SelectedEnum; }) => {
 
@@ -35,7 +36,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
         axios.get('http://localhost:4000/api/me/admin')
             .then(() => {
                 setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
-            })
+            }).catch(() => {})
     }, [])
 
     const navigate = useNavigate()
