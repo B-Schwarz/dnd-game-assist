@@ -2,24 +2,46 @@ const { User } = require('../db/models/user.model')
 const { Character } = require('../db/models/character.model')
 const _ = require('lodash')
 
+// REQUIRES MASTER
 const saveCharacter = async (req, res) => {
-    const newChar = new Character();
-    newChar.character = req.body.character
-    await newChar.save()
-    req.user.character.push(newChar._id)
-    req.user.save()
+    const char = req.body.character
+    const charID = req.body.charID
+
+    await Character.findOneAndUpdate({
+        _id: charID
+    }, {character: char})
+
     res.sendStatus(200)
+}
+
+const saveOwnCharacter = async (req, res) => {
+    const char = req.body.character
+    const charID = req.body.charID
+
+    if (isOwnedByUser(req.user.character, charID)) {
+        await Character.findOneAndUpdate({
+            _id: charID
+        }, {character: char})
+
+        res.sendStatus(200)
+    } else {
+        res.sendStatus(401)
+    }
+}
+
+const createCharacter = async (req, res) => {
+
 }
 
 // REQUIRES MASTER
 const getCharacter = async (req, res) => {
-    if (req.body.characterid) {
+    if (req.params.id) {
         const char = await Character.findOne({
-            _id: req.body.characterid
+            _id: req.params.id
         })
 
         if (char) {
-            res.send(char)
+            res.send(filterCharacter(char))
         } else {
             res.sendStatus(404)
         }
@@ -29,14 +51,14 @@ const getCharacter = async (req, res) => {
 }
 
 const getOwnCharacter = async (req, res) => {
-    if (req.body.characterid) {
-        if (req.user.character.filter(c => c === req.body.characterid).length > 0) {
+    if (req.params.id) {
+        if (isOwnedByUser(req.user.character, req.params.id)) {
             const char = await Character.findOne({
-                _id: req.body.characterid
+                _id: req.params.id
             })
 
             if (char) {
-                res.send(char)
+                res.send(filterCharacter(char))
             } else {
                 res.sendStatus(404)
             }
@@ -51,7 +73,7 @@ const getOwnCharacter = async (req, res) => {
 // REQUIRES MASTER
 const getCharacterList = async (req, res) => {
     const charList = await Character.find()
-    res.send(filterCharacter(charList))
+    res.send(filterCharacterListe(charList))
 }
 
 const getOwnCharacterList = async (req, res) => {
@@ -61,16 +83,32 @@ const getOwnCharacterList = async (req, res) => {
         charList.push(await Character.findOne({_id: charID}))
     }
 
-    res.send(filterCharacter(charList))
+    res.send(filterCharacterListe(charList))
 }
 
-const filterCharacter = (liste) => {
+const filterCharacterListe = (liste) => {
     return _.map(liste, (item) => {
-        return _.pick(item, ['character'])
+        return filterCharacter(item)
     })
 }
 
+const filterCharacter = (char) => {
+    return _.pick(char, ['_id','character'])
+}
+
+const isOwnedByUser = (character, id) => {
+    return (character.filter(c => c.toString() === id).length > 0)
+}
+
 const isMaster = (req, res, next) => {
+    if (req.user.master) {
+        next()
+    } else {
+        res.sendStatus(401)
+    }
+}
+
+const isMasterOrAdmin = (req, res, next) => {
     if (req.user.master || req.user.admin) {
         next()
     } else {
@@ -80,9 +118,11 @@ const isMaster = (req, res, next) => {
 
 module.exports = {
     saveCharacter,
+    saveOwnCharacter,
     getCharacter,
     getOwnCharacter,
     getCharacterList,
     getOwnCharacterList,
-    isMaster
+    isMaster,
+    isMasterOrAdmin
 }

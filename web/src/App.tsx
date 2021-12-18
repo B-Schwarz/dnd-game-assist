@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Character from "./character-sheet/character";
 import Login from "./login/login"
+import CharacterList from "./character-sheet/character-list";
 
 function App() {
     return (
@@ -14,7 +15,7 @@ function App() {
             <Fragment>
                 <Routes>
                     <Route path="/login" element={<Login/>}/>
-                    <Route path="/character" element={<Character />} /> {/* TODO: Liste mit seinen Chars*/}
+                    <Route path="/character" element={<CharacterList />} /> {/* TODO: Liste mit seinen Chars*/}
                     <Route path="/character/:id" element={<Character />} />
                 </Routes>
             </Fragment>

@@ -8,7 +8,8 @@ const {login, isAuth} = require('./auth')
 
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
-const {isMaster, getCharacterList, getOwnCharacterList} = require("./character");
+const {isMaster, getCharacterList, getOwnCharacterList, getCharacter,
+    getOwnCharacter, isMasterOrAdmin, saveCharacter, saveOwnCharacter} = require("./character");
 
 const port = 4000;
 
@@ -77,6 +78,12 @@ app.get('/api/auth/logout', (req, res) => {
 
 app.get('/api/charlist', isAuth, isMaster, getCharacterList)
 app.get('/api/charlist/me', isAuth, getOwnCharacterList)
+
+app.get('/api/char/:id', isAuth, isMaster, getCharacter)
+app.get('/api/char/me/:id', isAuth, getOwnCharacter)
+
+app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
+app.post('/api/char/me', isAuth, saveOwnCharacter)
 
 app.post('/api/test', isAuth, async (req, res) => {
     const newChar = new Character();

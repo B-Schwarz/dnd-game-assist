@@ -1,6 +1,11 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
-import { DnDCharacterStatsSheet, DnDCharacterProfileSheet, DnDCharacterSpellSheet, DnDCharacter } from 'dnd-character-sheets'
+import {
+    DnDCharacterStatsSheet,
+    DnDCharacterProfileSheet,
+    DnDCharacterSpellSheet,
+    DnDCharacter
+} from 'dnd-character-sheets'
 import 'dnd-character-sheets/dist/index.css'
 
 import {Button} from "@chakra-ui/react";
@@ -9,9 +14,10 @@ import {useParams} from "react-router-dom";
 
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
+    const [change, setChange] = useState(false)
 
     const id = useParams().id
-    console.log(id)
+
     const statsSheet = (
         <DnDCharacterStatsSheet
             character={character}
@@ -33,49 +39,79 @@ const App = () => {
         />
     )
 
-    function loadDefaultCharacter () {
+    function loadDefaultCharacter() {
         let character: DnDCharacter = {}
         const lsData = localStorage.getItem('dnd-character-data')
         if (lsData) {
             try {
                 character = JSON.parse(lsData)
-            } catch {}
+            } catch {
+            }
         }
         return character
     }
 
-    function updateCharacter (character: DnDCharacter) {
+    function updateCharacter(character: DnDCharacter) {
         setCharacter(character)
         localStorage.setItem('dnd-character-data', JSON.stringify(character))
+        setChange(true)
+        console.log(change)
     }
 
     async function send() {
-        const data = {character: character}
+        const data = {character: character, charID: id}
         console.log(data)
-        await axios.post('http://localhost:4000/api/test', data, {
+        await axios.post('http://localhost:4000/api/char', data, {
             withCredentials: true,
             headers: {
                 'Content-Type': 'application/json'
+            }
+        }).catch(async (e) => {
+            if (e.response.status === 401) {
+                await axios.post(`http://localhost:4000/api/char/me/${id}`, data, {withCredentials: true})
+                    .catch(() => {
+                    })
             }
         })
     }
 
     async function recv() {
-        axios.get('http://localhost:4000/api/test', {withCredentials: true})
-            .then((data) => updateCharacter(data.data.character))
-            .catch((e) => console.error(e))
+        axios.get(`http://localhost:4000/api/char/${id}`, {withCredentials: true})
+            .then((data) => {
+                updateCharacter(data.data.character)
+            })
+            .catch(async (e) => {
+                if (e.response.status === 401) {
+                    await axios.get(`http://localhost:4000/api/char/me/${id}`, {withCredentials: true})
+                        .then((data) => {
+                            updateCharacter(data.data.character)
+                        })
+                        .catch((e) => {
+                        })
+                }
+            })
     }
 
+    useEffect(() => {
+        recv()
+    }, [])
+
+    useEffect(() => {
+        if (change) {
+            send().then(() => {
+                setChange(false)
+            })
+        }
+    }, [change])
+
     return (
-            <React.Fragment>
-                <Button colorScheme='blue' onClick={send}>Senden!</Button>
-                <Button colorScheme='blue' onClick={recv}>Erhalten!</Button>
-                <div>
-                    {statsSheet}
-                    {profileSheet}
-                    {spellSheet}
-                </div>
-            </React.Fragment>
+        <>
+            <div>
+                {statsSheet}
+                {profileSheet}
+                {spellSheet}
+            </div>
+        </>
     )
 }
 
