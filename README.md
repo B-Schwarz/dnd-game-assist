@@ -45,7 +45,7 @@ everytime they're changed.
 
 ## Settings
 
-[ ] A user should be able to change their password  
+[X] A user should be able to change their password  
 [X] A user should be able to delete their account + all characters
 
 ---
