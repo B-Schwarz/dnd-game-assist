@@ -19,7 +19,8 @@ everytime they're changed.
 
 [ ] Automatically rolls initiative for NPCs.  
 [ ] Sorted by Initiative.  
-[ ] Button to mark character's turn
+[ ] Button to mark character's turn  
+[ ] Dungeon Master can hide characters from players 
 
 ## Encounter editor
 
