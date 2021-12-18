@@ -1,8 +1,9 @@
 const { User } = require('../db/models/user.model')
 const { Character } = require('../db/models/character.model')
 const _ = require('lodash')
+const mongoose = require('mongoose')
 
-// REQUIRES MASTER
+// REQUIRES MASTER OR ADMIN
 const saveCharacter = async (req, res) => {
     const char = req.body.character
     const charID = req.body.charID
@@ -30,10 +31,19 @@ const saveOwnCharacter = async (req, res) => {
 }
 
 const createCharacter = async (req, res) => {
+    const char = await Character.create({
+        character: {
+            name: ''
+        }
+    })
 
+    req.user.character.push(char._id)
+    req.user.save()
+
+    res.send({id: char._id})
 }
 
-// REQUIRES MASTER
+// REQUIRES MASTER OR ADMIN
 const getCharacter = async (req, res) => {
     if (req.params.id) {
         const char = await Character.findOne({
@@ -70,7 +80,7 @@ const getOwnCharacter = async (req, res) => {
     }
 }
 
-// REQUIRES MASTER
+// REQUIRES MASTER OR ADMIN
 const getCharacterList = async (req, res) => {
     const charList = await Character.find()
     res.send(filterCharacterListe(charList))
@@ -84,6 +94,35 @@ const getOwnCharacterList = async (req, res) => {
     }
 
     res.send(filterCharacterListe(charList))
+}
+
+// REQUIRES MASTER OR ADMIN
+const deleteCharacter = async (req, res) => {
+    const charID = req.params.id
+
+    User.updateOne({ character: mongoose.Types.ObjectId(charID) }, {
+        $pullAll: {
+            character: [mongoose.Types.ObjectId(charID)]
+        }
+    }, () => {})
+
+    Character.deleteOne({_id: charID}, () => {})
+
+    res.sendStatus(200)
+}
+
+const deleteOwnCharacter = async (req, res) => {
+    const charID = req.params.id
+
+    User.updateOne({ _id: req.user._id, character: mongoose.Types.ObjectId(charID) }, {
+        $pullAll: {
+            character: [mongoose.Types.ObjectId(charID)]
+        }
+    }, () => {})
+
+    Character.deleteOne({_id: charID}, () => {})
+
+    res.sendStatus(200)
 }
 
 const filterCharacterListe = (liste) => {
@@ -123,6 +162,9 @@ module.exports = {
     getOwnCharacter,
     getCharacterList,
     getOwnCharacterList,
+    createCharacter,
+    deleteCharacter,
+    deleteOwnCharacter,
     isMaster,
     isMasterOrAdmin
 }

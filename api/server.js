@@ -9,7 +9,9 @@ const {login, isAuth} = require('./auth')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const {isMaster, getCharacterList, getOwnCharacterList, getCharacter,
-    getOwnCharacter, isMasterOrAdmin, saveCharacter, saveOwnCharacter} = require("./character");
+    getOwnCharacter, isMasterOrAdmin, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
+    deleteOwnCharacter
+} = require("./character");
 
 const port = 4000;
 
@@ -76,39 +78,19 @@ app.get('/api/auth/logout', (req, res) => {
     res.redirect('/')
 })
 
-app.get('/api/charlist', isAuth, isMaster, getCharacterList)
+app.get('/api/charlist', isAuth, isMasterOrAdmin, getCharacterList)
 app.get('/api/charlist/me', isAuth, getOwnCharacterList)
 
-app.get('/api/char/:id', isAuth, isMaster, getCharacter)
-app.get('/api/char/me/:id', isAuth, getOwnCharacter)
+app.get('/api/char/new', isAuth, createCharacter)
+
+app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
+app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
 
 app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
 app.post('/api/char/me', isAuth, saveOwnCharacter)
 
-app.post('/api/test', isAuth, async (req, res) => {
-    const newChar = new Character();
-    newChar.character = req.body.character
-    await newChar.save()
-    req.user.character.push(newChar._id)
-    req.user.save()
-    res.sendStatus(200)
-})
-
-app.get('/api/test', isAuth, async (req, res) => {
-    console.log(req.user)
-    if (req.user.character[0]) {
-        // const char = await Character.findOne({
-        //     _id: req.user.character[0]
-        // })
-        res.sendStatus(200)
-    } else {
-        res.sendStatus(404)
-    }
-})
-
-app.get('/api/auth/debug', (req, res) => {
-    res.send('<h1>Hello</h1>')
-})
+app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
+app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
 const start = async () => {
     try {

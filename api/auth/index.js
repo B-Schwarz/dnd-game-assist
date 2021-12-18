@@ -10,7 +10,7 @@ const login = (req, res) => {
                 if (user) {
 
                     req.session.token = await user.generateSession()
-                    console.log(req.session)
+
                     req.session.save()
                     res.sendStatus(200)
 

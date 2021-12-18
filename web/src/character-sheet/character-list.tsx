@@ -1,15 +1,30 @@
 import React, {useEffect, useState} from 'react'
 
 import axios from "axios";
-import {Button, Center, Heading} from "@chakra-ui/react";
+import {
+    AlertDialog, AlertDialogBody,
+    AlertDialogContent, AlertDialogFooter, AlertDialogHeader,
+    AlertDialogOverlay,
+    Button,
+    Center,
+    Heading
+} from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
 import {Divider} from "@chakra-ui/layout";
+import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
 
 const App = () => {
 
     const [ownCharData, setOwnCharData] = useState([])
     const [charData, setCharData] = useState([])
+    const [isOpen, setIsOpen] = useState(false)
+    const [isOwn, setIsOwn] = useState(false)
+    const [deleteID, setDeleteID] = useState('')
+
     const navigate = useNavigate()
+    const cancelRef = React.useRef()
+
+    const closePopup = () => setIsOpen(false)
 
     function getOwnChars() {
         return axios.get('http://localhost:4000/api/charlist/me')
@@ -17,6 +32,16 @@ const App = () => {
 
     function getChars() {
         return axios.get('http://localhost:4000/api/charlist')
+    }
+
+    async function deleteChar() {
+        if (isOwn) {
+            await axios.delete('http://localhost:4000/api/char/me/' + deleteID)
+        } else {
+            await axios.delete('http://localhost:4000/api/char/' + deleteID)
+        }
+
+        window.location.reload()
     }
 
     useEffect(() => {
@@ -43,36 +68,58 @@ const App = () => {
                     }
                 }
             })
-            .catch(() => {})
+            .catch(() => {
+            })
     }, [ownCharData])
 
     function openCharacter(id: string) {
-        navigate("/character/"+id)
+        navigate("/character/" + id)
+    }
+
+    async function createCharacter() {
+        const response = await axios.get('http://localhost:4000/api/char/new')
+        return response.data.id
     }
 
     return (
         <>
             <Center marginBottom={'1rem'}>
                 <Heading>
-                    Eigene Charactere
+                    Meine Charactere
                 </Heading>
             </Center>
             {
                 ownCharData.map((item) => (
                     <Center key={item['_id']}>
-                        <Button borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
-                                width={"90%"} onClick={() => openCharacter(item['_id'])}>
-                            Name: {item['character']['name'] || 'N/A'},
-                            Klasse: {item['character']['classLevel'] || 'N/A'},
-                            Rasse: {item['character']['race'] || 'N/A'},
-                            Player: {item['character']['playerName'] || 'N/A'}
+                        <Button key={item['_id']} borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
+                                width={"85%"} onClick={() => openCharacter(item['_id'])}>
+                            Name: {(item['character'] && item['character']['name']) || 'N/A'},
+                            Klasse: {(item['character'] && item['character']['classLevel']) || 'N/A'},
+                            Rasse: {(item['character'] && item['character']['race']) || 'N/A'},
+                            Player: {(item['character'] && item['character']['playerName']) || 'N/A'}
+                        </Button>
+                        <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
+                                marginLeft='0.25rem' onClick={() => {
+                            setDeleteID(item['_id'])
+                            setIsOwn(true)
+                            setIsOpen(true)
+                        }}>
+                            <DeleteIcon/>
                         </Button>
                     </Center>
                 ))
             }
+            <Center>
+                <Button width='88%' marginBlock='0.25rem' colorScheme='blue' onClick={async () => {
+                    const id = await createCharacter()
+                    openCharacter(id)
+                }}>
+                    <AddIcon marginRight='0.25rem' /> Neuer Charakter
+                </Button>
+            </Center>
             {charData.length > 0 &&
                 <>
-                    <Divider marginTop={'0.5rem'} marginBottom={'0.5rem'} />
+                    <Divider marginTop={'0.5rem'} marginBottom={'0.5rem'}/>
                     <Center marginBottom={'1rem'}>
                         <Heading>
                             Alle Charactere
@@ -81,18 +128,53 @@ const App = () => {
                     {
                         charData.map((item) => (
                             <Center key={item['_id']}>
-                                <Button borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
-                                        width={"90%"} onClick={() => openCharacter(item['_id'])}>
+                                <Button key={item['_id']} borderWidth='1px' borderRadius='lg' marginBlock={'0.25rem'}
+                                        width={"85%"} onClick={() => openCharacter(item['_id'])}>
                                     Name: {item['character']['name'] || 'N/A'},
                                     Klasse: {item['character']['classLevel'] || 'N/A'},
                                     Rasse: {item['character']['race'] || 'N/A'},
                                     Player: {item['character']['playerName'] || 'N/A'}
+                                </Button>
+                                <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
+                                        marginLeft='0.25rem' onClick={() => {
+                                    setDeleteID(item['_id'])
+                                    setIsOwn(false)
+                                    setIsOpen(true)
+                                }}>
+                                    <DeleteIcon/>
                                 </Button>
                             </Center>
                         ))
                     }
                 </>
             }
+
+            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            Delete Character
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Bist du sicher?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef.current} onClick={closePopup}>
+                                Abbrechen
+                            </Button>
+                            <Button colorScheme='red' onClick={async () => {
+                                await deleteChar()
+                                closePopup()
+                            }} ml={3}>
+                                Löschen
+                            </Button>
+                        </AlertDialogFooter>
+
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </>
     )
 }

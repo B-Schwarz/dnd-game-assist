@@ -76,13 +76,13 @@ const App = () => {
     }
 
     async function recv() {
-        axios.get(`http://localhost:4000/api/char/${id}`, {withCredentials: true})
+        axios.get(`http://localhost:4000/api/char/get/${id}`, {withCredentials: true})
             .then((data) => {
                 updateCharacter(data.data.character)
             })
             .catch(async (e) => {
                 if (e.response.status === 401) {
-                    await axios.get(`http://localhost:4000/api/char/me/${id}`, {withCredentials: true})
+                    await axios.get(`http://localhost:4000/api/char/me/get/${id}`, {withCredentials: true})
                         .then((data) => {
                             updateCharacter(data.data.character)
                         })
