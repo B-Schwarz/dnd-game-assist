@@ -8,10 +8,13 @@ const saveCharacter = async (req, res) => {
     const char = req.body.character
     const charID = req.body.charID
 
-    await Character.findOneAndUpdate({
-        _id: charID
-    }, {character: char})
-
+    try {
+        await Character.findOneAndUpdate({
+            _id: charID
+        }, {character: char})
+    } catch (_) {
+        res.sendStatus(404)
+    }
     res.sendStatus(200)
 }
 
@@ -20,11 +23,15 @@ const saveOwnCharacter = async (req, res) => {
     const charID = req.body.charID
 
     if (isOwnedByUser(req.user.character, charID)) {
-        await Character.findOneAndUpdate({
-            _id: charID
-        }, {character: char})
+        try {
+            await Character.findOneAndUpdate({
+                _id: charID
+            }, {character: char})
 
-        res.sendStatus(200)
+            res.sendStatus(200)
+        } catch (_) {
+            res.sendStatus(404)
+        }
     } else {
         res.sendStatus(401)
     }

@@ -92,6 +92,8 @@ app.post('/api/char/me', isAuth, saveOwnCharacter)
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
+app.get('/api/me')
+
 app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
     res.sendStatus(200)
 })
