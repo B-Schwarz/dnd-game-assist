@@ -53,7 +53,28 @@ const deleteAccount = async (req, res) => {
     }
 }
 
+const changeOwnPassword = (req, res) => {
+    const currPass = req.body.currPass
+    const newPass = req.body.newPass
+
+    if (currPass && newPass) {
+        User.findByCredentials(req.user.name, currPass)
+            .then(async (u) => {
+                u.password = newPass
+                await u.save()
+                res.sendStatus(200)
+            })
+            .catch((e) => {
+                console.log(e)
+                res.sendStatus(401)
+            })
+    } else {
+        res.sendStatus(400)
+    }
+}
+
 module.exports = {
     deleteOwnAccount,
-    deleteAccount
+    deleteAccount,
+    changeOwnPassword
 }

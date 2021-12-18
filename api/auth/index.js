@@ -76,9 +76,36 @@ const isAuth = (req, res, next) => {
     }
 }
 
+const isMaster = (req, res, next) => {
+    if (req.user.master) {
+        next()
+    } else {
+        res.sendStatus(401)
+    }
+}
+
+const isAdmin = (req, res, next) => {
+    if (req.user.admin) {
+        next()
+    } else {
+        res.sendStatus(401)
+    }
+}
+
+const isMasterOrAdmin = (req, res, next) => {
+    if (req.user.master || req.user.admin) {
+        next()
+    } else {
+        res.sendStatus(401)
+    }
+}
+
 module.exports = {
     login,
     logout,
     register,
-    isAuth
+    isAuth,
+    isMaster,
+    isAdmin,
+    isMasterOrAdmin
 }

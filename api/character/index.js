@@ -158,30 +158,6 @@ const isOwnedByUser = (character, id) => {
     return (character.filter(c => c.toString() === id).length > 0)
 }
 
-const isMaster = (req, res, next) => {
-    if (req.user.master) {
-        next()
-    } else {
-        res.sendStatus(401)
-    }
-}
-
-const isAdmin = (req, res, next) => {
-    if (req.user.admin) {
-        next()
-    } else {
-        res.sendStatus(401)
-    }
-}
-
-const isMasterOrAdmin = (req, res, next) => {
-    if (req.user.master || req.user.admin) {
-        next()
-    } else {
-        res.sendStatus(401)
-    }
-}
-
 module.exports = {
     saveCharacter,
     saveOwnCharacter,
@@ -191,8 +167,5 @@ module.exports = {
     getOwnCharacterList,
     createCharacter,
     deleteCharacter,
-    deleteOwnCharacter,
-    isMaster,
-    isAdmin,
-    isMasterOrAdmin
+    deleteOwnCharacter
 }

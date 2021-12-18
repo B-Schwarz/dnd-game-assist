@@ -4,13 +4,14 @@ const {connectDB} = require('./db')
 const {mongoose} = require('mongoose')
 const {Character} = require('./db/models/character.model')
 const {User} = require('./db/models/user.model')
-const {login, logout, isAuth, register} = require('./auth')
-
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
-const {isMaster, getCharacterList, getOwnCharacterList, getCharacter,
-    getOwnCharacter, isMasterOrAdmin, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, isAdmin
+
+const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
+const {
+    getCharacterList, getOwnCharacterList, getCharacter,
+    getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
+    deleteOwnCharacter, changeOwnPassword
 } = require("./character");
 const {deleteOwnAccount, deleteAccount} = require("./settings");
 
@@ -74,6 +75,8 @@ app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
 app.delete('/api/me/delete', isAuth, deleteOwnAccount)
 app.delete('/api/account/delete', isAuth, isAdmin, deleteAccount)
+
+app.put('/api/me/password', isAuth, changeOwnPassword)
 
 app.get('/api/me', isAuth, (req, res) => {
     res.sendStatus(200)
