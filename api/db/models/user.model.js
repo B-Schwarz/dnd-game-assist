@@ -29,8 +29,7 @@ const UserSchema = new mongoose.Schema({
     },
     session: [{
         token: {
-            type: String,
-            unique: true
+            type: String
         }
     }]
 });

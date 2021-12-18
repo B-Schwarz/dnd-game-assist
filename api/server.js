@@ -12,6 +12,7 @@ const {isMaster, getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, isMasterOrAdmin, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
     deleteOwnCharacter, isAdmin
 } = require("./character");
+const {deleteOwnAccount, deleteAccount} = require("./settings");
 
 const port = 4000;
 
@@ -71,7 +72,8 @@ app.post('/api/char/me', isAuth, saveOwnCharacter)
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
-app.get('/api/me')
+app.delete('/api/me/delete', isAuth, deleteOwnAccount)
+app.delete('/api/account/delete', isAuth, isAdmin, deleteAccount)
 
 app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
     res.sendStatus(200)
