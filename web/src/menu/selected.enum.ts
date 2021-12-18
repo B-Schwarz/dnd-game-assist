@@ -1,5 +1,6 @@
 export enum SelectedEnum {
     NONE,
     CHARACTER,
-    INITIATIVE
+    INITIATIVE,
+    SETTINGS
 }
