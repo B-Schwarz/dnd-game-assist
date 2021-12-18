@@ -11,9 +11,9 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, changeOwnPassword
+    deleteOwnCharacter
 } = require("./character");
-const {deleteOwnAccount, deleteAccount} = require("./settings");
+const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 
 const port = 4000;
 

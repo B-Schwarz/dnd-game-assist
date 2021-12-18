@@ -6,12 +6,10 @@ import {
     FormErrorMessage,
     FormLabel,
     Heading,
-    Input,
-    useToast
+    Input
 } from '@chakra-ui/react'
 import {Field, FieldProps, Form, Formik, FormikProps} from 'formik'
 import React from 'react'
-import {Divider} from '@chakra-ui/layout'
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
@@ -35,7 +33,6 @@ const validatePassword = (value: string) => {
 }
 
 const Login: React.FC<LoginProps> = () => {
-    const toast = useToast()
     const navigate = useNavigate()
 
     return (

@@ -6,17 +6,21 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogOverlay,
-    Button
+    Button, Center, Container, Flex, FormControl, FormErrorMessage, FormLabel, Input, useToast, VStack
 } from "@chakra-ui/react";
 import axios from "axios";
 import {DeleteIcon} from "@chakra-ui/icons";
 import WithAuth from "../login/withAuth";
+import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
+import {Divider} from "@chakra-ui/layout";
 
 const App = () => {
 
     const [isOpen, setIsOpen] = useState(false)
+    const [newPassVal, setNewPassVal] = useState('')
 
     const cancelRef = React.useRef()
+    const toast = useToast()
 
     const closePopup = () => {
         setIsOpen(false)
@@ -28,42 +32,151 @@ const App = () => {
         window.location.reload()
     }
 
+    const validatePassword = (value: string) => {
+        let error
+        if (!value || value.length === 0) {
+            error = 'Ein Passwort muss angegeben werden'
+        }
+        return error
+    }
+
+    const validateNewPassword = (value: string) => {
+        let error
+        if (!newPassVal || newPassVal.length < 8) {
+            error = 'Das Passwort ist zu kurz! Es muss mind. 8 Zeichen enthalten'
+        }
+        return error
+    }
+
+    const validateNewPasswordRepeat = (value: string) => {
+        let error
+        if (!value || value !== newPassVal) {
+            error = 'Die Passwörter stimmen nicht über ein'
+        }
+        return error
+    }
+
     return (
-        <>
-            <Button leftIcon={<DeleteIcon />} borderWidth='1px' borderRadius='lg' colorScheme='red'
-                    marginLeft='0.25rem' size='sm' onClick={() => {
-                setIsOpen(true)
-            }}>
-                ACCOUNT LÖSCHEN
-            </Button>
+        <Center>
+            <VStack width='100%'>
+                <Container>
+                    <Formik
+                        initialValues={{
+                            password: '',
+                            newPassword: '',
+                            newPasswordRepeat: ''
+                        }}
+                        onSubmit={async (values, actions) => {
+                            try {
+                                await axios.put('http://localhost:4000/api/me/password', {
+                                    'currPass': values.password,
+                                    'newPass': newPassVal
+                                },{
+                                    withCredentials: true,
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }})
 
-            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
-                <AlertDialogOverlay>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            Account Löschen
-                        </AlertDialogHeader>
+                                actions.setFieldValue('password', '', false)
+                                setNewPassVal('')
+                                actions.setFieldValue('newPassword', '', false)
+                                actions.setFieldValue('newPasswordRepeat', '', false)
 
-                        <AlertDialogBody>
-                            Bist du sicher? Dadurch wird der Account und all deine Charaktere <b>DAUERHAFT</b> gelöscht!
-                        </AlertDialogBody>
+                                toast({
+                                    title: 'Passwort wurde geändert',
+                                    description: "Das Passwort wurde erfolgreich geändert.",
+                                    status: 'success',
+                                    duration: 9000,
+                                    isClosable: true,
+                                })
 
-                        <AlertDialogFooter>
-                            <Button ref={cancelRef.current} onClick={closePopup}>
-                                Abbrechen
-                            </Button>
-                            <Button colorScheme='red' onClick={async () => {
-                                await deleteAcc()
-                                closePopup()
-                            }} ml={3}>
-                                Löschen
-                            </Button>
-                        </AlertDialogFooter>
+                            } catch (e) {
+                                actions.setErrors({
+                                    password: 'Das Passwort ist Falsch!'
+                                })
+                            }
+                        }}
+                    >
+                        {(props: FormikProps<any>) => (
+                            <Form>
+                                <Flex direction="column">
+                                    <Field name="password"  validate={validatePassword}>
+                                        {({field, form}: FieldProps<any>) => (
+                                            <FormControl
+                                                isInvalid={form.errors.password !== undefined && form.touched.password !== undefined}>
+                                                <FormLabel htmlFor="password">Aktuelles Passwort</FormLabel>
+                                                <Input {...field} id="pass" type="password" placeholder="Aktuelles Passwort"/>
+                                                <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Field name="newPassword" validate={validateNewPassword}>
+                                        {({field, form}: FieldProps<any>) => (
+                                            <FormControl mt={3}
+                                                         isInvalid={form.errors.newPassword !== undefined && form.touched.newPassword !== undefined}>
+                                                <FormLabel htmlFor="newPassword">Neues Passwort</FormLabel>
+                                                <Input {...field} id="newPass" type="password" value={newPassVal} onChange={evt => setNewPassVal(evt.target.value)} placeholder="Neues Passwort"/>
+                                                <FormErrorMessage>{form.errors.newPassword}</FormErrorMessage>
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Field name="newPasswordRepeat" validate={validateNewPasswordRepeat}>
+                                        {({field, form}: FieldProps<any>) => (
+                                            <FormControl mt={3}
+                                                         isInvalid={form.errors.newPasswordRepeat !== undefined && form.touched.newPasswordRepeat !== undefined}>
+                                                <FormLabel htmlFor="newPasswordRepeat">Neues Passwort Wiederholen</FormLabel>
+                                                <Input {...field} id="newPassRep" type="password" placeholder="Neues Passwort Wiederholen"/>
+                                                <FormErrorMessage>{form.errors.newPasswordRepeat}</FormErrorMessage>
+                                            </FormControl>
+                                        )}
+                                    </Field>
+                                    <Flex justifyContent="end">
+                                        <Button colorScheme="blue" mt={4} ml="auto" type="submit"
+                                                isLoading={props.isSubmitting}>Ändern</Button>
+                                    </Flex>
+                                </Flex>
+                            </Form>
+                        )}
+                    </Formik>
+                </Container>
+                <Container>
+                    <Button leftIcon={<DeleteIcon/>} borderWidth='1px' borderRadius='lg' colorScheme='red'
+                            float='right' position='relative' marginTop='100%' size='sm' onClick={() => {
+                        setIsOpen(true)
+                    }}>
+                        ACCOUNT LÖSCHEN
+                    </Button>
 
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
-        </>
+                    <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+                        <AlertDialogOverlay>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    Account Löschen
+                                </AlertDialogHeader>
+
+                                <AlertDialogBody>
+                                    Bist du sicher? Dadurch wird der Account und all deine
+                                    Charaktere <b>DAUERHAFT</b> gelöscht!
+                                </AlertDialogBody>
+
+                                <AlertDialogFooter>
+                                    <Button ref={cancelRef.current} onClick={closePopup}>
+                                        Abbrechen
+                                    </Button>
+                                    <Button colorScheme='red' onClick={async () => {
+                                        await deleteAcc()
+                                        closePopup()
+                                    }} ml={3}>
+                                        Löschen
+                                    </Button>
+                                </AlertDialogFooter>
+
+                            </AlertDialogContent>
+                        </AlertDialogOverlay>
+                    </AlertDialog>
+                </Container>
+            </VStack>
+        </Center>
     )
 }
 

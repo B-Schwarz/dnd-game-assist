@@ -64,8 +64,7 @@ const changeOwnPassword = (req, res) => {
                 await u.save()
                 res.sendStatus(200)
             })
-            .catch((e) => {
-                console.log(e)
+            .catch(() => {
                 res.sendStatus(401)
             })
     } else {
