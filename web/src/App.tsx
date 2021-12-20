@@ -3,7 +3,8 @@ import './App.css';
 import {
     BrowserRouter as Router,
     Route,
-    Routes
+    Routes,
+    Navigate
 } from "react-router-dom";
 import Character from "./character-sheet/character";
 import Login from "./login/login"
@@ -21,12 +22,16 @@ function App() {
                 <Fragment>
                     <Routes>
                         <Route path="/login" element={
-                            <><Menu selected={SelectedEnum.NONE}/><Login/></>}/>
-                        <Route path="/character" element={<><Menu selected={SelectedEnum.CHARACTER}/><CharacterList/></>}/>
-                        <Route path="/character/:id" element={<><Menu selected={SelectedEnum.CHARACTER}/><Character/></>}/>
-                        <Route path="/initiative" element={<><Menu selected={SelectedEnum.INITIATIVE}/><Initiative/></>}/>
+                            <><Login/></>}/>
+                        <Route path="/character"
+                               element={<><Menu selected={SelectedEnum.CHARACTER}/><CharacterList/></>}/>
+                        <Route path="/character/:id"
+                               element={<><Menu selected={SelectedEnum.CHARACTER}/><Character/></>}/>
+                        <Route path="/initiative"
+                               element={<><Menu selected={SelectedEnum.INITIATIVE}/><Initiative/></>}/>
                         <Route path="/settings" element={<><Menu selected={SelectedEnum.SETTINGS}/><Settings/></>}/>
                         <Route path="/admin" element={<><Menu selected={SelectedEnum.ADMIN}/><Admin/></>}/>
+                        <Route path="*" element={<Navigate  to='/character' replace/>}/>
                     </Routes>
                 </Fragment>
             </Router>

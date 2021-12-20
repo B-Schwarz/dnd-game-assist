@@ -2,36 +2,33 @@ import React, {useEffect, useState} from "react";
 import {
     AccordionButton,
     AccordionItem,
-    AccordionPanel, Badge,
-    Box,
-    Grid, GridItem,
+    AccordionPanel,
+    Badge,
+    Box, Button, ButtonGroup, ExpandedIndex,
+    Grid,
+    GridItem,
     Progress,
     Spacer,
     Switch,
     Text
 } from "@chakra-ui/react";
-import {DnDCharacter} from "dnd-character-sheets";
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {getIcon} from "./status-icons";
+import {Player} from "./player.type";
+import axios from "axios";
+import {IoEyeSharp, IoEyeOffSharp} from "react-icons/io5";
 
-const App = (props: {
-    char: DnDCharacter,
-    initiative: number,
-    isMaster: boolean,
-    statusEffects?: StatusEffectsEnum[],
-    npc?: boolean,
-    hidden?: boolean
-}) => {
+const App = (props: { p: Player, f: boolean, l: boolean}) => {
 
-    const hp = props.char.hp || '0'
-    const tempHp = props.char.tempHp || '0'
-    const maxHp = props.char.maxHp || '0'
+    const hp = props.p.character.hp || '0'
+    const tempHp = props.p.character.tempHp || '0'
+    const maxHp = props.p.character.maxHp || '0'
 
-    const ac = props.char.ac || '0'
-    const statusEffects = props.statusEffects || []
+    const ac = props.p.character.ac || '0'
+    const statusEffects = props.p.statusEffects || []
 
-    const npc = props.npc || false
-    const hidden = props.hidden || false
+    const npc = props.p.npc || false
+    const hidden = props.p.hidden || false
 
     const [blind, setBlind] = useState(false)
     const [poison, setPoison] = useState(false)
@@ -87,19 +84,33 @@ const App = (props: {
 
     function createStatusIcons() {
         setEffects([])
+        const e = []
 
         if (down) {
             // @ts-ignore
             setEffects(e => [...e, getIcon(StatusEffectsEnum.DOWNED)])
+            e.push(StatusEffectsEnum.DOWNED)
         }
         if (blind) {
             // @ts-ignore
             setEffects(e => [...e, getIcon(StatusEffectsEnum.BLIND)])
+            e.push(StatusEffectsEnum.BLIND)
         }
         if (poison) {
             // @ts-ignore
             setEffects(e => [...e, getIcon(StatusEffectsEnum.POISONED)])
+            e.push(StatusEffectsEnum.POISONED)
         }
+
+        if (props.p.isMaster) {
+            props.p.statusEffects = e
+            savePlayer()
+        }
+    }
+
+    function savePlayer() {
+        axios.put('http://localhost:4000/api/initiative/player', {player: props.p}, {withCredentials: true})
+            .catch(() => {})
     }
 
     function toggleEffects(s: StatusEffectsEnum) {
@@ -130,54 +141,102 @@ const App = (props: {
         createStatusIcons()
     }, [blind, down, poison])
 
-    if (!props.isMaster && hidden) {
+    useEffect(() => {
+        props.p.hidden = hide
+        savePlayer()
+    }, [hide])
+
+    if (!props.p.isMaster && hidden) {
         return (
             <></>
         )
     }
 
+    function writePlayerMetadata() {
+        if (!npc || props.p.isMaster) {
+            return (
+                <React.Fragment>
+                    {divider()}
+                    {write('HP:', calcHp())}
+                </React.Fragment>
+            )
+        } else {
+            return (<React.Fragment/>)
+        }
+    }
+
+    function createHPBar() {
+        if (!npc || props.p.isMaster) {
+            return (
+                <React.Fragment>
+                    <Progress size='sm' colorScheme='yellow'
+                              value={Number(hp) + Number(tempHp)}
+                              max={Number(calcMaxHp())}/>
+                    <Progress size='sm' colorScheme='red' translateY='-0.5rem' transform='auto' value={Number(hp)}
+                              max={Number(calcMaxHp())} bg='0'/>
+                </React.Fragment>
+            )
+        } else {
+            return (<React.Fragment/>)
+        }
+    }
+
+    function createHideButton() {
+        if (!hide) {
+            return (<Button bg="blue.100" borderRadius="0px" onClick={() => {
+                setHide(true)
+                createHideButton()
+            }}><IoEyeSharp/></Button>)
+        } else {
+            return (
+                <Button bg="purple.100" borderRadius="0px" onClick={() => {
+                    setHide(false)
+                    createHideButton()
+                }}><IoEyeOffSharp/></Button>
+            )
+        }
+    }
+
     return (
-        <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
-                       padding='0.4rem 0.75rem'>
-            <AccordionButton _expanded={{bg: '#ebebeb'}}>
-                {write('', props.char.name!)}
-                {divider()}
-                {write('HP:', calcHp())}
-                {hide &&
-                    <>
-                    <Box marginLeft='0.5rem'></Box><Badge colorScheme='teal'>Hidden</Badge><Box marginRight='0.5rem'></Box>
-                    </>
+        <>
+            <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
+                           padding='0.4rem 0.75rem'
+                           borderColor={(props.p.isTurn) ? 'gold' : 'blackAlpha.200'}>
+                <ButtonGroup isAttached w='100%'>
+                    {props.p.isMaster && createHideButton()}
+                    <AccordionButton _expanded={{bg: '#ebebeb'}}>
+                        {write('', props.p.character.name!)}
+                        {writePlayerMetadata()}
+                        {hide &&
+                            <>
+                                <Box marginLeft='0.5rem'/><Badge colorScheme='teal'>VERSTECKT</Badge><Box
+                                marginRight='0.5rem'/>
+                            </>
+                        }
+                        {effects}
+                        <Spacer/>
+                        {(!npc || props.p.isMaster) && write('AC:', String(ac))}
+                        {(!npc || props.p.isMaster) && divider()}
+                        {write('Initiative:', String(props.p.initiative))}
+                    </AccordionButton>
+                </ButtonGroup>
+                {createHPBar()}
+                {props.p.isMaster &&
+                    <AccordionPanel>
+                        <Grid templateColumns='repeat(5, 1fr)' gap={6}>
+                            <GridItem>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
+                                        isChecked={blind}>Blind</Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
+                                        isChecked={poison}>Vergifted</Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.DOWNED)} isChecked={down}>Am
+                                    Boden</Switch><br/>
+                            </GridItem>
+                        </Grid>
+                    </AccordionPanel>
                 }
-                {effects}
-                <Spacer/>
-                {write('AC:', String(ac))}
-                {divider()}
-                {write('Initiative:', String(props.initiative))}
-            </AccordionButton>
-            <Progress size='sm' colorScheme='yellow'
-                      value={Number(hp) + Number(tempHp)}
-                      max={Number(calcMaxHp())}/>
-            <Progress size='sm' colorScheme='red' translateY='-0.5rem' transform='auto' value={Number(hp)}
-                      max={Number(calcMaxHp())} bg='0'/>
-            { props.isMaster &&
-                <AccordionPanel>
-                    <Grid templateColumns='repeat(5, 1fr)' gap={6}>
-                        <GridItem>
-                            <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
-                                    isChecked={blind}>Blind</Switch><br/>
-                            <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
-                                    isChecked={poison}>Vergifted</Switch><br/>
-                            <Switch onChange={() => toggleEffects(StatusEffectsEnum.DOWNED)} isChecked={down}>Am
-                                Boden</Switch><br/>
-                        </GridItem>
-                        <GridItem>
-                            <Switch onChange={(event) => setHide(event.target.checked)}
-                                    isChecked={hide}>Versteckt</Switch><br/>
-                        </GridItem>
-                    </Grid>
-                </AccordionPanel>
-            }
-        </AccordionItem>
+            </AccordionItem>
+        </>
     )
 }
 

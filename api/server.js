@@ -14,6 +14,7 @@ const {
     deleteOwnCharacter
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
+const {setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, updatePlayer, movePlayer} = require("./initiative");
 
 const port = 4000;
 
@@ -84,6 +85,13 @@ app.get('/api/me', isAuth, (req, res) => {
 app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
     res.sendStatus(200)
 })
+
+app.put('/api/initiative', isAuth, isMaster, setPlayer)
+app.get('/api/initiative', isAuth, getPlayerPlayer)
+app.get('/api/initiative/master', isAuth, isMaster, getPlayerMaster)
+app.get('/api/initiative/sort', isAuth, isMaster, sortPlayer)
+app.put('/api/initiative/player', isAuth, isMaster, updatePlayer)
+app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
 
 const start = async () => {
     try {
