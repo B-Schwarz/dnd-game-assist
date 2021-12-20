@@ -30,3 +30,5 @@ running ``npm run start``
 | /api/initiative/sort   |  `GET`   |                    `none`                    |       `master`       | Sorts the list by initiative and turn order               | `none`                                  |
 | /api/initiative/player |  `PUT`   |               `player:Player`                |       `master`       | Updates a single player, uniquely identified by turn nr   | `none`                                  |
 | /api/initiative/move   |  `PUT`   | `index:number`<br/>`direction:{'UP','DOWN'}` |       `master`       | Swaps the position of two players                         | `none`                                  |
+| /api/initiative/round  |  `GET`   |                    `none`                    |       `master`       | Gets the current round number                             | `none`                                  |
+| /api/initiative/round  |  `PUT`   |                `round:number`                |       `master`       | Sets the current round number                             | `none`                                  |

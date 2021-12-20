@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import WithAuth from "../login/withAuth";
-import {Divider} from "@chakra-ui/layout";
+import {Divider, Text} from "@chakra-ui/layout";
 import InitiaveEntry from "./initiave-entry";
 import {StatusEffectsEnum} from "./status-effects.enum";
-import {Accordion, Button, Center, Heading, HStack} from "@chakra-ui/react";
+import {Accordion, Button, Center, Heading, HStack, StackItem, VStack} from "@chakra-ui/react";
 import {DnDCharacter} from "dnd-character-sheets";
 import {Player} from "./player.type";
 import axios from "axios";
@@ -99,6 +99,7 @@ const App = () => {
     const [player, setPlayer] = useState<Player[]>([])
     const [isMaster, setIsMaster] = useState(false)
     const [updateInterval, setUpdateInterval] = useState<number>(0)
+    const [round, setRound] = useState<number>(0)
 
     function save(p: Player[]) {
         axios.put('http://localhost:4000/api/initiative', {player: p}).catch(() => {
@@ -117,6 +118,29 @@ const App = () => {
                 temp[i].isTurn = false
                 const next = (i+1) % temp.length
                 temp[next].isTurn = true
+                if (next < i) {
+                    axios.put('http://localhost:4000/api/initiative/round', {round: round+1})
+                        .catch(() => {})
+                    setRound(round + 1)
+                }
+                break
+            }
+        }
+        save(temp)
+    }
+
+    function prevTurn() {
+        const temp = _.cloneDeep(player)
+        for (let i = 0; i < temp.length; i++) {
+            if (temp[i].isTurn) {
+                temp[i].isTurn = false
+                const next = (i+temp.length-1) % temp.length
+                temp[next].isTurn = true
+                if (next > i) {
+                    axios.put('http://localhost:4000/api/initiative/round', {round: round-1})
+                        .catch(() => {})
+                    setRound(round - 1)
+                }
                 break
             }
         }
@@ -128,8 +152,6 @@ const App = () => {
             try {
                 axios.get('http://localhost:4000/api/initiative/master')
                     .then((r) => {
-                        // setPlayer([])
-                        // setPlayer(r.data)
                         updatePlayer(r.data)
                     }).catch(() => {setIsMaster(false)})
             } catch (_) {
@@ -138,8 +160,6 @@ const App = () => {
         } else {
             axios.get('http://localhost:4000/api/initiative')
                 .then((r) => {
-                    // setPlayer([])
-                    // setPlayer(r.data)
                     updatePlayer(r.data)
                 })
                 .catch(() => {
@@ -178,6 +198,11 @@ const App = () => {
         axios.get('http://localhost:4000/api/me/master')
             .then(() => {
                 setIsMaster(true)
+                axios.get('http://localhost:4000/api/initiative/round')
+                    .then((r) => {
+                        setRound(r.data.round)
+                    })
+                    .catch(() => {})
             })
             .catch(() => {
             })
@@ -200,21 +225,24 @@ const App = () => {
                 <HStack>
                     {
                         isMaster &&
-                        <>
-                            <Heading>Master</Heading>
-                            <Button colorScheme='teal' onClick={create}>Create</Button>
-                            <Button colorScheme='blue' onClick={() => save(player)}>Save</Button>
-                            <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
-                            <Button colorScheme='blue' onClick={sort}>Sort</Button>
-                            <Button colorScheme='green'>Add</Button>
-                        </>
+                        <VStack>
+                            <Heading>Master</Heading> {/*JUST FOR DEV*/}
+                            <Text fontSize='2xl'>Runde: {round}</Text>
+                            <StackItem>
+                                <Button colorScheme='teal' onClick={create}>Create</Button> {/*JUST FOR DEV*/}
+                                <Button colorScheme='blue' onClick={() => save(player)}>Save</Button> {/*JUST FOR DEV*/}
+                                <Button colorScheme='blue' onClick={prevTurn}>Vorheriger</Button>
+                                <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
+                                <Button colorScheme='blue' onClick={sort}>Sort</Button>
+                                <Button colorScheme='green'>Add</Button>
+                            </StackItem>
+                        </VStack>
                     }
                     {
                         !isMaster &&
-                        <>
-                            <Heading>Player</Heading>
-                            <Button colorScheme='blue' onClick={() => get(isMaster)}>Reload</Button>
-                        </>
+                        <React.Fragment>
+                            <Heading>Player</Heading> {/*JUST FOR DEV*/}
+                        </React.Fragment>
                     }
                 </HStack>
             </Center>

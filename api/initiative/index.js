@@ -2,6 +2,7 @@ const _ = require('lodash')
 
 let master = []
 let player = []
+let round = 0
 
 // set master
 // REQUIRES MASTER
@@ -39,8 +40,6 @@ const updateMaster = (req, res) => {
     updatePlayerData()
     res.sendStatus(200)
 }
-
-// add master (later)
 
 // Sort
 // REQUIRES MASTER
@@ -81,6 +80,24 @@ const movePlayer = (req, res) => {
     } catch (_) {
     }
 
+}
+
+// REQUIES MASTER
+const setRound = (req, res) => {
+    let r = req.body.round
+
+    try {
+        r = Number(r)
+        round = r
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(400)
+    }
+}
+
+// REQUIRES MASTER
+const getRound = (req, res) => {
+    res.send({round: round})
 }
 
 const setTurn = () => {
@@ -126,5 +143,7 @@ module.exports = {
     getPlayerMaster,
     getPlayerPlayer,
     updatePlayer: updateMaster,
-    movePlayer
+    movePlayer,
+    getRound,
+    setRound
 }

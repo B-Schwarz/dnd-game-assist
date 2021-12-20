@@ -1,9 +1,6 @@
 const express = require('express');
 const app = express();
 const {connectDB} = require('./db')
-const {mongoose} = require('mongoose')
-const {Character} = require('./db/models/character.model')
-const {User} = require('./db/models/user.model')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 
@@ -14,7 +11,10 @@ const {
     deleteOwnCharacter
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
-const {setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, updatePlayer, movePlayer} = require("./initiative");
+const {
+    setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, updatePlayer, movePlayer,
+    setRound, getRound
+} = require("./initiative");
 
 const port = 4000;
 
@@ -95,6 +95,8 @@ app.get('/api/initiative/master', isAuth, isMaster, getPlayerMaster)
 app.get('/api/initiative/sort', isAuth, isMaster, sortPlayer)
 app.put('/api/initiative/player', isAuth, isMaster, updatePlayer)
 app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
+app.put('/api/initiative/round', isAuth, isMaster, setRound)
+app.get('/api/initiative/round', isAuth, isMaster, getRound)
 
 const start = async () => {
     try {
