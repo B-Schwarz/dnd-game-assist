@@ -10,15 +10,16 @@ import {
     Progress,
     Spacer,
     Switch,
-    Text
+    Text, VStack
 } from "@chakra-ui/react";
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {getIcon} from "./status-icons";
 import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeSharp, IoEyeOffSharp} from "react-icons/io5";
+import {ArrowDownIcon, ArrowUpIcon} from "@chakra-ui/icons";
 
-const App = (props: { p: Player, f: boolean, l: boolean}) => {
+const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
 
     const hp = props.p.character.hp || '0'
     const tempHp = props.p.character.tempHp || '0'
@@ -37,6 +38,7 @@ const App = (props: { p: Player, f: boolean, l: boolean}) => {
     const [effects, setEffects] = useState([])
 
     const [hide, setHide] = useState(hidden)
+    const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
     function write(key: string, value: string) {
         return (
@@ -102,7 +104,7 @@ const App = (props: { p: Player, f: boolean, l: boolean}) => {
             e.push(StatusEffectsEnum.POISONED)
         }
 
-        if (props.p.isMaster) {
+        if (isMaster) {
             props.p.statusEffects = e
             savePlayer()
         }
@@ -110,7 +112,8 @@ const App = (props: { p: Player, f: boolean, l: boolean}) => {
 
     function savePlayer() {
         axios.put('http://localhost:4000/api/initiative/player', {player: props.p}, {withCredentials: true})
-            .catch(() => {})
+            .catch(() => {
+            })
     }
 
     function toggleEffects(s: StatusEffectsEnum) {
@@ -135,14 +138,15 @@ const App = (props: { p: Player, f: boolean, l: boolean}) => {
         for (let e of statusEffects) {
             toggleEffects(e)
         }
-    }, [])
+    }, [isMaster])
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison])
+    }, [blind, down, poison, isMaster])
 
     useEffect(() => {
         props.p.hidden = hide
+        if (props.p.isMaster)
         savePlayer()
     }, [hide])
 
@@ -197,19 +201,33 @@ const App = (props: { p: Player, f: boolean, l: boolean}) => {
         }
     }
 
+    function move(direction: string) {
+        axios.put('http://localhost:4000/api/initiative/move', {
+            index: props.i,
+            direction: direction
+        }, {withCredentials: true})
+            .catch(() => {})
+    }
+
     return (
         <>
             <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
-                           padding='0.4rem 0.75rem'
-                           borderColor={(props.p.isTurn) ? 'gold' : 'blackAlpha.200'}>
+                           padding='0.4rem 0.75rem' background={(props.p.isTurn) ? '#fff9e1' : '#fafafa'}
+                           borderColor={(props.p.isTurn) ? 'black' : 'blackAlpha.200'}>
                 <ButtonGroup isAttached w='100%'>
                     {props.p.isMaster && createHideButton()}
-                    <AccordionButton _expanded={{bg: '#ebebeb'}}>
+                    <AccordionButton _expanded={ props.p.isMaster ? {bg: '#ebebeb'} : undefined} style={{ outline: 'none', border: 'none', boxShadow: 'none'}}>
                         {write('', props.p.character.name!)}
                         {writePlayerMetadata()}
                         {hide &&
                             <>
                                 <Box marginLeft='0.5rem'/><Badge colorScheme='teal'>VERSTECKT</Badge><Box
+                                marginRight='0.5rem'/>
+                            </>
+                        }
+                        {npc &&
+                            <>
+                                <Box marginLeft='0.5rem'/><Badge colorScheme='green'>NPC</Badge><Box
                                 marginRight='0.5rem'/>
                             </>
                         }
@@ -219,6 +237,10 @@ const App = (props: { p: Player, f: boolean, l: boolean}) => {
                         {(!npc || props.p.isMaster) && divider()}
                         {write('Initiative:', String(props.p.initiative))}
                     </AccordionButton>
+                    {props.p.isMaster && <React.Fragment><ButtonGroup isAttached>
+                        <Button size='sm' isDisabled={props.f} onClick={() => move('up')}><ArrowUpIcon/></Button>
+                        <Button size='sm' isDisabled={props.l} onClick={() => move('down')}><ArrowDownIcon/></Button>
+                    </ButtonGroup></React.Fragment>}
                 </ButtonGroup>
                 {createHPBar()}
                 {props.p.isMaster &&

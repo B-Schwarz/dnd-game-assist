@@ -19,6 +19,7 @@ running ``npm run start``
 | /api/char/:id          | `DELETE` |                    `none`                    | `admin`<br/>`master` | Deletes someones character sheet                          | `none`                                  |
 | /api/char/me/:id       | `DELETE` |                    `none`                    |        `user`        | Deletes one of my character sheets                        | `none`                                  |
 | /api/me/admin          |  `GET`   |                    `none`                    |       `admin`        | Gets if user is admin                                     | `none`                                  |
+| /api/me/master         |  `GET`   |                    `none`                    |       `admin`        | Gets if user is master                                    | `none`                                  |
 | /api/me                |  `GET`   |                    `none`                    |        `user`        | Gets if user is logged in                                 | `none`                                  |
 | /api/me/password       |  `PUT`   |    `currPass:string`<br/>`newPass:string`    |        `user`        | Changes the user password                                 | `none`                                  |
 | /api/me/delete         | `DELETE` |                    `none`                    |        `user`        | Deletes your own user account + all your character sheets | `none`                                  |

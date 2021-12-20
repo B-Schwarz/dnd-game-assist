@@ -23,7 +23,7 @@ const getPlayerMaster = (req, res) => {
 }
 
 // update master
-const updatePlayer = (req, res) => {
+const updateMaster = (req, res) => {
     if (master.length > 0) {
         const p = req.body.player
         if (p) {
@@ -109,7 +109,7 @@ const updatePlayerData = () => {
         if (Boolean(p.isTurn) && Boolean(p.hidden)) {
             p.isTurn = false
             for (let j = 0; j < temp.length; j++) {
-                const p2 = temp[j % temp.length]
+                const p2 = temp[(j+i) % temp.length]
                 if (!Boolean(p2.hidden)) {
                     p2.isTurn = true
                     break
@@ -125,6 +125,6 @@ module.exports = {
     sortPlayer,
     getPlayerMaster,
     getPlayerPlayer,
-    updatePlayer,
+    updatePlayer: updateMaster,
     movePlayer
 }

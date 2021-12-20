@@ -85,6 +85,9 @@ app.get('/api/me', isAuth, (req, res) => {
 app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
     res.sendStatus(200)
 })
+app.get('/api/me/master', isAuth, isMaster, (req, res) => {
+    res.sendStatus(200)
+})
 
 app.put('/api/initiative', isAuth, isMaster, setPlayer)
 app.get('/api/initiative', isAuth, getPlayerPlayer)

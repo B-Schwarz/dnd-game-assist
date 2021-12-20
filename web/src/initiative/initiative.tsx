@@ -6,8 +6,8 @@ import {StatusEffectsEnum} from "./status-effects.enum";
 import {Accordion, Button, Center, Heading, HStack} from "@chakra-ui/react";
 import {DnDCharacter} from "dnd-character-sheets";
 import {Player} from "./player.type";
-import character from "../character-sheet/character";
 import axios from "axios";
+import _ from "lodash";
 
 const App = () => {
 
@@ -96,62 +96,103 @@ const App = () => {
         return [p1p, p2p, p3p, p4p]
     }
 
-    const [player, setPlayer] = useState([])
-    const [isMaster, setIsMaster] = useState(true)
+    const [player, setPlayer] = useState<Player[]>([])
+    const [isMaster, setIsMaster] = useState(false)
+    const [updateInterval, setUpdateInterval] = useState<number>(0)
 
-    function save() {
-        axios.put('http://localhost:4000/api/initiative', {player: player}, {
-            withCredentials: true
-        }).catch(() => {
+    function save(p: Player[]) {
+        axios.put('http://localhost:4000/api/initiative', {player: p}).catch(() => {
         })
     }
 
     function create() {
-        axios.put('http://localhost:4000/api/initiative', {player: createMasterPlayer()}, {
-            withCredentials: true
-        }).catch(() => {
+        axios.put('http://localhost:4000/api/initiative', {player: createMasterPlayer()}).catch(() => {
         })
     }
 
-    function get() {
-        if (isMaster) {
-            axios.get('http://localhost:4000/api/initiative/master', {withCredentials: true})
-                .then((r) => {
-                    setPlayer([])
-                    setPlayer(r.data)
-                })
-                .catch(() => {
-                    setIsMaster(false)
-                    axios.get('http://localhost:4000/api/initiative', {withCredentials: true})
-                        .then((r) => {
-                            setPlayer([])
-                            setPlayer(r.data)
-                        })
-                        .catch(() => {
-                        })
-                })
+    function nextTurn() {
+        const temp = _.cloneDeep(player)
+        for (let i = 0; i < temp.length; i++) {
+            if (temp[i].isTurn) {
+                temp[i].isTurn = false
+                const next = (i+1) % temp.length
+                temp[next].isTurn = true
+                break
+            }
+        }
+        save(temp)
+    }
+
+    function get(master: boolean) {
+        if (master) {
+            try {
+                axios.get('http://localhost:4000/api/initiative/master')
+                    .then((r) => {
+                        // setPlayer([])
+                        // setPlayer(r.data)
+                        updatePlayer(r.data)
+                    }).catch(() => {setIsMaster(false)})
+            } catch (_) {
+                setIsMaster(false)
+            }
         } else {
-            axios.get('http://localhost:4000/api/initiative', {withCredentials: true})
+            axios.get('http://localhost:4000/api/initiative')
                 .then((r) => {
-                    setPlayer([])
-                    setPlayer(r.data)
+                    // setPlayer([])
+                    // setPlayer(r.data)
+                    updatePlayer(r.data)
                 })
                 .catch(() => {
                 })
         }
     }
 
+    function updatePlayer(newPlayer: Player[]) {
+        if (player.length === 0) {
+            setPlayer(newPlayer)
+        } else {
+            if (newPlayer.length !== player.length) {
+                setPlayer([])
+                setPlayer(newPlayer)
+            } else {
+                for (let i = 0; i < player.length; i++) {
+                    if (!_.isEqual(player[i], newPlayer[i])) {
+                        setPlayer([])
+                        setPlayer(newPlayer)
+                        break
+                    }
+                }
+            }
+        }
+    }
+
     function sort() {
-        axios.get('http://localhost:4000/api/initiative/sort', {withCredentials: true})
+        axios.get('http://localhost:4000/api/initiative/sort')
             .then(() => {
-                get()
+                get(isMaster)
             }).catch(() => {
         })
     }
 
     useEffect(() => {
-        get()
+        axios.get('http://localhost:4000/api/me/master')
+            .then(() => {
+                setIsMaster(true)
+            })
+            .catch(() => {
+            })
     }, [])
+
+    useEffect(() => {
+        if (updateInterval === 0) {
+            setTimeout(() => {
+                get(isMaster)
+                setUpdateInterval(0)
+            }, 350)
+            setUpdateInterval(1)
+        }
+
+    }, [isMaster, player, updateInterval])
 
     return (
         <>
@@ -162,8 +203,8 @@ const App = () => {
                         <>
                             <Heading>Master</Heading>
                             <Button colorScheme='teal' onClick={create}>Create</Button>
-                            <Button colorScheme='blue' onClick={save}>Save</Button>
-                            <Button colorScheme='blue' onClick={get}>Reload</Button>
+                            <Button colorScheme='blue' onClick={() => save(player)}>Save</Button>
+                            <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
                             <Button colorScheme='blue' onClick={sort}>Sort</Button>
                             <Button colorScheme='green'>Add</Button>
                         </>
@@ -172,7 +213,7 @@ const App = () => {
                         !isMaster &&
                         <>
                             <Heading>Player</Heading>
-                            <Button colorScheme='blue' onClick={get}>Reload</Button>
+                            <Button colorScheme='blue' onClick={() => get(isMaster)}>Reload</Button>
                         </>
                     }
                 </HStack>
@@ -182,7 +223,7 @@ const App = () => {
                 <Accordion allowToggle width='80%'>
                     {
                         player.map((m, i) => (
-                            <InitiaveEntry p={m} f={i === 0} l={i === player.length-1} key={i}/>
+                            <InitiaveEntry p={m} i={i} f={i === 0} l={i === player.length - 1} key={i}/>
                         ))
                     }
                 </Accordion>
