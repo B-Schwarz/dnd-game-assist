@@ -22,18 +22,20 @@ everytime they're changed.
 
 ## Combat tracker
 
-[ ] Tracks:
+[X] Tracks:
 * initiative
 * health
 * armor class
 * status effects (poisoned, knocked down, etc.)
-* turn number
+* turn number (NEW: only for master)
 * character whose turn it is
 
 [ ] Automatically rolls initiative for NPCs.  
-[ ] Sorted by Initiative.  
-[ ] Button to mark character's turn  
-[ ] Dungeon Master can hide characters from players 
+[X] Sorted by Initiative. (NEW: Manually)  
+[X] Button to mark character's turn  
+[X] Dungeon Master can hide characters from players  
+[X] Hidden players turn is skipped for non master  
+[X] Master can rearrange player list freely  
 
 ---
 
