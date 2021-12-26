@@ -38,6 +38,9 @@ everytime they're changed.
 [X] Master can rearrange player list freely  
 [X] Button to remove player from list  
 [X] Master is able to edit HP/Temp HP/Max HP and AC  
+[ ] Master is able to add players with initiative  
+[ ] Master is able to add encounter (auto initiative)  
+[ ] Master is able to add custom monster/npc  
 
 ---
 
