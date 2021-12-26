@@ -13,7 +13,7 @@ const {
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
     setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, movePlayer,
-    setRound, getRound, deleteMaster, updateMaster
+    setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster
 } = require("./initiative");
 
 const port = 4000;
@@ -94,7 +94,9 @@ app.get('/api/initiative', isAuth, getPlayerPlayer)
 app.get('/api/initiative/master', isAuth, isMaster, getPlayerMaster)
 app.get('/api/initiative/sort', isAuth, isMaster, sortPlayer)
 app.put('/api/initiative/player', isAuth, isMaster, updateMaster)
+app.post('/api/initiative/player', isAuth, isMaster, addMaster)
 app.delete('/api/initiative/player/:id', isAuth, isMaster, deleteMaster)
+app.delete('/api/initiative/player', isAuth, isMaster, deleteAllMaster)
 app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
 app.put('/api/initiative/round', isAuth, isMaster, setRound)
 app.get('/api/initiative/round', isAuth, isMaster, getRound)

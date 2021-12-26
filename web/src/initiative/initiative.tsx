@@ -3,46 +3,25 @@ import WithAuth from "../login/withAuth";
 import {Divider, Text} from "@chakra-ui/layout";
 import InitiaveEntry from "./initiave-entry";
 import {StatusEffectsEnum} from "./status-effects.enum";
-import {Accordion, Button, Center, Heading, HStack, StackItem, VStack} from "@chakra-ui/react";
+import {
+    Accordion,
+    Button,
+    Center,
+    Heading,
+    HStack,
+    Modal, ModalContent, ModalFooter,
+    ModalOverlay,
+    StackItem,
+    useDisclosure,
+    VStack
+} from "@chakra-ui/react";
 import {DnDCharacter} from "dnd-character-sheets";
 import {Player} from "./player.type";
 import axios from "axios";
 import _ from "lodash";
+import Add from "./add/add";
 
 const App = () => {
-
-    const tempChar = new DnDCharacter()
-    tempChar.name = 'Craigman'
-    tempChar.ac = '16'
-    tempChar.hp = '30'
-    tempChar.maxHp = '30'
-    tempChar.tempHp = '3'
-    tempChar.deathsaveSuccesses = 0
-    tempChar.deathsaveFailures = 0
-
-    const tempCharTwo = new DnDCharacter()
-    tempCharTwo.name = 'Jeremy'
-    tempCharTwo.ac = '14'
-    tempCharTwo.hp = '21'
-    tempCharTwo.maxHp = '32'
-    tempCharTwo.deathsaveSuccesses = 0
-    tempCharTwo.deathsaveFailures = 0
-
-    const tempCharThree = new DnDCharacter()
-    tempCharThree.name = 'Sneaky Assasin'
-    tempCharThree.ac = '15'
-    tempCharThree.hp = '30'
-    tempCharThree.maxHp = '30'
-    tempCharThree.deathsaveSuccesses = 0
-    tempCharThree.deathsaveFailures = 0
-
-    const tempCharFour = new DnDCharacter()
-    tempCharFour.name = 'Dummy'
-    tempCharFour.ac = '15'
-    tempCharFour.hp = '15'
-    tempCharFour.maxHp = '30'
-    tempCharFour.deathsaveSuccesses = 0
-    tempCharFour.deathsaveFailures = 0
 
     async function createMasterPlayer() {
         const p1 = await axios.get('http://localhost:4000/api/char/get/61bde2e1d908d9469fee4030')
@@ -88,6 +67,8 @@ const App = () => {
     const [isMaster, setIsMaster] = useState(false)
     const [updateInterval, setUpdateInterval] = useState<number>(0)
     const [round, setRound] = useState<number>(0)
+
+    const {isOpen, onOpen, onClose } = useDisclosure()
 
     function save(p: Player[]) {
         axios.put('http://localhost:4000/api/initiative', {player: p}).catch(() => {
@@ -192,6 +173,11 @@ const App = () => {
         })
     }
 
+    function reset() {
+        axios.delete('http://localhost:4000/api/initiative/player')
+            .catch(() => {})
+    }
+
     useEffect(() => {
         axios.get('http://localhost:4000/api/me/master')
             .then(() => {
@@ -237,7 +223,8 @@ const App = () => {
                                 <Button colorScheme='blue' onClick={prevTurn}>Vorheriger</Button>
                                 <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
                                 <Button colorScheme='blue' onClick={sort}>Sort</Button>
-                                <Button colorScheme='green'>Add</Button>
+                                <Button colorScheme='green' onClick={onOpen}>Add</Button>
+                                <Button colorScheme='red' onClick={reset}>RESET</Button>
                             </StackItem>
                         </VStack>
                     }
@@ -259,6 +246,16 @@ const App = () => {
                     }
                 </Accordion>
             </Center>
+            <Modal isOpen={isOpen} onClose={onClose} closeOnEsc isCentered
+                    scrollBehavior='inside'>
+                <ModalOverlay/>
+                <ModalContent maxW='35rem' maxH='40rem'>
+                    <Add/>
+                    <ModalFooter>
+                        <Button onClick={onClose}>Schließen</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </>
     )
 }

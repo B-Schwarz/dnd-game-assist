@@ -19,11 +19,21 @@ const getPlayerPlayer = (req, res) => {
 }
 
 // get master master
+// REQUIRES MASTER
 const getPlayerMaster = (req, res) => {
     res.send(master)
 }
 
+// clear master
+// REQUIRES MASTER
+const deleteAllMaster = (req, res) => {
+    master = []
+    updatePlayerData()
+    res.sendStatus(200)
+}
+
 // delete master
+// REQUIRES MASTER
 const deleteMaster = (req, res) => {
     if (master.length > 0) {
         const p = req.params.id
@@ -36,20 +46,59 @@ const deleteMaster = (req, res) => {
 }
 
 // update master
+// REQUIRES MASTER
 const updateMaster = (req, res) => {
     if (master.length > 0) {
         const p = req.body.player
         if (p) {
-            for (let i = 0; i < master.length; i++) {
-                if (master[i].turn === p.turn) {
-                    master[i] = p
-                    master[i].isMaster = true
-                    break
+            try {
+                for (let i = 0; i < master.length; i++) {
+                    if (master[i].turn === p.turn) {
+                        master[i] = p
+                        master[i].isMaster = true
+                        break
+                    }
                 }
+            } catch (_) {
             }
         }
     }
     updatePlayerData()
+    res.sendStatus(200)
+}
+
+// Add
+// REQUIRES MASTER
+const addMaster = (req, res) => {
+    const p = req.body.player
+
+    if (p) {
+        try {
+            p.isMaster = true
+
+            if (master.length > 0) {
+                let i = 1
+                let a = false
+                for (const m of master) {
+                    if (m.character.name === p.character.name) {
+                        m.character.name += ' (' + i + ')'
+                        i++
+                        a = true
+                    }
+                }
+
+                if (a) {
+                    p.character.name += ' (' + i + ')'
+                }
+            }
+
+            master.push(p)
+            setTurn()
+            updatePlayerData()
+        } catch (_) {
+        }
+    }
+
     res.sendStatus(200)
 }
 
@@ -154,8 +203,10 @@ module.exports = {
     sortPlayer,
     getPlayerMaster,
     getPlayerPlayer,
+    addMaster,
     updateMaster,
     deleteMaster,
+    deleteAllMaster,
     movePlayer,
     getRound,
     setRound

@@ -30,7 +30,6 @@ everytime they're changed.
 * turn number (NEW: only for master)
 * character whose turn it is
 
-[ ] Automatically rolls initiative for NPCs.  
 [X] Sorted by Initiative. (NEW: Manually)  
 [X] Button to mark character's turn  
 [X] Dungeon Master can hide characters from players  
@@ -38,7 +37,7 @@ everytime they're changed.
 [X] Master can rearrange player list freely  
 [X] Button to remove player from list  
 [X] Master is able to edit HP/Temp HP/Max HP and AC  
-[ ] Master is able to add players with initiative  
+[X] Master is able to add players with initiative  
 [ ] Master is able to add encounter (auto initiative)  
 [ ] Master is able to add custom monster/npc (auto initiative)  
 [X] Master is able to see saving throw modifiers  
