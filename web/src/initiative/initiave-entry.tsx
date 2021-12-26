@@ -8,7 +8,7 @@ import {
     Button,
     ButtonGroup,
     Grid,
-    GridItem,
+    GridItem, Heading,
     HStack,
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -17,8 +17,8 @@ import {
     NumberInputStepper,
     Progress,
     Spacer,
-    Switch,
-    Text,
+    Switch, Table, Tbody, Td,
+    Text, Th, Thead, Tr,
     VStack
 } from "@chakra-ui/react";
 import {StatusEffectsEnum} from "./status-effects.enum";
@@ -60,9 +60,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
 
     const [hide, setHide] = useState(hidden)
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
-
-    const [schaden, setSchaden] = useState(0)
-    const [heilung, setHeilung] = useState(0)
 
     const onHpEdit = (val: string) => {
         const p: DnDCharacter = props.p.character
@@ -111,6 +108,118 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
     function divider() {
         return (
             <><Box marginLeft='0.5rem'/><Text>|</Text><Box marginRight='0.5rem'/></>
+        )
+    }
+
+    const strSave = () => {
+        try {
+            let save = Number(props.p.character.strSave)
+            if (props.p.character.strSaveChecked!) {
+                save += Number(props.p.character.proficiencyBonus)
+            }
+
+            if (!Number.isNaN(save)) {
+                    return (
+                        <Text>{save > 0 && '+'}{save}</Text>
+                    )
+            }
+
+        } catch (_){
+        }
+
+        return (
+            <Text>0</Text>
+        )
+
+    }
+
+    const dexSave = () => {
+        try {
+            let save = Number(props.p.character.dexSave)
+            if (props.p.character.dexSaveChecked!) {
+                save += Number(props.p.character.proficiencyBonus)
+            }
+            if (!Number.isNaN(save)) {
+                return (
+                    <Text>{save > 0 && '+'}{save}</Text>
+                )
+            }
+        } catch (_){}
+
+        return (
+            <Text>0</Text>
+        )
+    }
+
+    const conSave = () => {
+        try {
+            let save = Number(props.p.character.conSave)
+            if (props.p.character.conSaveChecked!) {
+                save += Number(props.p.character.proficiencyBonus)
+            }
+            if (!Number.isNaN(save)) {
+                return (
+                    <Text>{save > 0 && '+'}{save}</Text>
+                )
+            }
+        } catch (_){}
+
+        return (
+            <Text>0</Text>
+        )
+    }
+
+    const intSave = () => {
+        try {
+            let save = Number(props.p.character.intSave)
+            if (props.p.character.intSaveChecked!) {
+                save += Number(props.p.character.proficiencyBonus)
+            }
+            if (!Number.isNaN(save)) {
+                return (
+                    <Text>{save > 0 && '+'}{save}</Text>
+                )
+            }
+        } catch (_){}
+
+        return (
+            <Text>0</Text>
+        )
+    }
+
+    const wisSave = () => {
+        try {
+            let save = Number(props.p.character.wisSave)
+            if (props.p.character.wisSaveChecked!) {
+                save += Number(props.p.character.proficiencyBonus)
+            }
+            if (!Number.isNaN(save)) {
+                return (
+                    <Text>{save > 0 && '+'}{save}</Text>
+                )
+            }
+        } catch (_){}
+
+        return (
+            <Text>0</Text>
+        )
+    }
+
+    const chaSave = () => {
+        try {
+            let save = Number(props.p.character.chaSave)
+            if (props.p.character.chaSaveChecked!) {
+                save += Number(props.p.character.proficiencyBonus)
+            }
+            if (!Number.isNaN(save)) {
+                return (
+                    <Text>{save > 0 && '+'}{save}</Text>
+                )
+            }
+        } catch (_){}
+
+        return (
+            <Text>0</Text>
         )
     }
 
@@ -398,7 +507,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                 {createHPBar()}
                 {props.p.isMaster &&
                     <AccordionPanel>
-                        <Grid templateColumns='repeat(4, 1fr)' gap={6}>
+                        <Grid templateColumns='repeat(5, 1fr)' gap={0}>
                             <GridItem>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
                                         isChecked={blind}>Blind</Switch><br/>
@@ -448,6 +557,42 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                                         isChecked={unconscious}>
                                     Unconscious
                                 </Switch><br/>
+                            </GridItem>
+                            <GridItem>
+                                <Table size='sm'>
+                                    <Thead>
+                                        <Tr>
+                                            <Th>Saving Throw</Th>
+                                            <Th>Modifier</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        <Tr>
+                                            <Td>Strength</Td>
+                                            <Td>{strSave()}</Td>
+                                        </Tr>
+                                        <Tr>
+                                            <Td>Dexterity</Td>
+                                            <Td>{dexSave()}</Td>
+                                        </Tr>
+                                        <Tr>
+                                            <Td>Constitution</Td>
+                                            <Td>{conSave()}</Td>
+                                        </Tr>
+                                        <Tr>
+                                            <Td>Intelligence</Td>
+                                            <Td>{intSave()}</Td>
+                                        </Tr>
+                                        <Tr>
+                                            <Td>Wisdom</Td>
+                                            <Td>{wisSave()}</Td>
+                                        </Tr>
+                                        <Tr>
+                                            <Td>Charisma</Td>
+                                            <Td>{chaSave()}</Td>
+                                        </Tr>
+                                    </Tbody>
+                                </Table>
                             </GridItem>
                             <GridItem/>
                             <GridItem>

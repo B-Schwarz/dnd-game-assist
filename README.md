@@ -40,7 +40,8 @@ everytime they're changed.
 [X] Master is able to edit HP/Temp HP/Max HP and AC  
 [ ] Master is able to add players with initiative  
 [ ] Master is able to add encounter (auto initiative)  
-[ ] Master is able to add custom monster/npc  
+[ ] Master is able to add custom monster/npc (auto initiative)  
+[X] Master is able to see saving throw modifiers  
 
 ---
 
