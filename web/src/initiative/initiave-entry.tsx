@@ -61,6 +61,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
     const [hide, setHide] = useState(hidden)
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
+    const [schaden, setSchaden] = useState(0)
+    const [heilung, setHeilung] = useState(0)
+
     const onHpEdit = (val: string) => {
         const p: DnDCharacter = props.p.character
         p.hp = val
@@ -95,7 +98,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
 
     const onDelete = () => {
         axios.delete(`http://localhost:4000/api/initiative/player/${props.p.turn}`)
-            .catch(() => {})
+            .catch(() => {
+            })
     }
 
     function write(key: string, value: string) {
@@ -450,7 +454,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                                 <VStack>
                                     <HStack>
                                         <Text width='120px'>HP:</Text>
-                                        <NumberInput defaultValue={props.p.character.hp} min={0} onChange={onHpEdit}
+                                        <NumberInput defaultValue={props.p.character.hp || 0} min={0}
+                                                     onChange={onHpEdit}
                                                      max={Number(props.p.character.maxHp)}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
@@ -472,7 +477,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                                     </HStack>
                                     <HStack>
                                         <Text width='120px'>Max HP:</Text>
-                                        <NumberInput defaultValue={props.p.character.maxHp} min={0}
+                                        <NumberInput defaultValue={props.p.character.maxHp || 0} min={0}
                                                      onChange={onMaxHpEdit}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
@@ -483,7 +488,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                                     </HStack>
                                     <HStack>
                                         <Text width='120px'>AC:</Text>
-                                        <NumberInput defaultValue={props.p.character.ac} min={0}
+                                        <NumberInput defaultValue={props.p.character.ac || 0} min={0}
                                                      onChange={onAcEdit}>
                                             <NumberInputField/>
                                             <NumberInputStepper>

@@ -36,6 +36,8 @@ everytime they're changed.
 [X] Dungeon Master can hide characters from players  
 [X] Hidden players turn is skipped for non master  
 [X] Master can rearrange player list freely  
+[X] Button to remove player from list  
+[X] Master is able to edit HP/Temp HP/Max HP and AC  
 
 ---
 
