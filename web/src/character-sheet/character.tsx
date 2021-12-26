@@ -15,6 +15,7 @@ import WithAuth from "../login/withAuth";
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
     const [change, setChange] = useState(false)
+    const [isMaster, setIsMaster] = useState(true)
 
     const id = useParams().id
 
@@ -59,35 +60,46 @@ const App = () => {
 
     async function send() {
         const data = {character: character, charID: id}
-        await axios.post('http://localhost:4000/api/char', data, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).catch(async (e) => {
-            if (e.response.status === 401) {
-                await axios.post(`http://localhost:4000/api/char/me/${id}`, data, {withCredentials: true})
+        if (isMaster) {
+            axios.post('http://localhost:4000/api/char', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).catch(() => {
+                setIsMaster(false)
+                axios.post(`http://localhost:4000/api/char/me`, data)
                     .catch(() => {
                     })
-            }
-        })
+            })
+        } else {
+            axios.post(`http://localhost:4000/api/char/me`, data)
+                .catch(() => {
+                })
+        }
     }
 
     async function recv() {
-        axios.get(`http://localhost:4000/api/char/get/${id}`, {withCredentials: true})
-            .then((data) => {
-                updateCharacter(data.data.character)
-            })
-            .catch(async (e) => {
-                if (e.response.status === 401) {
-                    await axios.get(`http://localhost:4000/api/char/me/get/${id}`, {withCredentials: true})
+        if (isMaster) {
+            axios.get(`http://localhost:4000/api/char/get/${id}`)
+                .then((data) => {
+                    updateCharacter(data.data.character)
+                })
+                .catch(() => {
+                    axios.get(`http://localhost:4000/api/char/me/get/${id}`)
                         .then((data) => {
                             updateCharacter(data.data.character)
                         })
                         .catch(() => {
                         })
-                }
-            })
+                })
+        } else {
+            axios.get(`http://localhost:4000/api/char/me/get/${id}`)
+                .then((data) => {
+                    updateCharacter(data.data.character)
+                })
+                .catch(() => {
+                })
+        }
     }
 
     useEffect(() => {
@@ -100,7 +112,7 @@ const App = () => {
                 setChange(false)
             })
         }
-    }, [change])
+    }, [change, isMaster])
 
     return (
         <>
