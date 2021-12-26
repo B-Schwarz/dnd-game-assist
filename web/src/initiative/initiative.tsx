@@ -102,6 +102,7 @@ const App = () => {
 
     function nextTurn() {
         const temp = _.cloneDeep(player)
+        let done = false
         for (let i = 0; i < temp.length; i++) {
             if (temp[i].isTurn) {
                 temp[i].isTurn = false
@@ -113,8 +114,12 @@ const App = () => {
                         })
                     setRound(round + 1)
                 }
+                done = true
                 break
             }
+        }
+        if (!done && temp.length > 0) {
+            temp[0].isTurn = true
         }
         save(temp)
     }
@@ -206,7 +211,7 @@ const App = () => {
         if (updateInterval === 0) {
             let i = 350
             if (isMaster) {
-                i = 1000
+                i = 500
             }
             window.setTimeout(() => {
                 get(isMaster)
@@ -215,7 +220,7 @@ const App = () => {
             setUpdateInterval(1)
 
         }
-    }, [get, isMaster, updateInterval])
+    }, [isMaster, updateInterval])
 
     return (
         <>

@@ -26,7 +26,7 @@ import {getIcon} from "./status-icons";
 import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeSharp, IoEyeOffSharp} from "react-icons/io5";
-import {ArrowDownIcon, ArrowUpIcon} from "@chakra-ui/icons";
+import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
 import {DnDCharacter} from "dnd-character-sheets";
 
 const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
@@ -91,6 +91,11 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
     const onAcEdit = (val: string) => {
         props.p.character.ac = val
         savePlayer()
+    }
+
+    const onDelete = () => {
+        axios.delete(`http://localhost:4000/api/initiative/player/${props.p.turn}`)
+            .catch(() => {})
     }
 
     function write(key: string, value: string) {
@@ -487,6 +492,10 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                                             </NumberInputStepper>
                                         </NumberInput>
                                     </HStack>
+                                    <Button borderWidth='1px' borderRadius='lg' colorScheme='red' w='100%'
+                                            onClick={onDelete}>
+                                        <DeleteIcon/>LÖSCHEN
+                                    </Button>
                                 </VStack>
                             </GridItem>
                         </Grid>

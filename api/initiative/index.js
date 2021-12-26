@@ -23,6 +23,18 @@ const getPlayerMaster = (req, res) => {
     res.send(master)
 }
 
+// delete master
+const deleteMaster = (req, res) => {
+    if (master.length > 0) {
+        const p = req.params.id
+        if (p) {
+            master = master.filter(m => Number(m.turn) !== Number(p))
+        }
+    }
+    updatePlayerData()
+    res.sendStatus(200)
+}
+
 // update master
 const updateMaster = (req, res) => {
     if (master.length > 0) {
@@ -142,7 +154,8 @@ module.exports = {
     sortPlayer,
     getPlayerMaster,
     getPlayerPlayer,
-    updatePlayer: updateMaster,
+    updateMaster,
+    deleteMaster,
     movePlayer,
     getRound,
     setRound
