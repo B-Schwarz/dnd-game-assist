@@ -1,5 +1,16 @@
 export enum StatusEffectsEnum {
-    DOWNED,
+    PRONE,
     POISONED,
-    BLIND
+    BLIND,
+    CHARMED,
+    DEAFENED,
+    FRIGHTENED,
+    GRAPPLED,
+    INCAPACITATED,
+    INVISIBLE,
+    PARALYZED,
+    PETRIFIED,
+    RESTRAINED,
+    STUNNED,
+    UNCONSCIOUS
 }

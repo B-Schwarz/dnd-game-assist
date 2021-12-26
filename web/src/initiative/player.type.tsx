@@ -9,6 +9,7 @@ export interface Player {
     isTurnSet: boolean,
     turn: number,
     statusEffects: StatusEffectsEnum[],
+    id: string,
     hidden?: boolean,
-    npc?: boolean,
+    npc?: boolean
 }

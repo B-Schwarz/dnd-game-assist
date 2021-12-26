@@ -44,56 +44,44 @@ const App = () => {
     tempCharFour.deathsaveSuccesses = 0
     tempCharFour.deathsaveFailures = 0
 
-    function createMasterPlayer() {
-        const p1: Player = {
-            hidden: false, initiative: 13, isMaster: true, npc: false, statusEffects: [],
-            character: tempChar, isTurn: false, turn: 0, isTurnSet: false
-        }
+    async function createMasterPlayer() {
+        const p1 = await axios.get('http://localhost:4000/api/char/get/61bde2e1d908d9469fee4030')
+            .then((c) => {
+                return {
+                    hidden: false, initiative: 20, isMaster: true, npc: false, statusEffects: [],
+                    character: c.data.character, isTurn: false, turn: 0, isTurnSet: false, id: c.data._id
+                }
+            })
 
-        const p2: Player = {
-            character: tempCharTwo, initiative: 11, isMaster: true, statusEffects: [StatusEffectsEnum.DOWNED],
-            isTurn: false, turn: 0, isTurnSet: false
-        }
+        const p2 = await axios.get('http://localhost:4000/api/char/get/61c866303282743779bba3d0')
+            .then((c) => {
+                return {
+                    character: c.data.character,
+                    initiative: 12,
+                    isMaster: true,
+                    statusEffects: [StatusEffectsEnum.PRONE],
+                    isTurn: false,
+                    turn: 0,
+                    isTurnSet: false,
+                    id: c.data._id
+                }
+            })
 
-        const p3: Player = {
-            character: tempCharThree,
-            initiative: 10,
-            isMaster: true,
-            statusEffects: [StatusEffectsEnum.POISONED, StatusEffectsEnum.BLIND],
-            hidden: true,
-            isTurn: true,
-            turn: 0,
-            isTurnSet: false
-        }
-        const p4: Player = {
-            character: tempCharFour,
-            initiative: 11,
-            isMaster: true,
-            statusEffects: [StatusEffectsEnum.POISONED, StatusEffectsEnum.BLIND],
-            hidden: false,
-            isTurn: false,
-            turn: 0,
-            isTurnSet: false,
-            npc: true
-        }
+        const p3 = await axios.get('http://localhost:4000/api/char/get/61c866343282743779bba421')
+            .then((c) => {
+                return {
+                    character: c.data.character,
+                    initiative: 11,
+                    isMaster: true,
+                    statusEffects: [StatusEffectsEnum.POISONED, StatusEffectsEnum.BLIND],
+                    isTurn: true,
+                    turn: 0,
+                    isTurnSet: false,
+                    id: c.data._id
+                }
+            })
 
-        return [p1, p2, p3, p4]
-    }
-
-    function createPlayerPlayer(mp: Player[]) {
-        const p1p: Player = {...mp[0]}
-        p1p.isMaster = false
-
-        const p2p: Player = {...mp[1]}
-        p2p.isMaster = false
-
-        const p3p: Player = {...mp[2]}
-        p3p.isMaster = false
-
-        const p4p: Player = {...mp[3]}
-        p4p.isMaster = false
-
-        return [p1p, p2p, p3p, p4p]
+        return [p1, p2, p3]
     }
 
     const [player, setPlayer] = useState<Player[]>([])
@@ -106,8 +94,9 @@ const App = () => {
         })
     }
 
-    function create() {
-        axios.put('http://localhost:4000/api/initiative', {player: createMasterPlayer()}).catch(() => {
+    async function create() {
+        const p = await createMasterPlayer()
+        axios.put('http://localhost:4000/api/initiative', {player: p}).catch(() => {
         })
     }
 
@@ -116,11 +105,12 @@ const App = () => {
         for (let i = 0; i < temp.length; i++) {
             if (temp[i].isTurn) {
                 temp[i].isTurn = false
-                const next = (i+1) % temp.length
+                const next = (i + 1) % temp.length
                 temp[next].isTurn = true
                 if (next < i) {
-                    axios.put('http://localhost:4000/api/initiative/round', {round: round+1})
-                        .catch(() => {})
+                    axios.put('http://localhost:4000/api/initiative/round', {round: round + 1})
+                        .catch(() => {
+                        })
                     setRound(round + 1)
                 }
                 break
@@ -134,11 +124,12 @@ const App = () => {
         for (let i = 0; i < temp.length; i++) {
             if (temp[i].isTurn) {
                 temp[i].isTurn = false
-                const next = (i+temp.length-1) % temp.length
+                const next = (i + temp.length - 1) % temp.length
                 temp[next].isTurn = true
                 if (next > i) {
-                    axios.put('http://localhost:4000/api/initiative/round', {round: round-1})
-                        .catch(() => {})
+                    axios.put('http://localhost:4000/api/initiative/round', {round: round - 1})
+                        .catch(() => {
+                        })
                     setRound(round - 1)
                 }
                 break
@@ -153,7 +144,9 @@ const App = () => {
                 axios.get('http://localhost:4000/api/initiative/master')
                     .then((r) => {
                         updatePlayer(r.data)
-                    }).catch(() => {setIsMaster(false)})
+                    }).catch(() => {
+                    setIsMaster(false)
+                })
             } catch (_) {
                 setIsMaster(false)
             }
@@ -202,7 +195,8 @@ const App = () => {
                     .then((r) => {
                         setRound(r.data.round)
                     })
-                    .catch(() => {})
+                    .catch(() => {
+                    })
             })
             .catch(() => {
             })
@@ -210,14 +204,18 @@ const App = () => {
 
     useEffect(() => {
         if (updateInterval === 0) {
-            setTimeout(() => {
+            let i = 350
+            if (isMaster) {
+                i = 1000
+            }
+            window.setTimeout(() => {
                 get(isMaster)
                 setUpdateInterval(0)
-            }, 350)
+            }, i)
             setUpdateInterval(1)
-        }
 
-    }, [isMaster, player, updateInterval])
+        }
+    }, [get, isMaster, updateInterval])
 
     return (
         <>

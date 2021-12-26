@@ -4,13 +4,22 @@ import {
     AccordionItem,
     AccordionPanel,
     Badge,
-    Box, Button, ButtonGroup, ExpandedIndex,
+    Box,
+    Button,
+    ButtonGroup,
     Grid,
     GridItem,
+    HStack,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
     Progress,
     Spacer,
     Switch,
-    Text, VStack
+    Text,
+    VStack
 } from "@chakra-ui/react";
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {getIcon} from "./status-icons";
@@ -18,6 +27,7 @@ import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeSharp, IoEyeOffSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon} from "@chakra-ui/icons";
+import {DnDCharacter} from "dnd-character-sheets";
 
 const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
 
@@ -34,11 +44,54 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
     const [blind, setBlind] = useState(false)
     const [poison, setPoison] = useState(false)
     const [down, setDown] = useState(false)
+    const [charmed, setCharmed] = useState(false)
+    const [deafened, setDeafened] = useState(false)
+    const [frightened, setFrightened] = useState(false)
+    const [grappled, setGrappled] = useState(false)
+    const [incapacitated, setIncapacitated] = useState(false)
+    const [invisible, setInvisible] = useState(false)
+    const [paralyzed, setParalyzed] = useState(false)
+    const [petrified, setPetrified] = useState(false)
+    const [restrained, setRestrained] = useState(false)
+    const [stunned, setStunned] = useState(false)
+    const [unconscious, setUnconscious] = useState(false)
 
     const [effects, setEffects] = useState([])
 
     const [hide, setHide] = useState(hidden)
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
+
+    const onHpEdit = (val: string) => {
+        const p: DnDCharacter = props.p.character
+        p.hp = val
+        axios.post('http://localhost:4000/api/char', {character: p, charID: props.p.id})
+            .catch(() => {
+            })
+        savePlayer()
+    }
+
+    const onTempHpEdit = (val: string) => {
+        const p: DnDCharacter = props.p.character
+        p.tempHp = val
+        axios.post('http://localhost:4000/api/char', {character: p, charID: props.p.id})
+            .catch(() => {
+            })
+        savePlayer()
+    }
+
+    const onMaxHpEdit = (val: string) => {
+        const p: DnDCharacter = props.p.character
+        p.maxHp = val
+        axios.post('http://localhost:4000/api/char', {character: p, charID: props.p.id})
+            .catch(() => {
+            })
+        savePlayer()
+    }
+
+    const onAcEdit = (val: string) => {
+        props.p.character.ac = val
+        savePlayer()
+    }
 
     function write(key: string, value: string) {
         return (
@@ -90,8 +143,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
 
         if (down) {
             // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.DOWNED)])
-            e.push(StatusEffectsEnum.DOWNED)
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.PRONE)])
+            e.push(StatusEffectsEnum.PRONE)
         }
         if (blind) {
             // @ts-ignore
@@ -103,6 +156,62 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
             setEffects(e => [...e, getIcon(StatusEffectsEnum.POISONED)])
             e.push(StatusEffectsEnum.POISONED)
         }
+        if (charmed) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.CHARMED)])
+            e.push(StatusEffectsEnum.CHARMED)
+        }
+        if (deafened) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.DEAFENED)])
+            e.push(StatusEffectsEnum.DEAFENED)
+        }
+        if (frightened) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.FRIGHTENED)])
+            e.push(StatusEffectsEnum.FRIGHTENED)
+        }
+        if (grappled) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.GRAPPLED)])
+            e.push(StatusEffectsEnum.GRAPPLED)
+        }
+        if (incapacitated) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.INCAPACITATED)])
+            e.push(StatusEffectsEnum.INCAPACITATED)
+        }
+        if (invisible) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.INVISIBLE)])
+            e.push(StatusEffectsEnum.INVISIBLE)
+        }
+        if (paralyzed) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.PARALYZED)])
+            e.push(StatusEffectsEnum.PARALYZED)
+        }
+        if (petrified) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.PETRIFIED)])
+            e.push(StatusEffectsEnum.PETRIFIED)
+        }
+        if (restrained) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.RESTRAINED)])
+            e.push(StatusEffectsEnum.RESTRAINED)
+        }
+        if (stunned) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.STUNNED)])
+            e.push(StatusEffectsEnum.STUNNED)
+        }
+        if (unconscious) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.UNCONSCIOUS)])
+            e.push(StatusEffectsEnum.UNCONSCIOUS)
+        }
+
 
         if (isMaster) {
             props.p.statusEffects = e
@@ -111,7 +220,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
     }
 
     function savePlayer() {
-        axios.put('http://localhost:4000/api/initiative/player', {player: props.p}, {withCredentials: true})
+        axios.put('http://localhost:4000/api/initiative/player', {player: props.p})
             .catch(() => {
             })
     }
@@ -124,8 +233,41 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
             case StatusEffectsEnum.POISONED:
                 setPoison(!poison)
                 break
-            case StatusEffectsEnum.DOWNED:
+            case StatusEffectsEnum.PRONE:
                 setDown(!down)
+                break
+            case StatusEffectsEnum.CHARMED:
+                setCharmed(!charmed)
+                break
+            case StatusEffectsEnum.DEAFENED:
+                setDeafened(!deafened)
+                break
+            case StatusEffectsEnum.FRIGHTENED:
+                setFrightened(!frightened)
+                break
+            case StatusEffectsEnum.GRAPPLED:
+                setGrappled(!grappled)
+                break
+            case StatusEffectsEnum.INCAPACITATED:
+                setIncapacitated(!incapacitated)
+                break
+            case StatusEffectsEnum.INVISIBLE:
+                setInvisible(!invisible)
+                break
+            case StatusEffectsEnum.PARALYZED:
+                setParalyzed(!paralyzed)
+                break
+            case StatusEffectsEnum.PETRIFIED:
+                setPetrified(!petrified)
+                break
+            case StatusEffectsEnum.RESTRAINED:
+                setRestrained(!restrained)
+                break
+            case StatusEffectsEnum.STUNNED:
+                setStunned(!stunned)
+                break
+            case StatusEffectsEnum.UNCONSCIOUS:
+                setUnconscious(!unconscious)
                 break
             default:
                 break
@@ -142,12 +284,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, isMaster])
 
     useEffect(() => {
         props.p.hidden = hide
         if (props.p.isMaster)
-        savePlayer()
+            savePlayer()
     }, [hide])
 
     if (!props.p.isMaster && hidden) {
@@ -206,7 +348,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
             index: props.i,
             direction: direction
         }, {withCredentials: true})
-            .catch(() => {})
+            .catch(() => {
+            })
     }
 
     return (
@@ -216,7 +359,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                            borderColor={(props.p.isTurn) ? 'black' : 'blackAlpha.200'}>
                 <ButtonGroup isAttached w='100%'>
                     {props.p.isMaster && createHideButton()}
-                    <AccordionButton _expanded={ props.p.isMaster ? {bg: '#ebebeb'} : undefined} style={{ outline: 'none', border: 'none', boxShadow: 'none'}}>
+                    <AccordionButton _expanded={props.p.isMaster ? {bg: '#ebebeb'} : undefined}
+                                     style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
                         {write('', props.p.character.name!)}
                         {writePlayerMetadata()}
                         {hide &&
@@ -245,14 +389,105 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
                 {createHPBar()}
                 {props.p.isMaster &&
                     <AccordionPanel>
-                        <Grid templateColumns='repeat(5, 1fr)' gap={6}>
+                        <Grid templateColumns='repeat(4, 1fr)' gap={6}>
                             <GridItem>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
                                         isChecked={blind}>Blind</Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
                                         isChecked={poison}>Vergifted</Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.DOWNED)} isChecked={down}>Am
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PRONE)} isChecked={down}>Am
                                     Boden</Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.CHARMED)} isChecked={charmed}>
+                                    Charmed
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.DEAFENED)} isChecked={deafened}>
+                                    Deafened
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.FRIGHTENED)}
+                                        isChecked={frightened}>
+                                    Frightened
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.GRAPPLED)} isChecked={grappled}>
+                                    Grappled
+                                </Switch><br/>
+                            </GridItem>
+                            <GridItem>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.INCAPACITATED)}
+                                        isChecked={incapacitated}>
+                                    Incapacitated
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.INVISIBLE)}
+                                        isChecked={invisible}>
+                                    Invisible
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PARALYZED)}
+                                        isChecked={paralyzed}>
+                                    Paralyzed
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PETRIFIED)}
+                                        isChecked={petrified}>
+                                    Petrified
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.RESTRAINED)}
+                                        isChecked={restrained}>
+                                    Restrained
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.STUNNED)} isChecked={stunned}>
+                                    Stunned
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNCONSCIOUS)}
+                                        isChecked={unconscious}>
+                                    Unconscious
+                                </Switch><br/>
+                            </GridItem>
+                            <GridItem/>
+                            <GridItem>
+                                <VStack>
+                                    <HStack>
+                                        <Text width='120px'>HP:</Text>
+                                        <NumberInput defaultValue={props.p.character.hp} min={0} onChange={onHpEdit}
+                                                     max={Number(props.p.character.maxHp)}>
+                                            <NumberInputField/>
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper/>
+                                                <NumberDecrementStepper/>
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HStack>
+                                    <HStack>
+                                        <Text width='120px'>Temp HP:</Text>
+                                        <NumberInput defaultValue={props.p.character.tempHp || 0} min={0}
+                                                     onChange={onTempHpEdit}>
+                                            <NumberInputField/>
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper/>
+                                                <NumberDecrementStepper/>
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HStack>
+                                    <HStack>
+                                        <Text width='120px'>Max HP:</Text>
+                                        <NumberInput defaultValue={props.p.character.maxHp} min={0}
+                                                     onChange={onMaxHpEdit}>
+                                            <NumberInputField/>
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper/>
+                                                <NumberDecrementStepper/>
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HStack>
+                                    <HStack>
+                                        <Text width='120px'>AC:</Text>
+                                        <NumberInput defaultValue={props.p.character.ac} min={0}
+                                                     onChange={onAcEdit}>
+                                            <NumberInputField/>
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper/>
+                                                <NumberDecrementStepper/>
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HStack>
+                                </VStack>
                             </GridItem>
                         </Grid>
                     </AccordionPanel>
