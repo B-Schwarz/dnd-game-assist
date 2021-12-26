@@ -50,6 +50,15 @@ const createCharacter = async (req, res) => {
     res.send({id: char._id})
 }
 
+const createMonster = async (req, res) => {
+    const mon = await Character.create({
+        character: {
+            name: ''
+        },
+        npc: true
+    })
+}
+
 // REQUIRES MASTER OR ADMIN
 const getCharacter = async (req, res) => {
     if (req.params.id) {
@@ -97,7 +106,9 @@ const getOwnCharacter = async (req, res) => {
 
 // REQUIRES MASTER OR ADMIN
 const getCharacterList = async (req, res) => {
-    const charList = await Character.find()
+    const charList = await Character.find({
+        npc: false
+    })
     res.send(filterCharacterListe(charList))
 }
 

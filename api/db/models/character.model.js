@@ -5,6 +5,10 @@ const CharacterSchema = new mongoose.Schema({
     character:{
         type: Object,
         required: true
+    },
+    npc: {
+        type: Boolean,
+        default: false
     }
 });
 
