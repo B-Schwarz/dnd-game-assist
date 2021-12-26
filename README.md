@@ -45,6 +45,19 @@ everytime they're changed.
 
 ---
 
+## Monster Editor
+
+[ ] Create monster and NPCs  
+
+---
+
+## Spell List
+
+[ ] Create spells  
+[ ] Search for spells with different filter  
+
+---
+
 ## Settings
 
 [X] A user should be able to change their password  
