@@ -7,15 +7,16 @@ import {
     Accordion,
     Button,
     Center,
-    Heading,
-    HStack,
-    Modal, ModalContent, ModalFooter,
+    Grid,
+    GridItem,
+    Modal,
+    ModalContent,
+    ModalFooter,
     ModalOverlay,
     StackItem,
     useDisclosure,
     VStack
 } from "@chakra-ui/react";
-import {DnDCharacter} from "dnd-character-sheets";
 import {Player} from "./player.type";
 import axios from "axios";
 import _ from "lodash";
@@ -68,17 +69,22 @@ const App = () => {
     const [updateInterval, setUpdateInterval] = useState<number>(0)
     const [round, setRound] = useState<number>(0)
 
-    const {isOpen, onOpen, onClose } = useDisclosure()
+    const {isOpen, onOpen, onClose} = useDisclosure()
 
     function save(p: Player[]) {
-        axios.put('http://localhost:4000/api/initiative', {player: p}).catch(() => {
-        })
+        axios.put('http://localhost:4000/api/initiative', {player: p})
+            .then(() => update())
+            .catch(() => {
+            })
     }
 
+    // TODO: DEV
     async function create() {
         const p = await createMasterPlayer()
-        axios.put('http://localhost:4000/api/initiative', {player: p}).catch(() => {
-        })
+        axios.put('http://localhost:4000/api/initiative', {player: p})
+            .then(() => update())
+            .catch(() => {
+            })
     }
 
     function nextTurn() {
@@ -168,14 +174,16 @@ const App = () => {
     function sort() {
         axios.get('http://localhost:4000/api/initiative/sort')
             .then(() => {
-                get(isMaster)
+                update()
             }).catch(() => {
         })
     }
 
     function reset() {
         axios.delete('http://localhost:4000/api/initiative/player')
-            .catch(() => {})
+            .then(() => update())
+            .catch(() => {
+            })
     }
 
     useEffect(() => {
@@ -196,63 +204,64 @@ const App = () => {
     useEffect(() => {
         if (updateInterval === 0) {
             let i = 350
-            if (isMaster) {
-                i = 500
-            }
             window.setTimeout(() => {
                 get(isMaster)
                 setUpdateInterval(0)
             }, i)
-            setUpdateInterval(1)
+            if (!isMaster) {
+                setUpdateInterval(1)
+            }
 
         }
     }, [isMaster, updateInterval])
 
+    const update = () => {
+        get(isMaster)
+    }
+
     return (
         <>
-            <Center>
-                <HStack>
-                    {
-                        isMaster &&
-                        <VStack>
-                            <Heading>Master</Heading> {/*JUST FOR DEV*/}
-                            <Text fontSize='2xl'>Runde: {round}</Text>
-                            <StackItem>
-                                <Button colorScheme='teal' onClick={create}>Create</Button> {/*JUST FOR DEV*/}
-                                <Button colorScheme='blue' onClick={() => save(player)}>Save</Button> {/*JUST FOR DEV*/}
+            {
+                isMaster &&
+                <VStack>
+                    <Button colorScheme='teal' onClick={create}>Create</Button> {/*JUST FOR DEV*/}
+                    <Text fontSize='2xl'>Runde: {round}</Text>
+                    <StackItem>
+                        <Grid templateColumns='repeat(4, 1fr)' gap={3}>
+                            <Button colorScheme='red' onClick={reset}>RESET</Button>
+                            <Button colorScheme='blue' onClick={sort}>Sort</Button>
+                            <GridItem>
                                 <Button colorScheme='blue' onClick={prevTurn}>Vorheriger</Button>
                                 <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
-                                <Button colorScheme='blue' onClick={sort}>Sort</Button>
-                                <Button colorScheme='green' onClick={onOpen}>Add</Button>
-                                <Button colorScheme='red' onClick={reset}>RESET</Button>
-                            </StackItem>
-                        </VStack>
-                    }
-                    {
-                        !isMaster &&
-                        <React.Fragment>
-                            <Heading>Player</Heading> {/*JUST FOR DEV*/}
-                        </React.Fragment>
-                    }
-                </HStack>
-            </Center>
-            <Divider marginBottom='2rem'/>
+                            </GridItem>
+                            <Button colorScheme='green' onClick={onOpen}>Add</Button>
+                        </Grid>
+                    </StackItem>
+                </VStack>
+            }
+            <Divider marginTop='1rem' marginBottom='2rem'/>
             <Center>
                 <Accordion allowToggle width='80%'>
                     {
                         player.map((m, i) => (
-                            <InitiaveEntry p={m} i={i} f={i === 0} l={i === player.length - 1} key={i}/>
+                            <InitiaveEntry p={m} i={i} f={i === 0} l={i === player.length - 1} u={update} key={i}/>
                         ))
                     }
                 </Accordion>
             </Center>
-            <Modal isOpen={isOpen} onClose={onClose} closeOnEsc isCentered
-                    scrollBehavior='inside'>
+            <Modal isOpen={isOpen} onClose={() => {
+                update()
+                onClose()
+            }} closeOnEsc isCentered
+                   scrollBehavior='inside'>
                 <ModalOverlay/>
                 <ModalContent maxW='35rem' maxH='40rem'>
-                    <Add/>
+                    <Add u={update}/>
                     <ModalFooter>
-                        <Button onClick={onClose}>Schließen</Button>
+                        <Button onClick={() => {
+                            update()
+                            onClose()
+                        }}>Schließen</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

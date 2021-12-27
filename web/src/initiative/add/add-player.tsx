@@ -19,10 +19,10 @@ import {Player} from "../player.type";
 import axios from "axios";
 import {DnDCharacter} from "dnd-character-sheets";
 
-let data: Player[] = []
+const App = (props: {u: () => void}) => {
 
-const App = () => {
-    const [values, setValue] = useState<Player[]>(data)
+    const [data, setData] = useState<Player[]>([])
+    const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
         const temp = _.cloneDeep(data)
@@ -48,6 +48,7 @@ const App = () => {
                         turn: 0
                     })
                 })
+                setValue(data)
             })
             .catch(() => {
             })
@@ -55,6 +56,7 @@ const App = () => {
 
     const onAdd = (p: Player) => {
         axios.post('http://localhost:4000/api/initiative/player', {player: p})
+            .then(() => props.u())
             .catch(() => {
             })
     }

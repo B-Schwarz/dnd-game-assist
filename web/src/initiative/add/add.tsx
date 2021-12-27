@@ -8,7 +8,7 @@ import {
 import AddPlayer from "./add-player";
 import AddMonster from "./add-monster";
 
-const App = () => {
+const App = (props: {u: () => void}) => {
 
     return (
         <React.Fragment>
@@ -25,7 +25,7 @@ const App = () => {
 
                     <TabPanels>
                         <TabPanel>
-                            <AddPlayer/>
+                            <AddPlayer u={props.u}/>
                         </TabPanel>
                         <TabPanel>
                             <AddMonster/>

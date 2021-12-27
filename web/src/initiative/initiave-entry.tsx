@@ -8,8 +8,7 @@ import {
     Button,
     ButtonGroup,
     Grid,
-    GridItem, Heading,
-    HStack,
+    GridItem, HStack,
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
@@ -27,15 +26,15 @@ import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeSharp, IoEyeOffSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
-import {DnDCharacter} from "dnd-character-sheets";
+import _ from "lodash";
 
-const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
+const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => void }) => {
 
-    const hp = props.p.character.hp || '0'
-    const tempHp = props.p.character.tempHp || '0'
-    const maxHp = props.p.character.maxHp || '0'
+    const [hp, setHp] = useState(props.p.character.hp || '0')
+    const [tempHp, setTempHp] = useState(props.p.character.tempHp || '0')
+    const [maxHp, setMaxHp] = useState(props.p.character.maxHp || '0')
 
-    const ac = props.p.character.ac || '0'
+    const [ac, setAc] = useState(props.p.character.ac || '0')
     const statusEffects = props.p.statusEffects || []
 
     const npc = props.p.npc || false
@@ -62,39 +61,32 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
     const onHpEdit = (val: string) => {
-        const p: DnDCharacter = props.p.character
-        p.hp = val
-        axios.post('http://localhost:4000/api/char', {character: p, charID: props.p.id})
-            .catch(() => {
-            })
-        savePlayer()
+        props.p.character.hp = val
+        setHp(val)
+        updatePlayer()
     }
 
     const onTempHpEdit = (val: string) => {
-        const p: DnDCharacter = props.p.character
-        p.tempHp = val
-        axios.post('http://localhost:4000/api/char', {character: p, charID: props.p.id})
-            .catch(() => {
-            })
-        savePlayer()
+        props.p.character.tempHp = val
+        setTempHp(val)
+        updatePlayer()
     }
 
     const onMaxHpEdit = (val: string) => {
-        const p: DnDCharacter = props.p.character
-        p.maxHp = val
-        axios.post('http://localhost:4000/api/char', {character: p, charID: props.p.id})
-            .catch(() => {
-            })
-        savePlayer()
+        props.p.character.maxHp = val
+        setMaxHp(val)
+        updatePlayer()
     }
 
     const onAcEdit = (val: string) => {
         props.p.character.ac = val
+        setAc(val)
         savePlayer()
     }
 
     const onDelete = () => {
         axios.delete(`http://localhost:4000/api/initiative/player/${props.p.turn}`)
+            .then(() => props.u())
             .catch(() => {
             })
     }
@@ -337,9 +329,25 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
         }
     }
 
+    function updatePlayer() {
+        if (props.p.npc === false) {
+            const temp = _.cloneDeep(props.p.character)
+            temp.name = temp.name?.substring(0, temp.name?.indexOf('('))
+
+            axios.post('http://localhost:4000/api/char', {character: _.omit(temp, ['name']), charID: props.p.id})
+                .then(() => savePlayer())
+                .catch(() => {
+                })
+        } else {
+            savePlayer()
+        }
+    }
+
     function savePlayer() {
         axios.put('http://localhost:4000/api/initiative/player', {player: props.p})
-            .catch(() => {
+            .then(() => props.u())
+            .catch((e) => {
+                console.log(e)
             })
     }
 
@@ -465,7 +473,10 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean }) => {
         axios.put('http://localhost:4000/api/initiative/move', {
             index: props.i,
             direction: direction
-        }, {withCredentials: true})
+        })
+            .then(() => {
+                props.u()
+            })
             .catch(() => {
             })
     }

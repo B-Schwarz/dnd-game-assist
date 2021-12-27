@@ -71,7 +71,6 @@ const updateMaster = (req, res) => {
 // REQUIRES MASTER
 const addMaster = (req, res) => {
     const p = req.body.player
-
     if (p) {
         try {
             p.isMaster = true
@@ -80,7 +79,10 @@ const addMaster = (req, res) => {
                 let i = 1
                 let a = false
                 for (const m of master) {
-                    if (m.character.name === p.character.name) {
+                    if (m.character.name.startsWith(p.character.name) && m.character.name.endsWith(')')) {
+                        i++
+                        a = true
+                    } else if (m.character.name === p.character.name) {
                         m.character.name += ' (' + i + ')'
                         i++
                         a = true
