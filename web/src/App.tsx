@@ -1,11 +1,6 @@
 import React, {Fragment} from 'react';
 import './App.css';
-import {
-    BrowserRouter as Router,
-    Route,
-    Routes,
-    Navigate
-} from "react-router-dom";
+import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import Character from "./character-sheet/character";
 import Login from "./login/login"
 import CharacterList from "./character-sheet/character-list";
@@ -14,6 +9,7 @@ import {SelectedEnum} from "./menu/selected.enum";
 import Initiative from "./initiative/initiative";
 import Settings from "./settings/settings";
 import Admin from "./admin/admin";
+import MonsterList from "./monster/monster-list";
 
 function App() {
     return (
@@ -31,6 +27,7 @@ function App() {
                                element={<><Menu selected={SelectedEnum.INITIATIVE}/><Initiative/></>}/>
                         <Route path="/settings" element={<><Menu selected={SelectedEnum.SETTINGS}/><Settings/></>}/>
                         <Route path="/admin" element={<><Menu selected={SelectedEnum.ADMIN}/><Admin/></>}/>
+                        <Route path="/monster" element={<><Menu selected={SelectedEnum.MONSTER}/><MonsterList/></>}/>
                         <Route path="*" element={<Navigate  to='/character' replace/>}/>
                     </Routes>
                 </Fragment>

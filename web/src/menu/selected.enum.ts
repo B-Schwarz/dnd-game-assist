@@ -3,5 +3,6 @@ export enum SelectedEnum {
     CHARACTER,
     INITIATIVE,
     SETTINGS,
-    ADMIN
+    ADMIN,
+    MONSTER
 }

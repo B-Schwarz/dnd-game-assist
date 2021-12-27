@@ -5,7 +5,6 @@ import {Divider} from "@chakra-ui/layout";
 import {useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
-import WithAuth from "../login/withAuth";
 
 const Menu = (props: { selected: SelectedEnum; }) => {
 
@@ -16,6 +15,9 @@ const Menu = (props: { selected: SelectedEnum; }) => {
         }, {
             name: 'Initiative',
             selected: SelectedEnum.INITIATIVE
+        }, {
+            name: 'Monster',
+            selected: SelectedEnum.MONSTER
         }, {
             name: 'Settings',
             icon: <SettingsIcon/>,
