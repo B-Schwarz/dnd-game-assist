@@ -50,13 +50,19 @@ const createCharacter = async (req, res) => {
     res.send({id: char._id})
 }
 
-const createMonster = async (req, res) => {
-    const mon = await Character.create({
+// REQUIRES MASTER
+const createNPCharacter = async (req, res) => {
+    const char = await Character.create({
         character: {
             name: ''
         },
         npc: true
     })
+
+    req.user.character.push(char._id)
+    req.user.save()
+
+    res.send({id: char._id})
 }
 
 // REQUIRES MASTER OR ADMIN
@@ -177,6 +183,7 @@ module.exports = {
     getCharacterList,
     getOwnCharacterList,
     createCharacter,
+    createNPCharacter,
     deleteCharacter,
     deleteOwnCharacter
 }

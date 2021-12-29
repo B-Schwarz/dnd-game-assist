@@ -3,7 +3,7 @@
 Designed to assist in playing the game
 
 ### Table of Contens
-- [Character editor](#character-editor)
+- [Monster editor](#character-editor)
 - [Combat tracker](#combat-tracker)
 - [Encounter editor](#encounter-editor)
 - [Setting](#settings)
@@ -11,7 +11,7 @@ Designed to assist in playing the game
 
 ---
 
-## Character editor
+## Monster editor
 
 [X] List all of my character sheets  
 [X] List all character sheets by other players (admin & master only)  

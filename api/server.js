@@ -8,13 +8,14 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter
+    deleteOwnCharacter, createNPCharacter
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
     setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, movePlayer,
     setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster
 } = require("./initiative");
+const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
 
 const port = 4000;
 
@@ -54,29 +55,32 @@ const sess = session({
 
 app.use(sess)
 
-app.post('/api/auth/register', register)
-
-app.post('/api/auth/login', login)
-
-app.get('/api/auth/logout', isAuth, logout)
-
+//
+//  CHARACTER LIST
+//
 app.get('/api/charlist', isAuth, isMasterOrAdmin, getCharacterList)
 app.get('/api/charlist/me', isAuth, getOwnCharacterList)
 
+//
+//  CHARACTER
+//
 app.get('/api/char/new', isAuth, createCharacter)
-
+app.get('/api/char/new/npc', isAuth, isMaster, createNPCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
-
 app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
 app.post('/api/char/me', isAuth, saveOwnCharacter)
-
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
+//
+//  ACCOUNT
+//
+app.post('/api/auth/register', register)
+app.post('/api/auth/login', login)
+app.get('/api/auth/logout', isAuth, logout)
 app.delete('/api/me/delete', isAuth, deleteOwnAccount)
 app.delete('/api/account/delete', isAuth, isAdmin, deleteAccount)
-
 app.put('/api/me/password', isAuth, changeOwnPassword)
 
 app.get('/api/me', isAuth, (req, res) => {
@@ -88,7 +92,13 @@ app.get('/api/me/admin', isAuth, isAdmin, (req, res) => {
 app.get('/api/me/master', isAuth, isMaster, (req, res) => {
     res.sendStatus(200)
 })
+app.get('/api/me/admin/master', isAuth, isMasterOrAdmin, (req, res) => {
+    res.sendStatus(200)
+})
 
+//
+//  INITIATIVE
+//
 app.put('/api/initiative', isAuth, isMaster, setPlayer)
 app.get('/api/initiative', isAuth, getPlayerPlayer)
 app.get('/api/initiative/master', isAuth, isMaster, getPlayerMaster)
@@ -100,6 +110,14 @@ app.delete('/api/initiative/player', isAuth, isMaster, deleteAllMaster)
 app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
 app.put('/api/initiative/round', isAuth, isMaster, setRound)
 app.get('/api/initiative/round', isAuth, isMaster, getRound)
+
+//
+//  MONSTER
+//
+app.get('/api/monster/new', isAuth, isMasterOrAdmin, createMonster)
+app.get('/api/monster/list', isAuth, getMonsterList)
+app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
+app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
 
 const start = async () => {
     try {
