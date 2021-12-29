@@ -3,6 +3,7 @@ const app = express();
 const {connectDB} = require('./db')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
+const path = require('path')
 
 const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
 const {
@@ -118,6 +119,14 @@ app.get('/api/monster/new', isAuth, isMasterOrAdmin, createMonster)
 app.get('/api/monster/list', isAuth, getMonsterList)
 app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
 app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
+
+//
+//  HOST REACT
+//
+app.use(express.static(path.join(__dirname, 'build')))
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build/index.html'))
+})
 
 const start = async () => {
     try {

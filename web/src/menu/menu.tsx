@@ -35,7 +35,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
     const [buttons, setButtons] = useState(btn)
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/me/admin')
+        axios.get('/api/me/admin')
             .then(() => {
                 setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
             }).catch(() => {})

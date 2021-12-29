@@ -31,7 +31,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const getPlayer = () => {
-        axios.get('http://localhost:4000/api/charlist')
+        axios.get('/api/charlist')
             .then((d) => {
                 d.data.forEach((c: {
                     character: DnDCharacter;
@@ -55,7 +55,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (p: Player) => {
-        axios.post('http://localhost:4000/api/initiative/player', {player: p})
+        axios.post('/api/initiative/player', {player: p})
             .then(() => props.u())
             .catch(() => {
             })
