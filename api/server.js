@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 });
 
 const store = MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/dnd',
+    mongoUrl: 'mongodb://db:27017/dnd',
     collectionName: 'sessions'
 })
 
