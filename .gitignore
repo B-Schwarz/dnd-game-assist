@@ -149,3 +149,6 @@ Temporary Items
 .apdisk
 
 node_modules
+
+api/build
+web/build

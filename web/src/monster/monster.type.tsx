@@ -33,5 +33,6 @@ export interface Monster {
         attributes: String,
         actions: String,
         legendaryActions: String
-    }
+    },
+    hidden: boolean
 }

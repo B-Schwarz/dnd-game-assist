@@ -9,8 +9,8 @@ import {
     AlertDialogContent,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogOverlay,
-    Button,
+    AlertDialogOverlay, Box,
+    Button, Container,
     Flex,
     Grid,
     GridItem,
@@ -130,9 +130,10 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
                 // @ts-ignore
                 monster.monster[key].split('\n').map((l, i) => (
                     <React.Fragment key={i}>
-                        {!big && replaceBold(l)}
-                        {big && l}
-                        <br/>
+                        <Text maxWidth="65vw" wordBreak="break-word">
+                            {!big && replaceBold(l)}
+                            {big && l}
+                        </Text>
                     </React.Fragment>
                 ))
             )
