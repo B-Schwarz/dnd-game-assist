@@ -2,17 +2,24 @@ import React, {useEffect, useState} from 'react'
 
 import axios from "axios";
 import {
-    AlertDialog, AlertDialogBody,
-    AlertDialogContent, AlertDialogFooter, AlertDialogHeader,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
     AlertDialogOverlay,
-    Button, ButtonGroup,
+    Button,
+    ButtonGroup,
     Center,
-    Heading, HStack, Text
+    Heading,
+    HStack,
+    Text
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
 import {Divider} from "@chakra-ui/layout";
 import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
 import WithAuth from "../login/withAuth";
+import {DnDCharacter} from "dnd-character-sheets";
 
 const App = () => {
 
@@ -21,6 +28,7 @@ const App = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [isOwn, setIsOwn] = useState(false)
     const [deleteID, setDeleteID] = useState('')
+    const [isMaster, setIsMaster] = useState(false)
 
     const navigate = useNavigate()
     const cancelRef = React.useRef()
@@ -45,20 +53,17 @@ const App = () => {
         window.location.reload()
     }
 
-    useEffect(() => {
+    const updateOwnCharList = () => {
         getOwnChars()
             .then(r => {
                 setOwnCharData([])
-                for (let char of r.data) {
-                    // @ts-ignore
-                    setOwnCharData(ownCharData => [...ownCharData, char])
-                }
+                setOwnCharData(r.data)
             })
             .catch(() => {
             })
-    }, [])
+    }
 
-    useEffect(() => {
+    const updateOtherCharList = () => {
         getChars()
             .then(r => {
                 setCharData([])
@@ -71,6 +76,20 @@ const App = () => {
             })
             .catch(() => {
             })
+    }
+
+    useEffect(() => {
+        axios.get('http://localhost:4000/api/me/master')
+            .then(() => setIsMaster(true))
+            .catch(() => {})
+    }, [])
+
+    useEffect(() => {
+        updateOwnCharList()
+    }, [isMaster])
+
+    useEffect(() => {
+        updateOtherCharList()
     }, [ownCharData])
 
     function openCharacter(id: string) {
@@ -82,6 +101,15 @@ const App = () => {
         return response.data.id
     }
 
+    const setNPC = (p: { _id: string, character: DnDCharacter, npc: boolean }) => {
+        console.log('Trigger')
+        axios.put('http://localhost:4000/api/char/npc/toggle', {
+            charID: p._id
+        })
+            .then(() => updateOwnCharList())
+            .catch((e) => {console.log(e)})
+    }
+
     return (
         <>
             <Center marginBottom={'1rem'}>
@@ -90,9 +118,13 @@ const App = () => {
                 </Heading>
             </Center>
             {
-                ownCharData.map((item) => (
+                ownCharData.map((item: { _id: string, character: DnDCharacter, npc: boolean }) => (
                     <Center key={item['_id']}>
                         <ButtonGroup isAttached width='85%'>
+                            {isMaster &&
+                                <Button borderWidth='1px' colorScheme={item["npc"] ? "teal" : "gray"} width="4rem"
+                                        borderRadius='lg'
+                                        onClick={() => setNPC(item)}>{item["npc"] && <>NPC</>}{!item["npc"] && <>PC</>}</Button>}
                             <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
                                     onClick={() => openCharacter(item['_id'])}>
                                 <HStack>
@@ -135,34 +167,43 @@ const App = () => {
                         </Heading>
                     </Center>
                     {
-                        charData.map((item) => (
-                            <Center key={item['_id']}>
-                                <ButtonGroup isAttached width='85%'>
-                                    <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
-                                            onClick={() => openCharacter(item['_id'])}>
-                                        <HStack>
-                                            <Text color='gray'>Name:</Text>
-                                            <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
-                                            <Text color='gray'>Klasse:</Text>
-                                            <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                                            <Text color='gray'>Rasse:</Text>
-                                            <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                                            <Text color='gray'>Player:</Text>
-                                            <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
-                                        </HStack>
-                                    </Button>
-                                    <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg'
-                                            colorScheme='red'
-                                            onClick={() => {
-                                                setDeleteID(item['_id'])
-                                                setIsOwn(true)
-                                                setIsOpen(true)
-                                            }}>
-                                        <DeleteIcon/>
-                                    </Button>
-                                </ButtonGroup>
-                            </Center>
-                        ))
+                        charData.map((item: { _id: string, character: DnDCharacter, npc: boolean }) => {
+                            if (item.npc && !isMaster) {
+                                return (
+                                    <></>
+                                )
+                            } else {
+                                return (
+                                    <Center key={item['_id']}>
+                                        <ButtonGroup isAttached width='85%'>
+                                            <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
+                                                    bg={item.npc ? "rgba(49,150,148,0.60)" : "#ebf0f5"}
+                                                    onClick={() => openCharacter(item['_id'])}>
+                                                <HStack>
+                                                    <Text color='gray'>Name:</Text>
+                                                    <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                                                    <Text color='gray'>Klasse:</Text>
+                                                    <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
+                                                    <Text color='gray'>Rasse:</Text>
+                                                    <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
+                                                    <Text color='gray'>Player:</Text>
+                                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                                </HStack>
+                                            </Button>
+                                            <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg'
+                                                    colorScheme='red'
+                                                    onClick={() => {
+                                                        setDeleteID(item['_id'])
+                                                        setIsOwn(true)
+                                                        setIsOpen(true)
+                                                    }}>
+                                                <DeleteIcon/>
+                                            </Button>
+                                        </ButtonGroup>
+                                    </Center>
+                                )
+                            }
+                        })
                     }
                 </>
             }

@@ -224,7 +224,6 @@ const App = () => {
             {
                 isMaster &&
                 <VStack>
-                    <Button colorScheme='teal' onClick={create}>Create</Button> {/*JUST FOR DEV*/}
                     <Text fontSize='2xl'>Runde: {round}</Text>
                     <StackItem>
                         <Grid templateColumns='repeat(4, 1fr)' gap={3}>

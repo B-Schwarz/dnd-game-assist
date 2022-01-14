@@ -35,18 +35,21 @@ const App = (props: {u: () => void}) => {
             .then((d) => {
                 d.data.forEach((c: {
                     character: DnDCharacter;
-                    _id: any;
+                    _id: string;
+                    npc: boolean;
                 }) => {
-                    data.push({
-                        character: c.character,
-                        id: c._id,
-                        initiative: 0,
-                        isMaster: false,
-                        isTurn: false,
-                        isTurnSet: false,
-                        statusEffects: [],
-                        turn: 0
-                    })
+                    if (!c.npc) {
+                        data.push({
+                            character: c.character,
+                            id: c._id,
+                            initiative: 0,
+                            isMaster: false,
+                            isTurn: false,
+                            isTurnSet: false,
+                            statusEffects: [],
+                            turn: 0
+                        })
+                    }
                 })
                 setValue(data)
             })
