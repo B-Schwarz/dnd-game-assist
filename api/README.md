@@ -38,7 +38,7 @@ running ``npm run start``
 | /api/initiative/round      |  `GET`   |                    `none`                    |       `master`       | Gets the current round number                                            | `none`                                |
 | /api/initiative/round      |  `PUT`   |                `round:number`                |       `master`       | Sets the current round number                                            | `none`                                |
 | /api/monster/new           |  `GET`   |                    `none`                    | `admin`<br/>`master` | Creates a new monster                                                    | `none`                                |
-| /api/monster/list          |  `GET`   |                    `none`                    |        `user`        | Returns a list of all monsters                                           | `[monster:{_id,Monster,abilities}]`   |
+| /api/monster/list          |  `GET`   |                    `none`                    |        `user`        | Returns a list of all monsters                                           | `[monster:{_id,Monster}]`   |
 | /api/monster               |  `PUT`   |   `charID:ObjectID`<br/>`monster:Monster`    | `admin`<br/>`master` | Updates a monster                                                        | `none`                                |
 | /api/monster/:id           | `DELETE` |                    `none`                    | `admin`<br/>`master` | Deletes a monster                                                        | `none`                                |
 
