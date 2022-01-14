@@ -28,7 +28,7 @@ const App = (props: {u: () => void}) => {
                             <AddPlayer u={props.u}/>
                         </TabPanel>
                         <TabPanel>
-                            <AddMonster/>
+                            <AddMonster u={props.u}/>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

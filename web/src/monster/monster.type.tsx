@@ -1,38 +1,38 @@
 export interface Monster {
-    _id: String,
+    _id: string,
     monster: {
-        name: String,
-        monsterType: String,
-        ac: String,
-        hp: String,
-        speed: String,
+        name: string,
+        monsterType: string,
+        ac: string,
+        hp: string,
+        speed: string,
         stats: {
-            str: Number,
-            dex: Number,
-            con: Number,
-            int: Number,
-            wis: Number,
-            cha: Number
+            str: number,
+            dex: number,
+            con: number,
+            int: number,
+            wis: number,
+            cha: number
         },
         saving: {
-            str: Number,
-            dex: Number,
-            con: Number,
-            int: Number,
-            wis: Number,
-            cha: Number
+            str: number,
+            dex: number,
+            con: number,
+            int: number,
+            wis: number,
+            cha: number
         },
-        skills: String,
-        dmgImmunity: String,
-        dmgResistance: String,
-        dmgVulnerability: String,
-        condImmunity: String,
-        senses: String,
-        languages: String,
-        cr: String,
-        attributes: String,
-        actions: String,
-        legendaryActions: String
+        skills: string,
+        dmgImmunity: string,
+        dmgResistance: string,
+        dmgVulnerability: string,
+        condImmunity: string,
+        senses: string,
+        languages: string,
+        cr: string,
+        attributes: string,
+        actions: string,
+        legendaryActions: string
     },
-    hidden: boolean
+    hidden?: boolean
 }
