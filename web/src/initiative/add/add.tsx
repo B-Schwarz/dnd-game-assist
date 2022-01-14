@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import AddPlayer from "./add-player";
 import AddMonster from "./add-monster";
+import AddNpc from "./add-npc";
 
 const App = (props: {u: () => void}) => {
 
@@ -21,6 +22,7 @@ const App = (props: {u: () => void}) => {
                     <TabList>
                         <Tab>Spieler</Tab>
                         <Tab>Monster</Tab>
+                        <Tab>NPC</Tab>
                     </TabList>
 
                     <TabPanels>
@@ -29,6 +31,9 @@ const App = (props: {u: () => void}) => {
                         </TabPanel>
                         <TabPanel>
                             <AddMonster u={props.u}/>
+                        </TabPanel>
+                        <TabPanel>
+                            <AddNpc u={props.u}/>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

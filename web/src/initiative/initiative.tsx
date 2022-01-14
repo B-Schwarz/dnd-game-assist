@@ -236,10 +236,11 @@ const App = () => {
                             <Button colorScheme='green' onClick={onOpen}>Add</Button>
                         </Grid>
                     </StackItem>
+
+                    <Divider marginTop='1rem'/>
                 </VStack>
             }
-            <Divider marginTop='1rem' marginBottom='2rem'/>
-            <Center>
+            <Center marginTop='2rem'>
                 <Accordion allowToggle width='80%'>
                     {
                         player.map((m, i) => (
