@@ -150,5 +150,6 @@ Temporary Items
 
 node_modules
 
-web/build
 api/build
+web/build
+api/books/pdf
