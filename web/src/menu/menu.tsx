@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button} from "@chakra-ui/react";
+import {Box, Button, Tag} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
 import {Divider} from "@chakra-ui/layout";
 import {useNavigate} from "react-router-dom";
@@ -17,7 +17,8 @@ const Menu = (props: { selected: SelectedEnum; }) => {
             selected: SelectedEnum.INITIATIVE
         }, {
             name: 'Monster',
-            selected: SelectedEnum.MONSTER
+            selected: SelectedEnum.MONSTER,
+            beta: true
         }, {
             name: 'Settings',
             icon: <SettingsIcon/>,
@@ -53,7 +54,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
                                 onClick={() => {
                                     navigate(`/${b.name.toLowerCase()}`)
                                 }}>
-                            {b.name}
+                            {b.name} {b.beta && <Tag colorScheme='blue' marginLeft='0.25rem'>Beta</Tag>}
                         </Button>
                     ))
                 }
