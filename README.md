@@ -8,6 +8,7 @@ Designed to assist in playing the game
 - [Encounter editor](#encounter-editor)
 - [Setting](#settings)
 - [Admin](#admin)
+- [Books](#books)
 
 ---
 
@@ -38,13 +39,13 @@ everytime they're changed.
 [X] Button to remove player from list  
 [X] Master is able to edit HP/Temp HP/Max HP and AC  
 [X] Master is able to add players with initiative  
-[ ] Master is able to add encounter (auto initiative)  
-[ ] Master is able to add custom monster/npc (auto initiative)  
+[ ] Master is able to add encounter (auto initiative) (won't do)  
+[X] Master is able to add custom monster/npc (auto initiative)  
 [X] Master is able to see saving throw modifiers  
 
 ---
 
-## Encounter editor
+## Encounter editor (won't do)
 
 [ ] Create custom encounters with saved enemies for quickly loading them
 
@@ -52,11 +53,11 @@ everytime they're changed.
 
 ## Monster Editor
 
-[ ] Create monster and NPCs  
+[X] Create monster (changed to monster only) 
 
 ---
 
-## Spell List
+## Spell List (For 1.1)
 
 [ ] Create spells  
 [ ] Search for spells with different filter  
@@ -78,3 +79,9 @@ everytime they're changed.
 [ ] Reassign character sheets to other users (only one at a time)  
 [ ] Delete another user account  
 [ ] Change another user's password  
+[X] Set User Roles  
+[X] Register new user
+
+## Books
+
+[X] Open pdf of books  
