@@ -5,6 +5,6 @@ services:
       - db
     build: .
     ports:
-      - "80:4000"
+      - "5000:4000"
   db:
     image: mongo:4.4.11-rc1
