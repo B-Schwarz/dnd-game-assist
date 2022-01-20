@@ -6,6 +6,7 @@ import {useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
 import {MdLogout} from "react-icons/md";
+import {MenuButtonType} from "./menu-button.type";
 
 const Menu = (props: { selected: SelectedEnum; }) => {
 
@@ -21,20 +22,26 @@ const Menu = (props: { selected: SelectedEnum; }) => {
             selected: SelectedEnum.MONSTER,
             beta: true
         }, {
-            name: 'Settings',
+            name: 'Einstellungen',
             icon: <SettingsIcon/>,
             color: 'teal',
-            selected: SelectedEnum.SETTINGS
+            selected: SelectedEnum.SETTINGS,
+            link: 'settings'
+        }, {
+            name: 'Bücher',
+            selected: SelectedEnum.BOOKS,
+            color: 'teal',
+            link: 'books'
         }]
 
-    const adminBtn = {
+    const adminBtn: MenuButtonType = {
         name: 'Admin',
         icon: <WarningTwoIcon/>,
         color: 'red',
         selected: SelectedEnum.ADMIN
     }
 
-    const [buttons, setButtons] = useState(btn)
+    const [buttons, setButtons] = useState<MenuButtonType[]>(btn)
 
     useEffect(() => {
         axios.get('http://localhost:4000/api/me/admin')
@@ -62,7 +69,11 @@ const Menu = (props: { selected: SelectedEnum; }) => {
                         <Button key={b.selected} colorScheme={b.color || 'gray'} leftIcon={b.icon || <></>}
                                 variant={props.selected === b.selected ? 'solid' : 'ghost'}
                                 onClick={() => {
-                                    navigate(`/${b.name.toLowerCase()}`)
+                                    if (b.link) {
+                                        navigate(`/${b.link.toLowerCase()}`)
+                                    } else {
+                                        navigate(`/${b.name.toLowerCase()}`)
+                                    }
                                 }}>
                             {b.name} {b.beta && <Tag colorScheme='blue' marginLeft='0.25rem'>Beta</Tag>}
                         </Button>

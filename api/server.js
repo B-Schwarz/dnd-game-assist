@@ -17,6 +17,7 @@ const {
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
 const {getUserList, setAdmin, setMaster} = require("./admin");
+const {getBookList, getBook} = require("./books");
 
 const port = 4000;
 
@@ -132,6 +133,12 @@ app.get('/api/monster/new', isAuth, isMasterOrAdmin, createMonster)
 app.get('/api/monster/list', isAuth, getMonsterList)
 app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
 app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
+
+//
+//  BOOKS
+//
+app.get('/api/books', isAuth, getBookList)
+app.use('/api/books/', isAuth, express.static('books/pdf'))
 
 const start = async () => {
     try {

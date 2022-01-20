@@ -10,6 +10,7 @@ import Initiative from "./initiative/initiative";
 import Settings from "./settings/settings";
 import Admin from "./admin/admin";
 import MonsterList from "./monster/monster-list";
+import Books from "./books/books";
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                         <Route path="/settings" element={<><Menu selected={SelectedEnum.SETTINGS}/><Settings/></>}/>
                         <Route path="/admin" element={<><Menu selected={SelectedEnum.ADMIN}/><Admin/></>}/>
                         <Route path="/monster" element={<><Menu selected={SelectedEnum.MONSTER}/><MonsterList/></>}/>
+                        <Route path="/books" element={<><Menu selected={SelectedEnum.BOOKS}/><Books/> </>}/>
                         <Route path="*" element={<Navigate  to='/character' replace/>}/>
                     </Routes>
                 </Fragment>
