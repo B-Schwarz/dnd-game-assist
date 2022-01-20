@@ -10,7 +10,7 @@ const WithAuth = (Component: React.FC) => {
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
-            axios.get('http://localhost:4000/api/me')
+            axios.get('/api/me')
                 .catch(() => {
                     navigate('/login')
                 })

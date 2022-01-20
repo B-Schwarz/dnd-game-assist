@@ -15,7 +15,7 @@ const App = () => {
 
     useEffect(() => {
         update()
-        axios.get('http://localhost:4000/api/me/admin/master')
+        axios.get('/api/me/admin/master')
             .then(() => setIsAdminOrMaster(true))
             .catch(() => {
             })
@@ -26,7 +26,7 @@ const App = () => {
     }, [monster, isAdminOrMaster])
 
     const update = () => {
-        axios.get('http://localhost:4000/api/monster/list')
+        axios.get('/api/monster/list')
             .then((data) => {
                 const temp: Monster[] = _.cloneDeep(data.data)
                 setMonster([])
@@ -56,7 +56,7 @@ const App = () => {
     }
 
     const createMonster = () => {
-        axios.get('http://localhost:4000/api/monster/new')
+        axios.get('/api/monster/new')
             .then(() => update())
             .catch(() => {
             })

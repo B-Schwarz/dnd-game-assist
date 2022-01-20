@@ -91,7 +91,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     const onDelete = () => {
-        axios.delete(`http://localhost:4000/api/initiative/player/${props.p.turn}`)
+        axios.delete(`/api/initiative/player/${props.p.turn}`)
             .then(() => props.u())
             .catch(() => {
             })
@@ -345,7 +345,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function savePlayer() {
-        axios.put('http://localhost:4000/api/initiative/player', {player: props.p})
+        axios.put('/api/initiative/player', {player: props.p})
             .then(() => props.u())
             .catch((e) => {
                 console.log(e)
@@ -471,7 +471,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function move(direction: string) {
-        axios.put('http://localhost:4000/api/initiative/move', {
+        axios.put('/api/initiative/move', {
             index: props.i,
             direction: direction
         })

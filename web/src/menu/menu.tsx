@@ -44,7 +44,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
     const [buttons, setButtons] = useState<MenuButtonType[]>(btn)
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/me/admin')
+        axios.get('/api/me/admin')
             .then(() => {
                 setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
             }).catch(() => {})
@@ -53,7 +53,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
     const navigate = useNavigate()
 
     const logout = () => {
-        axios.get('http://localhost:4000/api/auth/logout')
+        axios.get('/api/auth/logout')
             .then(() => {
                 navigate('/')
             })

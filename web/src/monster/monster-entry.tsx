@@ -226,7 +226,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const save = () => {
-        axios.put('http://localhost:4000/api/monster', {
+        axios.put('/api/monster', {
             charID: monster._id,
             monster: monster.monster
         })
@@ -244,7 +244,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const deleteMonster = () => {
-        axios.delete(`http://localhost:4000/api/monster/${monster._id}`)
+        axios.delete(`/api/monster/${monster._id}`)
             .then(() => props.u())
             .catch(() => {
             })

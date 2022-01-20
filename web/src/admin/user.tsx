@@ -29,7 +29,7 @@ const App = () => {
     const [duplicate, setDuplicate] = useState(false)
 
     const getUser = () => {
-        axios.get('http://localhost:4000/api/user')
+        axios.get('/api/user')
             .then((r) => {
                 setUser(r.data)
             })
@@ -37,7 +37,7 @@ const App = () => {
 
     const doRegister = () => {
         if (regUserPass === regUserPassWdh) {
-            axios.post('http://localhost:4000/api/auth/register', {
+            axios.post('/api/auth/register', {
                 username: regUser,
                 password: regUserPass
             }).then(() => {
@@ -52,7 +52,7 @@ const App = () => {
     }
 
     const setAdmin = (id: string, val: boolean) => {
-        axios.put('http://localhost:4000/api/user/admin', {userID: id, admin: val})
+        axios.put('/api/user/admin', {userID: id, admin: val})
             .then(() => {
                 getUser()
             })
@@ -60,7 +60,7 @@ const App = () => {
     }
 
     const setMaster = (id: string, val: boolean) => {
-        axios.put('http://localhost:4000/api/user/master', {userID: id, master: val})
+        axios.put('/api/user/master', {userID: id, master: val})
             .then(() => {
                 getUser()
             })

@@ -8,7 +8,7 @@ const App = () => {
     const [books, setBooks] = useState<string[]>([])
 
     const getBooks = () => {
-        axios.get('http://localhost:4000/api/books')
+        axios.get('/api/books')
             .then((r) => {
                 setBooks(r.data)
             })
@@ -17,7 +17,7 @@ const App = () => {
     }
 
     const openBook = (b: string) => {
-        window.open('http://localhost:4000/api/books/' + b)
+        window.open('/api/books/' + b)
     }
 
     useEffect(() => {
