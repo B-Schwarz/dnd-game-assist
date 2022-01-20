@@ -59,7 +59,8 @@ UserSchema.methods.generateSession = async function () {
 UserSchema.statics.findByCredentials = function (name, password) {
     let User = this;
     return User.findOne({
-        name: name
+        name: {
+            $regex : new RegExp(name, "i") }
     }).then((user) => {
         if (!user)
             return Promise.reject();
