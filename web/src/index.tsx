@@ -8,8 +8,6 @@ import axios from "axios";
 
 axios.defaults.withCredentials = true
 
-document.title = 'DnD'
-
 ReactDOM.render(
   <React.StrictMode>
       <ChakraProvider>

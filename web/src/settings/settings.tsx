@@ -27,7 +27,7 @@ const App = () => {
     }
 
     async function deleteAcc() {
-        await axios.delete('/api/me/delete')
+        await axios.delete('http://localhost:4000/api/me/delete')
 
         window.location.reload()
     }
@@ -68,7 +68,7 @@ const App = () => {
                         }}
                         onSubmit={async (values, actions) => {
                             try {
-                                await axios.put('/api/me/password', {
+                                await axios.put('http://localhost:4000/api/me/password', {
                                     'currPass': values.password,
                                     'newPass': newPassVal
                                 },{

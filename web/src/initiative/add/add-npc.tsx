@@ -4,7 +4,7 @@ import {
     Center,
     Input,
     NumberInput,
-    NumberInputField,
+    NumberInputField, Switch,
     Table,
     Tbody,
     Td,
@@ -38,7 +38,7 @@ const App = (props: {u: () => void}) => {
                     _id: string;
                     npc: boolean;
                 }) => {
-                    if (!c.npc) {
+                    if (c.npc) {
                         data.push({
                             character: c.character,
                             id: c._id,
@@ -47,7 +47,9 @@ const App = (props: {u: () => void}) => {
                             isTurn: false,
                             isTurnSet: false,
                             statusEffects: [],
-                            turn: 0
+                            turn: 0,
+                            hidden: false,
+                            npc: true
                         })
                     }
                 })
@@ -58,10 +60,18 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (p: Player) => {
+        const roll = Math.floor(Math.random() * 20)
+        const dexMod = Math.floor((Number(p.character.dex) - 10) / 2) || 0
+        p.initiative = dexMod + roll
+
         axios.post('http://localhost:4000/api/initiative/player', {player: p})
             .then(() => props.u())
             .catch(() => {
             })
+    }
+
+    const onHide = (p: Player, val: boolean) => {
+        p.hidden = val
     }
 
     useEffect(() => {
@@ -86,13 +96,7 @@ const App = (props: {u: () => void}) => {
                         values.map((item, index) => (
                             <Tr key={index}>
                                 <Td><Text isTruncated maxW='11rem'>{item.character.name}</Text></Td>
-                                <Td><NumberInput defaultValue={values[index]['initiative'] || 0} min={0}
-                                                 onChange={(val) => {
-                                                     // @ts-ignore
-                                                     values[index]['initiative'] = val
-                                                 }}>
-                                    <NumberInputField/>
-                                </NumberInput></Td>
+                                <Td><Switch onChange={(evt) => onHide(item, evt.currentTarget.checked)}/></Td>
                                 <Td>
                                     <Center>
                                         <Button colorScheme='green'

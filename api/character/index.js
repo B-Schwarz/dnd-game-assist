@@ -50,6 +50,7 @@ const createCharacter = async (req, res) => {
     res.send({id: char._id})
 }
 
+// @deprecated
 // REQUIRES MASTER
 const createNPCharacter = async (req, res) => {
     const char = await Character.create({
@@ -63,6 +64,26 @@ const createNPCharacter = async (req, res) => {
     req.user.save()
 
     res.send({id: char._id})
+}
+
+// REQUIRES MASTER
+const setNPC = async (req, res) => {
+    const charID = req.body.charID
+
+    if (charID) {
+        await Character.findOne({
+            _id: mongoose.Types.ObjectId(charID)
+        })
+            .then((char) => {
+                char.npc = !char.npc
+                char.save()
+            })
+            .catch(() => res.sendStatus(500))
+
+        res.sendStatus(200)
+    } else {
+        res.sendStatus(400)
+    }
 }
 
 // REQUIRES MASTER OR ADMIN
@@ -113,7 +134,6 @@ const getOwnCharacter = async (req, res) => {
 // REQUIRES MASTER OR ADMIN
 const getCharacterList = async (req, res) => {
     const charList = await Character.find({
-        npc: false
     })
     res.send(filterCharacterListe(charList))
 }
@@ -168,7 +188,7 @@ const filterCharacterListe = (liste) => {
 }
 
 const filterCharacter = (char) => {
-    return _.pick(char, ['_id', 'character'])
+    return _.pick(char, ['_id', 'character', 'npc'])
 }
 
 const isOwnedByUser = (character, id) => {
@@ -185,5 +205,6 @@ module.exports = {
     createCharacter,
     createNPCharacter,
     deleteCharacter,
-    deleteOwnCharacter
+    deleteOwnCharacter,
+    setNPC
 }

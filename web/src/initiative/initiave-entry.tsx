@@ -8,7 +8,8 @@ import {
     Button,
     ButtonGroup,
     Grid,
-    GridItem, HStack,
+    GridItem,
+    HStack,
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
@@ -16,17 +17,22 @@ import {
     NumberInputStepper,
     Progress,
     Spacer,
-    Switch, Table, Tbody, Td,
-    Text, Th, Thead, Tr,
+    Switch,
+    Table,
+    Tbody,
+    Td,
+    Text,
+    Th,
+    Thead,
+    Tr,
     VStack
 } from "@chakra-ui/react";
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {getIcon} from "./status-icons";
 import {Player} from "./player.type";
 import axios from "axios";
-import {IoEyeSharp, IoEyeOffSharp} from "react-icons/io5";
+import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
-import _ from "lodash";
 
 const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => void }) => {
 
@@ -85,7 +91,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     const onDelete = () => {
-        axios.delete(`/api/initiative/player/${props.p.turn}`)
+        axios.delete(`http://localhost:4000/api/initiative/player/${props.p.turn}`)
             .then(() => props.u())
             .catch(() => {
             })
@@ -111,12 +117,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             }
 
             if (!Number.isNaN(save)) {
-                    return (
-                        <Text>{save > 0 && '+'}{save}</Text>
-                    )
+                return (
+                    <Text>{save > 0 && '+'}{save}</Text>
+                )
             }
 
-        } catch (_){
+        } catch (_) {
         }
 
         return (
@@ -136,7 +142,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <Text>{save > 0 && '+'}{save}</Text>
                 )
             }
-        } catch (_){}
+        } catch (_) {
+        }
 
         return (
             <Text>0</Text>
@@ -154,7 +161,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <Text>{save > 0 && '+'}{save}</Text>
                 )
             }
-        } catch (_){}
+        } catch (_) {
+        }
 
         return (
             <Text>0</Text>
@@ -172,7 +180,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <Text>{save > 0 && '+'}{save}</Text>
                 )
             }
-        } catch (_){}
+        } catch (_) {
+        }
 
         return (
             <Text>0</Text>
@@ -190,7 +199,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <Text>{save > 0 && '+'}{save}</Text>
                 )
             }
-        } catch (_){}
+        } catch (_) {
+        }
 
         return (
             <Text>0</Text>
@@ -208,7 +218,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <Text>{save > 0 && '+'}{save}</Text>
                 )
             }
-        } catch (_){}
+        } catch (_) {
+        }
 
         return (
             <Text>0</Text>
@@ -330,21 +341,11 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function updatePlayer() {
-        if (props.p.npc === false) {
-            const temp = _.cloneDeep(props.p.character)
-            temp.name = temp.name?.substring(0, temp.name?.indexOf('('))
-
-            axios.post('/api/char', {character: _.omit(temp, ['name']), charID: props.p.id})
-                .then(() => savePlayer())
-                .catch(() => {
-                })
-        } else {
-            savePlayer()
-        }
+        savePlayer()
     }
 
     function savePlayer() {
-        axios.put('/api/initiative/player', {player: props.p})
+        axios.put('http://localhost:4000/api/initiative/player', {player: props.p})
             .then(() => props.u())
             .catch((e) => {
                 console.log(e)
@@ -470,7 +471,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function move(direction: string) {
-        axios.put('/api/initiative/move', {
+        axios.put('http://localhost:4000/api/initiative/move', {
             index: props.i,
             direction: direction
         })
@@ -524,49 +525,50 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                         isChecked={blind}>Blind</Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
                                         isChecked={poison}>Vergifted</Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PRONE)} isChecked={down}>Am
-                                    Boden</Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PRONE)} isChecked={down}>
+                                    Liegend
+                                </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.CHARMED)} isChecked={charmed}>
-                                    Charmed
+                                    Bezaubert
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.DEAFENED)} isChecked={deafened}>
-                                    Deafened
+                                    Taub
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.FRIGHTENED)}
                                         isChecked={frightened}>
-                                    Frightened
+                                    Verängstigt
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.GRAPPLED)} isChecked={grappled}>
-                                    Grappled
+                                    Gepackt
                                 </Switch><br/>
                             </GridItem>
                             <GridItem>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.INCAPACITATED)}
                                         isChecked={incapacitated}>
-                                    Incapacitated
+                                    Kampfunfähig
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.INVISIBLE)}
                                         isChecked={invisible}>
-                                    Invisible
+                                    Unsichtbar
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.PARALYZED)}
                                         isChecked={paralyzed}>
-                                    Paralyzed
+                                    Gelähmt
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.PETRIFIED)}
                                         isChecked={petrified}>
-                                    Petrified
+                                    Versteinert
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.RESTRAINED)}
                                         isChecked={restrained}>
-                                    Restrained
+                                    Festgesetzt
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.STUNNED)} isChecked={stunned}>
-                                    Stunned
+                                    Betäubt
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNCONSCIOUS)}
                                         isChecked={unconscious}>
-                                    Unconscious
+                                    Bewusstlos
                                 </Switch><br/>
                             </GridItem>
                             <GridItem>

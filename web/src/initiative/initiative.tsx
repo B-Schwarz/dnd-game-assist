@@ -25,7 +25,7 @@ import Add from "./add/add";
 const App = () => {
 
     async function createMasterPlayer() {
-        const p1 = await axios.get('/api/char/get/61bde2e1d908d9469fee4030')
+        const p1 = await axios.get('http://localhost:4000/api/char/get/61bde2e1d908d9469fee4030')
             .then((c) => {
                 return {
                     hidden: false, initiative: 20, isMaster: true, npc: false, statusEffects: [],
@@ -33,7 +33,7 @@ const App = () => {
                 }
             })
 
-        const p2 = await axios.get('/api/char/get/61c866303282743779bba3d0')
+        const p2 = await axios.get('http://localhost:4000/api/char/get/61c866303282743779bba3d0')
             .then((c) => {
                 return {
                     character: c.data.character,
@@ -47,7 +47,7 @@ const App = () => {
                 }
             })
 
-        const p3 = await axios.get('/api/char/get/61c866343282743779bba421')
+        const p3 = await axios.get('http://localhost:4000/api/char/get/61c866343282743779bba421')
             .then((c) => {
                 return {
                     character: c.data.character,
@@ -72,7 +72,7 @@ const App = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     function save(p: Player[]) {
-        axios.put('/api/initiative', {player: p})
+        axios.put('http://localhost:4000/api/initiative', {player: p})
             .then(() => update())
             .catch(() => {
             })
@@ -81,7 +81,7 @@ const App = () => {
     // TODO: DEV
     async function create() {
         const p = await createMasterPlayer()
-        axios.put('/api/initiative', {player: p})
+        axios.put('http://localhost:4000/api/initiative', {player: p})
             .then(() => update())
             .catch(() => {
             })
@@ -96,7 +96,7 @@ const App = () => {
                 const next = (i + 1) % temp.length
                 temp[next].isTurn = true
                 if (next < i) {
-                    axios.put('/api/initiative/round', {round: round + 1})
+                    axios.put('http://localhost:4000/api/initiative/round', {round: round + 1})
                         .catch(() => {
                         })
                     setRound(round + 1)
@@ -119,7 +119,7 @@ const App = () => {
                 const next = (i + temp.length - 1) % temp.length
                 temp[next].isTurn = true
                 if (next > i) {
-                    axios.put('/api/initiative/round', {round: round - 1})
+                    axios.put('http://localhost:4000/api/initiative/round', {round: round - 1})
                         .catch(() => {
                         })
                     setRound(round - 1)
@@ -133,7 +133,7 @@ const App = () => {
     function get(master: boolean) {
         if (master) {
             try {
-                axios.get('/api/initiative/master')
+                axios.get('http://localhost:4000/api/initiative/master')
                     .then((r) => {
                         updatePlayer(r.data)
                     }).catch(() => {
@@ -143,7 +143,7 @@ const App = () => {
                 setIsMaster(false)
             }
         } else {
-            axios.get('/api/initiative')
+            axios.get('http://localhost:4000/api/initiative')
                 .then((r) => {
                     updatePlayer(r.data)
                 })
@@ -172,7 +172,7 @@ const App = () => {
     }
 
     function sort() {
-        axios.get('/api/initiative/sort')
+        axios.get('http://localhost:4000/api/initiative/sort')
             .then(() => {
                 update()
             }).catch(() => {
@@ -180,17 +180,17 @@ const App = () => {
     }
 
     function reset() {
-        axios.delete('/api/initiative/player')
+        axios.delete('http://localhost:4000/api/initiative/player')
             .then(() => update())
             .catch(() => {
             })
     }
 
     useEffect(() => {
-        axios.get('/api/me/master')
+        axios.get('http://localhost:4000/api/me/master')
             .then(() => {
                 setIsMaster(true)
-                axios.get('/api/initiative/round')
+                axios.get('http://localhost:4000/api/initiative/round')
                     .then((r) => {
                         setRound(r.data.round)
                     })
@@ -224,7 +224,6 @@ const App = () => {
             {
                 isMaster &&
                 <VStack>
-                    <Button colorScheme='teal' onClick={create}>Create</Button> {/*JUST FOR DEV*/}
                     <Text fontSize='2xl'>Runde: {round}</Text>
                     <StackItem>
                         <Grid templateColumns='repeat(4, 1fr)' gap={3}>
@@ -237,10 +236,11 @@ const App = () => {
                             <Button colorScheme='green' onClick={onOpen}>Add</Button>
                         </Grid>
                     </StackItem>
+
+                    <Divider marginTop='1rem'/>
                 </VStack>
             }
-            <Divider marginTop='1rem' marginBottom='2rem'/>
-            <Center>
+            <Center marginTop='2rem'>
                 <Accordion allowToggle width='80%'>
                     {
                         player.map((m, i) => (

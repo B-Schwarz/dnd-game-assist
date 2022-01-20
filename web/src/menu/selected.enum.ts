@@ -4,5 +4,6 @@ export enum SelectedEnum {
     INITIATIVE,
     SETTINGS,
     ADMIN,
-    MONSTER
+    MONSTER,
+    BOOKS
 }

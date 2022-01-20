@@ -61,18 +61,18 @@ const App = () => {
     async function send() {
         const data = {character: character, charID: id}
         if (isMaster) {
-            axios.post('/api/char', data, {
+            axios.post('http://localhost:4000/api/char', data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             }).catch(() => {
                 setIsMaster(false)
-                axios.post(`/api/char/me`, data)
+                axios.post(`http://localhost:4000/api/char/me`, data)
                     .catch(() => {
                     })
             })
         } else {
-            axios.post(`/api/char/me`, data)
+            axios.post(`http://localhost:4000/api/char/me`, data)
                 .catch(() => {
                 })
         }
@@ -80,12 +80,12 @@ const App = () => {
 
     async function recv() {
         if (isMaster) {
-            axios.get(`/api/char/get/${id}`)
+            axios.get(`http://localhost:4000/api/char/get/${id}`)
                 .then((data) => {
                     updateCharacter(data.data.character)
                 })
                 .catch(() => {
-                    axios.get(`/api/char/me/get/${id}`)
+                    axios.get(`http://localhost:4000/api/char/me/get/${id}`)
                         .then((data) => {
                             updateCharacter(data.data.character)
                         })
@@ -93,7 +93,7 @@ const App = () => {
                         })
                 })
         } else {
-            axios.get(`/api/char/me/get/${id}`)
+            axios.get(`http://localhost:4000/api/char/me/get/${id}`)
                 .then((data) => {
                     updateCharacter(data.data.character)
                 })

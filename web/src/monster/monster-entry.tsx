@@ -9,8 +9,8 @@ import {
     AlertDialogContent,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogOverlay,
-    Button,
+    AlertDialogOverlay, Box,
+    Button, Container,
     Flex,
     Grid,
     GridItem,
@@ -130,9 +130,10 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
                 // @ts-ignore
                 monster.monster[key].split('\n').map((l, i) => (
                     <React.Fragment key={i}>
-                        {!big && replaceBold(l)}
-                        {big && l}
-                        <br/>
+                        <Text maxWidth="65vw" wordBreak="break-word">
+                            {!big && replaceBold(l)}
+                            {big && l}
+                        </Text>
                     </React.Fragment>
                 ))
             )
@@ -225,7 +226,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const save = () => {
-        axios.put('/api/monster', {
+        axios.put('http://localhost:4000/api/monster', {
             charID: monster._id,
             monster: monster.monster
         })
@@ -243,7 +244,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const deleteMonster = () => {
-        axios.delete(`/api/monster/${monster._id}`)
+        axios.delete(`http://localhost:4000/api/monster/${monster._id}`)
             .then(() => props.u())
             .catch(() => {
             })

@@ -3,13 +3,12 @@ const app = express();
 const {connectDB} = require('./db')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
-const path = require('path')
 
 const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, createNPCharacter
+    deleteOwnCharacter, createNPCharacter, setNPC
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
@@ -17,6 +16,8 @@ const {
     setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
+const {getUserList, setAdmin, setMaster} = require("./admin");
+const {getBookList, getBook} = require("./books");
 
 const port = 4000;
 
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 });
 
 const store = MongoStore.create({
-    mongoUrl: 'mongodb://db:27017/dnd',
+    mongoUrl: 'mongodb://localhost:27017/dnd',
     collectionName: 'sessions'
 })
 
@@ -69,17 +70,22 @@ app.get('/api/char/new', isAuth, createCharacter)
 app.get('/api/char/new/npc', isAuth, isMaster, createNPCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
+app.put('/api/char/npc/toggle', isAuth, isMaster, setNPC)
 app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
 app.post('/api/char/me', isAuth, saveOwnCharacter)
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
 //
-//  ACCOUNT
+//  AUTH
 //
-app.post('/api/auth/register', register)
+app.post('/api/auth/register', isAuth, isAdmin, register)
 app.post('/api/auth/login', login)
 app.get('/api/auth/logout', isAuth, logout)
+
+//
+//  ACCOUNT
+//
 app.delete('/api/me/delete', isAuth, deleteOwnAccount)
 app.delete('/api/account/delete', isAuth, isAdmin, deleteAccount)
 app.put('/api/me/password', isAuth, changeOwnPassword)
@@ -96,6 +102,14 @@ app.get('/api/me/master', isAuth, isMaster, (req, res) => {
 app.get('/api/me/admin/master', isAuth, isMasterOrAdmin, (req, res) => {
     res.sendStatus(200)
 })
+
+//
+//  ADMIN
+//
+
+app.get('/api/user', isAuth, isAdmin, getUserList)
+app.put('/api/user/admin', isAuth, isAdmin, setAdmin)
+app.put('/api/user/master', isAuth, isAdmin, setMaster)
 
 //
 //  INITIATIVE
@@ -121,12 +135,10 @@ app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
 app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
 
 //
-//  HOST REACT
+//  BOOKS
 //
-app.use(express.static(path.join(__dirname, 'build')))
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build/index.html'))
-})
+app.get('/api/books', isAuth, getBookList)
+app.use('/api/books/', isAuth, express.static('books/pdf'))
 
 const start = async () => {
     try {
