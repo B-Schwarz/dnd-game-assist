@@ -6,10 +6,11 @@ Start the server by first installing all modules with ``npm install`` and then r
 
 ## Auth
 
-| URL                        |  METHOD  |                  PARAMETER                   |         ROLE         | DESCR.                                                                   | Return                                |
-|----------------------------|:--------:|:--------------------------------------------:|:--------------------:|--------------------------------------------------------------------------|---------------------------------------|
-| /api/auth/login            |  `POST`  |   `password:string` <br/>`username:string`   |        `none`        | Logs the user in                                                         | `none`                                |
-| /api/auth/logout           |  `GET`   |                    `none`                    |        `none`        | Logs the user out                                                        | `none`                                |
+| URL                | METHOD |                PARAMETER                 |  ROLE   | DESCR.               | Return |
+|--------------------|:------:|:----------------------------------------:|:-------:|----------------------|--------|
+| /api/auth/login    | `POST` | `password:string` <br/>`username:string` | `none`  | Logs the user in     | `none` |
+| /api/auth/logout   | `GET`  |                  `none`                  | `none`  | Logs the user out    | `none` |
+| /api/auth/register | `POST` | `username:string`<br/>`password:string`  | `admin` | Registers a new user | `none` |
 
 ## Char List
 
@@ -43,6 +44,14 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/me/password           |  `PUT`   |    `currPass:string`<br/>`newPass:string`    |        `user`        | Changes the user password                                                | `none`                                |
 | /api/me/delete             | `DELETE` |                    `none`                    |        `user`        | Deletes your own user account + all your character sheets                | `none`                                |
 | /api/account/delete        | `DELETE` |              `userID:ObjectID`               |       `admin`        | Deletes an account with all their character sheets                       | `none`                                |
+
+## Admin
+
+| URL              | METHOD |               PARAMETER                |  ROLE   | DESCR.                                        | Return        |
+|------------------|:------:|:--------------------------------------:|:-------:|-----------------------------------------------|---------------|
+| /api/user        | `GET`  |                 `none`                 | `admin` | Returns a list with all users and their roles | `[user:User]` |
+| /api/user/admin  | `PUT`  | `userID:ObjectID`<br/>`admin:boolean`  | `admin` | Sets the role status                          | `none`        |
+| /api/user/master | `PUT`  | `userID:ObjectID`<br/>`master:boolean` | `admin` | Sets the role status                          | `none`        |
 
 ## Initiative Board
 

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, Tag} from "@chakra-ui/react";
+import {Box, Button, HStack, Spacer, Tag} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
 import {Divider} from "@chakra-ui/layout";
 import {useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
+import {MdLogout} from "react-icons/md";
 
 const Menu = (props: { selected: SelectedEnum; }) => {
 
@@ -44,9 +45,18 @@ const Menu = (props: { selected: SelectedEnum; }) => {
 
     const navigate = useNavigate()
 
+    const logout = () => {
+        axios.get('http://localhost:4000/api/auth/logout')
+            .then(() => {
+                navigate('/')
+            })
+            .catch(() => {})
+    }
+
     return (
         <>
             <Box padding='0.2rem'>
+                <HStack>
                 {
                     buttons.map((b) => (
                         <Button key={b.selected} colorScheme={b.color || 'gray'} leftIcon={b.icon || <></>}
@@ -58,6 +68,9 @@ const Menu = (props: { selected: SelectedEnum; }) => {
                         </Button>
                     ))
                 }
+                <Spacer/>
+                <Button leftIcon={<MdLogout/>} variant='ghost' onClick={logout}>Logout</Button>
+                </HStack>
             </Box>
             <Divider marginBottom='1rem'/>
         </>

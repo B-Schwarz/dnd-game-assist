@@ -16,6 +16,7 @@ const {
     setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
+const {getUserList, setAdmin, setMaster} = require("./admin");
 
 const port = 4000;
 
@@ -75,11 +76,15 @@ app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 
 //
-//  ACCOUNT
+//  AUTH
 //
-app.post('/api/auth/register', register)
+app.post('/api/auth/register', isAuth, isAdmin, register)
 app.post('/api/auth/login', login)
 app.get('/api/auth/logout', isAuth, logout)
+
+//
+//  ACCOUNT
+//
 app.delete('/api/me/delete', isAuth, deleteOwnAccount)
 app.delete('/api/account/delete', isAuth, isAdmin, deleteAccount)
 app.put('/api/me/password', isAuth, changeOwnPassword)
@@ -96,6 +101,14 @@ app.get('/api/me/master', isAuth, isMaster, (req, res) => {
 app.get('/api/me/admin/master', isAuth, isMasterOrAdmin, (req, res) => {
     res.sendStatus(200)
 })
+
+//
+//  ADMIN
+//
+
+app.get('/api/user', isAuth, isAdmin, getUserList)
+app.put('/api/user/admin', isAuth, isAdmin, setAdmin)
+app.put('/api/user/master', isAuth, isAdmin, setMaster)
 
 //
 //  INITIATIVE
