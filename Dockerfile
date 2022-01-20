@@ -23,7 +23,7 @@ RUN cd temp \
     && cp -r build/ /app/ \
     && cd /app \
     && npm ci \
-    && rm -rf /tmp
+    && rm -rf /temp
 WORKDIR /app
 EXPOSE 4000
 CMD ["npm", "run", "start"]
