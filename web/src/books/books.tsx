@@ -28,9 +28,7 @@ const App = () => {
         <Center>
             <VStack>
                 {books.map((value, index) => (
-                    <>
-                        <Button w='100%' key={index} onClick={() => openBook(value)}>{value}</Button>
-                    </>
+                    <Button w='100%' key={index} onClick={() => openBook(value)}>{value}</Button>
                 ))}
             </VStack>
         </Center>
