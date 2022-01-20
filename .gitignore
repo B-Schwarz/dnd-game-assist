@@ -153,3 +153,4 @@ node_modules
 api/build
 web/build
 api/books/pdf
+Books/*.pdf

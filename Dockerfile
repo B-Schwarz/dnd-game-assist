@@ -1,5 +1,8 @@
 FROM node:17.3-alpine3.14
+COPY api/amin app/admin
 COPY api/auth app/auth
+COPY api/books app/books
+RUN mkdir -p /app/books/pdf
 COPY api/character app/character
 COPY api/db app/db
 COPY api/initiative app/initiative
@@ -8,6 +11,7 @@ COPY api/settings app/settings
 COPY api/package.json app/
 COPY api/package-lock.json app/
 COPY api/server.js app/
+COPY Books/* app/api/books/pdf/
 COPY web/public temp/public
 COPY web/src temp/src
 COPY web/package.json temp/
