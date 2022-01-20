@@ -17,7 +17,8 @@ const {
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
 const {getUserList, setAdmin, setMaster} = require("./admin");
-const {getBookList, getBook} = require("./books");
+const {getBookList} = require("./books");
+const path = require("path");
 
 const port = 4000;
 
@@ -37,7 +38,7 @@ app.use((req, res, next) => {
 });
 
 const store = MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/dnd',
+    mongoUrl: 'mongodb://db:27017/dnd',
     collectionName: 'sessions'
 })
 
@@ -139,6 +140,14 @@ app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
 //
 app.get('/api/books', isAuth, getBookList)
 app.use('/api/books/', isAuth, express.static('books/pdf'))
+
+//
+//  HOST REACT
+//
+app.use(express.static(path.resolve('build')))
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve('build/index.html'))
+})
 
 const start = async () => {
     try {
