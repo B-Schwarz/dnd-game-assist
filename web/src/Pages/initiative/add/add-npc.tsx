@@ -1,18 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {
-    Button,
-    Center,
-    Input,
-    NumberInput,
-    NumberInputField, Switch,
-    Table,
-    Tbody,
-    Td,
-    Text,
-    Th,
-    Thead,
-    Tr
-} from "@chakra-ui/react"
+import {Button, Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react"
 import {AddIcon} from "@chakra-ui/icons";
 import _ from "lodash";
 import {Player} from "../player.type";
@@ -31,7 +18,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const getPlayer = () => {
-        axios.get('http://localhost:4000/api/charlist')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist')
             .then((d) => {
                 d.data.forEach((c: {
                     character: DnDCharacter;
@@ -64,7 +51,7 @@ const App = (props: {u: () => void}) => {
         const dexMod = Math.floor((Number(p.character.dex) - 10) / 2) || 0
         p.initiative = dexMod + roll
 
-        axios.post('http://localhost:4000/api/initiative/player', {player: p})
+        axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: p})
             .then(() => props.u())
             .catch(() => {
             })

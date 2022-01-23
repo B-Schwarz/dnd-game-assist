@@ -18,7 +18,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const getMonster = () => {
-        axios.get('http://localhost:4000/api/monster/list')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list')
             .then((d) => {
                 d.data.forEach((m: Monster) => {
                     data.push({
@@ -58,7 +58,7 @@ const App = (props: {u: () => void}) => {
         const dexMod = Math.floor((Number(m.character.dex) - 10) / 2)
         m.initiative = dexMod + roll
 
-        axios.post('http://localhost:4000/api/initiative/player', {player: m})
+        axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: m})
             .then(() => props.u())
             .catch(() => {
             })

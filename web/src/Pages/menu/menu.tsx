@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Box, Button, HStack, Spacer, Tag} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
 import {Divider} from "@chakra-ui/layout";
-import {useNavigate, Link as ReactRouterLink} from "react-router-dom";
+import {Link as ReactRouterLink, useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
 import {MdLogout} from "react-icons/md";
@@ -44,7 +44,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
     const [buttons, setButtons] = useState<MenuButtonType[]>(btn)
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/me/admin')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/admin')
             .then(() => {
                 setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
             }).catch(() => {})
@@ -53,7 +53,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
     const navigate = useNavigate()
 
     const logout = () => {
-        axios.get('http://localhost:4000/api/auth/logout')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/auth/logout')
             .then(() => {
                 navigate('/')
             })

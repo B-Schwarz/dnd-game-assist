@@ -2,14 +2,16 @@ import React, {useEffect, useState} from "react";
 import {
     Accordion,
     AccordionButton,
-    AccordionItem, AccordionPanel,
+    AccordionItem,
+    AccordionPanel,
     Box,
     Button,
     Center,
     FormControl,
     FormErrorMessage,
     GridItem,
-    Input, Switch,
+    Input,
+    Switch,
     Text,
     VStack
 } from "@chakra-ui/react";
@@ -29,7 +31,7 @@ const App = () => {
     const [duplicate, setDuplicate] = useState(false)
 
     const getUser = () => {
-        axios.get('http://localhost:4000/api/user')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/user')
             .then((r) => {
                 setUser(r.data)
             })
@@ -37,7 +39,7 @@ const App = () => {
 
     const doRegister = () => {
         if (regUserPass === regUserPassWdh) {
-            axios.post('http://localhost:4000/api/auth/register', {
+            axios.post(process.env.REACT_APP_API_PREFIX + '/api/auth/register', {
                 username: regUser,
                 password: regUserPass
             }).then(() => {
@@ -52,7 +54,7 @@ const App = () => {
     }
 
     const setAdmin = (id: string, val: boolean) => {
-        axios.put('http://localhost:4000/api/user/admin', {userID: id, admin: val})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/user/admin', {userID: id, admin: val})
             .then(() => {
                 getUser()
             })
@@ -60,7 +62,7 @@ const App = () => {
     }
 
     const setMaster = (id: string, val: boolean) => {
-        axios.put('http://localhost:4000/api/user/master', {userID: id, master: val})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/user/master', {userID: id, master: val})
             .then(() => {
                 getUser()
             })

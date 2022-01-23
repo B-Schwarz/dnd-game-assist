@@ -6,13 +6,21 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogOverlay,
-    Button, Center, Container, Flex, FormControl, FormErrorMessage, FormLabel, Input, useToast, VStack
+    Button,
+    Center,
+    Container,
+    Flex,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Input,
+    useToast,
+    VStack
 } from "@chakra-ui/react";
 import axios from "axios";
 import {DeleteIcon} from "@chakra-ui/icons";
 import WithAuth from "../login/withAuth";
 import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
-import {Divider} from "@chakra-ui/layout";
 
 const App = () => {
 
@@ -27,7 +35,7 @@ const App = () => {
     }
 
     async function deleteAcc() {
-        await axios.delete('http://localhost:4000/api/me/delete')
+        await axios.delete(process.env.REACT_APP_API_PREFIX + '/api/me/delete')
 
         window.location.reload()
     }
@@ -68,7 +76,7 @@ const App = () => {
                         }}
                         onSubmit={async (values, actions) => {
                             try {
-                                await axios.put('http://localhost:4000/api/me/password', {
+                                await axios.put(process.env.REACT_APP_API_PREFIX + '/api/me/password', {
                                     'currPass': values.password,
                                     'newPass': newPassVal
                                 },{

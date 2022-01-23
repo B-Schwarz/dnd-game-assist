@@ -1,17 +1,19 @@
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {Box, Icon} from "@chakra-ui/react";
-import {
-    IoArrowDownSharp,
-    IoEarOutline,
-    IoEyeOffSharp,
-    IoHeartSharp,
-    IoPulseSharp,
-    IoWaterSharp
-} from "react-icons/io5";
+import {IoArrowDownSharp, IoEarOutline, IoEyeOffSharp, IoWaterSharp} from "react-icons/io5";
 import React from "react";
-import {GiBootStomp,
-    GiCharm, GiChicken, GiDeadHead, GiHook, GiInvisible, GiKnockedOutStars,
-    GiKnockout, GiSpiderWeb, GiStoneBlock, GiThunderStruck} from "react-icons/gi";
+import {
+    GiBootStomp,
+    GiCharm,
+    GiChicken,
+    GiHook,
+    GiInvisible,
+    GiKnockedOutStars,
+    GiKnockout,
+    GiSpiderWeb,
+    GiStoneBlock,
+    GiThunderStruck
+} from "react-icons/gi";
 
 const prone = (
     <React.Fragment key='down'>
