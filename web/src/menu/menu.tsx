@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Box, Button, HStack, Spacer, Tag} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
 import {Divider} from "@chakra-ui/layout";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link as ReactRouterLink} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
 import {MdLogout} from "react-icons/md";
@@ -68,13 +68,8 @@ const Menu = (props: { selected: SelectedEnum; }) => {
                     buttons.map((b) => (
                         <Button key={b.selected} colorScheme={b.color || 'gray'} leftIcon={b.icon || <></>}
                                 variant={props.selected === b.selected ? 'solid' : 'ghost'}
-                                onClick={() => {
-                                    if (b.link) {
-                                        navigate(`/${b.link.toLowerCase()}`)
-                                    } else {
-                                        navigate(`/${b.name.toLowerCase()}`)
-                                    }
-                                }}>
+                                as={ReactRouterLink} to={b.link ? '/' + b.link.toLowerCase() : '/' + b.name.toLowerCase()}
+                                style={{ textDecoration: "none" }} replace>
                             {b.name} {b.beta && <Tag colorScheme='blue' marginLeft='0.25rem'>Beta</Tag>}
                         </Button>
                     ))
