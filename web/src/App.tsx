@@ -1,16 +1,16 @@
 import React, {Fragment} from 'react';
 import './App.css';
 import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
-import Character from "./character-sheet/character";
-import Login from "./login/login"
-import CharacterList from "./character-sheet/character-list";
-import Menu from "./menu/menu";
-import {SelectedEnum} from "./menu/selected.enum";
-import Initiative from "./initiative/initiative";
-import Settings from "./settings/settings";
-import Admin from "./admin/admin";
-import MonsterList from "./monster/monster-list";
-import Books from "./books/books";
+import Character from "./Pages/character-sheet/character";
+import Login from "./Pages/login/login"
+import CharacterList from "./Pages/character-sheet/character-list";
+import Menu from "./Pages/menu/menu";
+import {SelectedEnum} from "./Pages/menu/selected.enum";
+import Initiative from "./Pages/initiative/initiative";
+import Settings from "./Pages/settings/settings";
+import Admin from "./Pages/admin/admin";
+import MonsterList from "./Pages/monster/monster-list";
+import Books from "./Pages/books/books";
 
 function App() {
     return (
