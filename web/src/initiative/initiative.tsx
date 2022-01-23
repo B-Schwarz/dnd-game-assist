@@ -184,6 +184,10 @@ const App = () => {
             .then(() => update())
             .catch(() => {
             })
+        axios.put('http://localhost:4000/api/initiative/round', {round: round - 1})
+            .catch(() => {
+            })
+        setRound(0)
     }
 
     useEffect(() => {
