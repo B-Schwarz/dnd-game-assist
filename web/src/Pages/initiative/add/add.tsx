@@ -1,10 +1,5 @@
 import React from "react"
-import {
-    Accordion,
-    ModalBody,
-    ModalCloseButton,
-    ModalHeader, Tab, TabList, TabPanel, TabPanels, Tabs
-} from "@chakra-ui/react";
+import {ModalBody, ModalCloseButton, ModalHeader, Tab, TabList, TabPanel, TabPanels, Tabs} from "@chakra-ui/react";
 import AddPlayer from "./add-player";
 import AddMonster from "./add-monster";
 import AddNpc from "./add-npc";

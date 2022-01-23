@@ -36,18 +36,18 @@ const App = () => {
     const closePopup = () => setIsOpen(false)
 
     function getOwnChars() {
-        return axios.get('http://localhost:4000/api/charlist/me')
+        return axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist/me')
     }
 
     function getChars() {
-        return axios.get('http://localhost:4000/api/charlist')
+        return axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist')
     }
 
     async function deleteChar() {
         if (isOwn) {
-            await axios.delete('http://localhost:4000/api/char/me/' + deleteID)
+            await axios.delete(process.env.REACT_APP_API_PREFIX + '/api/char/me/' + deleteID)
         } else {
-            await axios.delete('http://localhost:4000/api/char/' + deleteID)
+            await axios.delete(process.env.REACT_APP_API_PREFIX + '/api/char/' + deleteID)
         }
 
         window.location.reload()
@@ -79,7 +79,7 @@ const App = () => {
     }
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/me/master')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => setIsMaster(true))
             .catch(() => {})
     }, [])
@@ -97,13 +97,13 @@ const App = () => {
     }
 
     async function createCharacter() {
-        const response = await axios.get('http://localhost:4000/api/char/new')
+        const response = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/new')
         return response.data.id
     }
 
     const setNPC = (p: { _id: string, character: DnDCharacter, npc: boolean }) => {
         console.log('Trigger')
-        axios.put('http://localhost:4000/api/char/npc/toggle', {
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/char/npc/toggle', {
             charID: p._id
         })
             .then(() => updateOwnCharList())

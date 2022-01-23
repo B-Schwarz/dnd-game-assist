@@ -25,7 +25,7 @@ import Add from "./add/add";
 const App = () => {
 
     async function createMasterPlayer() {
-        const p1 = await axios.get('http://localhost:4000/api/char/get/61bde2e1d908d9469fee4030')
+        const p1 = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/get/61bde2e1d908d9469fee4030')
             .then((c) => {
                 return {
                     hidden: false, initiative: 20, isMaster: true, npc: false, statusEffects: [],
@@ -33,7 +33,7 @@ const App = () => {
                 }
             })
 
-        const p2 = await axios.get('http://localhost:4000/api/char/get/61c866303282743779bba3d0')
+        const p2 = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/get/61c866303282743779bba3d0')
             .then((c) => {
                 return {
                     character: c.data.character,
@@ -47,7 +47,7 @@ const App = () => {
                 }
             })
 
-        const p3 = await axios.get('http://localhost:4000/api/char/get/61c866343282743779bba421')
+        const p3 = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/get/61c866343282743779bba421')
             .then((c) => {
                 return {
                     character: c.data.character,
@@ -72,7 +72,7 @@ const App = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     function save(p: Player[]) {
-        axios.put('http://localhost:4000/api/initiative', {player: p})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative', {player: p})
             .then(() => update())
             .catch(() => {
             })
@@ -81,7 +81,7 @@ const App = () => {
     // TODO: DEV
     async function create() {
         const p = await createMasterPlayer()
-        axios.put('http://localhost:4000/api/initiative', {player: p})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative', {player: p})
             .then(() => update())
             .catch(() => {
             })
@@ -96,7 +96,7 @@ const App = () => {
                 const next = (i + 1) % temp.length
                 temp[next].isTurn = true
                 if (next < i) {
-                    axios.put('http://localhost:4000/api/initiative/round', {round: round + 1})
+                    axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: round + 1})
                         .catch(() => {
                         })
                     setRound(round + 1)
@@ -119,7 +119,7 @@ const App = () => {
                 const next = (i + temp.length - 1) % temp.length
                 temp[next].isTurn = true
                 if (next > i) {
-                    axios.put('http://localhost:4000/api/initiative/round', {round: round - 1})
+                    axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: round - 1})
                         .catch(() => {
                         })
                     setRound(round - 1)
@@ -133,7 +133,7 @@ const App = () => {
     function get(master: boolean) {
         if (master) {
             try {
-                axios.get('http://localhost:4000/api/initiative/master')
+                axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/master')
                     .then((r) => {
                         updatePlayer(r.data)
                     }).catch(() => {
@@ -143,7 +143,7 @@ const App = () => {
                 setIsMaster(false)
             }
         } else {
-            axios.get('http://localhost:4000/api/initiative')
+            axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative')
                 .then((r) => {
                     updatePlayer(r.data)
                 })
@@ -172,7 +172,7 @@ const App = () => {
     }
 
     function sort() {
-        axios.get('http://localhost:4000/api/initiative/sort')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/sort')
             .then(() => {
                 update()
             }).catch(() => {
@@ -180,21 +180,21 @@ const App = () => {
     }
 
     function reset() {
-        axios.delete('http://localhost:4000/api/initiative/player')
+        axios.delete(process.env.REACT_APP_API_PREFIX + '/api/initiative/player')
             .then(() => update())
             .catch(() => {
             })
-        axios.put('http://localhost:4000/api/initiative/round', {round: round - 1})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: round - 1})
             .catch(() => {
             })
         setRound(0)
     }
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/me/master')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => {
                 setIsMaster(true)
-                axios.get('http://localhost:4000/api/initiative/round')
+                axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
                     .then((r) => {
                         setRound(r.data.round)
                     })

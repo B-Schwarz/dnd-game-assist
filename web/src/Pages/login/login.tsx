@@ -1,13 +1,4 @@
-import {
-    Button,
-    Center,
-    Flex,
-    FormControl,
-    FormErrorMessage,
-    FormLabel,
-    Heading,
-    Input
-} from '@chakra-ui/react'
+import {Button, Center, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input} from '@chakra-ui/react'
 import {Field, FieldProps, Form, Formik, FormikProps} from 'formik'
 import React from 'react'
 import {useNavigate} from "react-router-dom";
@@ -46,7 +37,7 @@ const Login: React.FC<LoginProps> = () => {
                     }}
                     onSubmit={async (values, actions) => {
                         try {
-                        const res = await axios.post('http://localhost:4000/api/auth/login/', {
+                        const res = await axios.post(process.env.REACT_APP_API_PREFIX + '/api/auth/login/', {
                             username: values.name,
                             password: values.password
                         })

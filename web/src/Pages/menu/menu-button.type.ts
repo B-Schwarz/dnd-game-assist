@@ -1,4 +1,3 @@
-import {SettingsIcon} from "@chakra-ui/icons";
 import {SelectedEnum} from "./selected.enum";
 import {JSXElementConstructor, ReactElement} from "react";
 

@@ -9,12 +9,11 @@ import {
     AlertDialogContent,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogOverlay, Box,
-    Button, Container,
+    AlertDialogOverlay,
+    Button,
     Flex,
     Grid,
     GridItem,
-    HStack,
     IconButton,
     Input,
     NumberDecrementStepper,
@@ -22,7 +21,8 @@ import {
     NumberInput,
     NumberInputField,
     NumberInputStepper,
-    Stack, StackItem,
+    Stack,
+    StackItem,
     Table,
     Tbody,
     Td,
@@ -30,7 +30,8 @@ import {
     Textarea,
     Th,
     Thead,
-    Tr, useToast
+    Tr,
+    useToast
 } from "@chakra-ui/react"
 import _ from "lodash";
 import {DeleteIcon, EditIcon} from "@chakra-ui/icons";
@@ -226,7 +227,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const save = () => {
-        axios.put('http://localhost:4000/api/monster', {
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/monster', {
             charID: monster._id,
             monster: monster.monster
         })
@@ -244,7 +245,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const deleteMonster = () => {
-        axios.delete(`http://localhost:4000/api/monster/${monster._id}`)
+        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/monster/${monster._id}`)
             .then(() => props.u())
             .catch(() => {
             })
