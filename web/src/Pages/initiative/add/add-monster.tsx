@@ -34,7 +34,8 @@ const App = (props: {u: () => void}) => {
                             dexSave: String(m.monster.saving.dex),
                             intSave: String(m.monster.saving.int),
                             wisSave: String(m.monster.saving.wis),
-                            chaSave: String(m.monster.saving.cha)
+                            chaSave: String(m.monster.saving.cha),
+                            speed: String(m.monster.speed)
                         },
                         id: m._id,
                         initiative: 0,

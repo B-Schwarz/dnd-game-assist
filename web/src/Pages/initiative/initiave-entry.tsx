@@ -40,6 +40,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [tempHp, setTempHp] = useState(props.p.character.tempHp || '0')
     const [maxHp, setMaxHp] = useState(props.p.character.maxHp || '0')
 
+    const geschwindigkeit = props.p.character.speed || 'UNBEKANNT'
     const [ac, setAc] = useState(props.p.character.ac || '0')
     const statusEffects = props.p.statusEffects || []
 
@@ -607,7 +608,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </Tbody>
                                 </Table>
                             </GridItem>
-                            <GridItem/>
+                            <GridItem>
+                                Geschwindigkeit: {geschwindigkeit}
+                            </GridItem>
                             <GridItem>
                                 <VStack>
                                     <HStack>
