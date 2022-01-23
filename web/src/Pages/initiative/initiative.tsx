@@ -184,7 +184,7 @@ const App = () => {
             .then(() => update())
             .catch(() => {
             })
-        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: round - 1})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: 0})
             .catch(() => {
             })
         setRound(0)
