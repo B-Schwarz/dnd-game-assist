@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  webapp:
+    depends_on:
+      - db
+    build: .
+    ports:
+      - "5000:4000"
+  db:
+    image: mongo:4.4.11-rc1
+    volumes:
+      - ./mongo_volume:/data/db
