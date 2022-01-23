@@ -74,7 +74,7 @@ const App = (props: {u: () => void}) => {
                 <Thead>
                     <Tr>
                         <Th>Charactername</Th>
-                        <Th>Initiative</Th>
+                        <Th>Versteckt</Th>
                         <Th>Hinzufügen</Th>
                     </Tr>
                 </Thead>
