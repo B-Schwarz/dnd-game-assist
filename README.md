@@ -2,7 +2,7 @@
 
 Designed to assist in playing the game
 
-### Table of Contens
+### Table of Contents
 - [Monster editor](#character-editor)
 - [Combat tracker](#combat-tracker)
 - [Encounter editor](#encounter-editor)
