@@ -106,14 +106,16 @@ const App = () => {
             .then(() => {
                 setIsMaster(true)
             })
-            .catch(() => {
-            })
-            .finally(() => {
-                updateOwnCharList()
-                updateOtherCharList()
-            })
             .catch(() => {})
     }, [])
+
+    useEffect(() => {
+        updateOwnCharList()
+    }, [isMaster, updateOwnCharList])
+
+    useEffect(() => {
+        updateOtherCharList()
+    }, [ownCharData, updateOtherCharList])
 
     function openCharacter(id: string) {
         navigate("/character/" + id)
