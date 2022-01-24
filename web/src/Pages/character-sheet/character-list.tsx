@@ -57,7 +57,20 @@ const App = () => {
         getOwnChars()
             .then(r => {
                 setOwnCharData([])
-                setOwnCharData([...r.data])
+                for (let char of r.data) {
+                    const c: Player = {
+                        character: char['character'],
+                        id: char['_id'],
+                        initiative: 0,
+                        isMaster: false,
+                        isTurn: false,
+                        isTurnSet: false,
+                        statusEffects: [],
+                        turn: 0
+                    }
+                    // @ts-ignore
+                    setOwnCharData(charData => [...charData, c])
+                }
             })
             .catch(() => {
             })
@@ -67,7 +80,22 @@ const App = () => {
         getChars()
             .then(r => {
                 setCharData([])
-                setCharData([...r.data])
+                for (let char of r.data) {
+                    if (ownCharData.filter(c => c.id === char['_id']).length === 0) {
+                        const c: Player = {
+                            character: char['character'],
+                            id: char['_id'],
+                            initiative: 0,
+                            isMaster: false,
+                            isTurn: false,
+                            isTurnSet: false,
+                            statusEffects: [],
+                            turn: 0
+                        }
+                        // @ts-ignore
+                        setCharData(charData => [...charData, c])
+                    }
+                }
             })
             .catch(() => {
             })
@@ -78,11 +106,13 @@ const App = () => {
             .then(() => {
                 setIsMaster(true)
             })
-            .catch(() => {})
+            .catch(() => {
+            })
             .finally(() => {
                 updateOwnCharList()
                 updateOtherCharList()
             })
+            .catch(() => {})
     }, [])
 
     function openCharacter(id: string) {
@@ -99,7 +129,7 @@ const App = () => {
             charID: p.id
         })
             .then(() => updateOwnCharList())
-            .catch((e) => {console.log(e)})
+            .catch(() => {})
     }
 
     return (
