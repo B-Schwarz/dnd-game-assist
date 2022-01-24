@@ -18,8 +18,10 @@ const {
 const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
 const {getUserList, setAdmin, setMaster} = require("./admin");
 const {getBookList, getBook} = require("./books");
+const path = require("path");
 
 const port = 4000;
+const url = process.env.NODE_ENV === 'production' ? "https://dnd.saltyk.de" : "http://localhost:3000"
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
@@ -28,7 +30,7 @@ app.disable('x-powered-by');
 
 // CORS Header
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Origin", url);
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Credentials", "true")
@@ -37,7 +39,7 @@ app.use((req, res, next) => {
 });
 
 const store = MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/dnd',
+    mongoUrl: process.env.DB_URI,
     collectionName: 'sessions'
 })
 
@@ -149,8 +151,18 @@ const start = async () => {
     }
 }
 
+//
+//  HOST REACT
+//
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.resolve('build')))
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve('build/index.html'))
+    })
+}
+
 start().then(() => {
-    console.log(`Der Server wurde gestartet! http://localhost:${port}`);
+    console.log(`Der Server wurde gestartet!`);
 });
 
 

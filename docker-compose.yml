@@ -6,6 +6,9 @@ services:
     build: .
     ports:
       - "5000:4000"
+    environment:
+      - NODE_ENV=production
+      - DB_URI=mongodb://db:27017/dnd
   db:
     image: mongo:4.4.11-rc1
     volumes:
