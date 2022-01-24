@@ -67,7 +67,7 @@ const App = () => {
         getChars()
             .then(r => {
                 setCharData([])
-                setOwnCharData([...r.data])
+                setCharData([...r.data])
             })
             .catch(() => {
             })
@@ -77,10 +77,12 @@ const App = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => {
                 setIsMaster(true)
+            })
+            .catch(() => {})
+            .finally(() => {
                 updateOwnCharList()
                 updateOtherCharList()
             })
-            .catch(() => {})
     }, [])
 
     function openCharacter(id: string) {
