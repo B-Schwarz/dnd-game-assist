@@ -56,7 +56,7 @@ everytime they're changed.
 
 ---
 
-## Spell List (For 1.1)
+## Spell List
 
 [ ] Create spells  
 [ ] Search for spells with different filter  
