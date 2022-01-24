@@ -16,7 +16,8 @@ COPY web/public temp/public
 COPY web/src temp/src
 COPY web/package.json temp/
 COPY web/package-lock.json temp/
-COPY web/tsconfig.json temp
+COPY web/tsconfig.json temp/
+COPY web/.env.production temp/
 RUN cd temp \
     && npm ci \
     && npm run build \

@@ -19,12 +19,12 @@ import {useNavigate} from "react-router-dom";
 import {Divider} from "@chakra-ui/layout";
 import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
 import WithAuth from "../login/withAuth";
-import {DnDCharacter} from "dnd-character-sheets";
+import {Player} from "../initiative/player.type";
 
 const App = () => {
 
-    const [ownCharData, setOwnCharData] = useState([])
-    const [charData, setCharData] = useState([])
+    const [ownCharData, setOwnCharData] = useState<Player[]>([])
+    const [charData, setCharData] = useState<Player[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [isOwn, setIsOwn] = useState(false)
     const [deleteID, setDeleteID] = useState('')
@@ -57,7 +57,7 @@ const App = () => {
         getOwnChars()
             .then(r => {
                 setOwnCharData([])
-                setOwnCharData(r.data)
+                setOwnCharData([...r.data])
             })
             .catch(() => {
             })
@@ -67,12 +67,7 @@ const App = () => {
         getChars()
             .then(r => {
                 setCharData([])
-                for (let char of r.data) {
-                    if (ownCharData.filter(c => c['_id'] === char['_id']).length === 0) {
-                        // @ts-ignore
-                        setCharData(charData => [...charData, char])
-                    }
-                }
+                setOwnCharData([...r.data])
             })
             .catch(() => {
             })
@@ -80,17 +75,13 @@ const App = () => {
 
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
-            .then(() => setIsMaster(true))
+            .then(() => {
+                setIsMaster(true)
+                updateOwnCharList()
+                updateOtherCharList()
+            })
             .catch(() => {})
     }, [])
-
-    useEffect(() => {
-        updateOwnCharList()
-    }, [isMaster])
-
-    useEffect(() => {
-        updateOtherCharList()
-    }, [ownCharData])
 
     function openCharacter(id: string) {
         navigate("/character/" + id)
@@ -101,10 +92,9 @@ const App = () => {
         return response.data.id
     }
 
-    const setNPC = (p: { _id: string, character: DnDCharacter, npc: boolean }) => {
-        console.log('Trigger')
+    const setNPC = (p: Player) => {
         axios.put(process.env.REACT_APP_API_PREFIX + '/api/char/npc/toggle', {
-            charID: p._id
+            charID: p.id
         })
             .then(() => updateOwnCharList())
             .catch((e) => {console.log(e)})
@@ -118,15 +108,15 @@ const App = () => {
                 </Heading>
             </Center>
             {
-                ownCharData.map((item: { _id: string, character: DnDCharacter, npc: boolean }) => (
-                    <Center key={item['_id']}>
+                ownCharData.map((item: Player) => (
+                    <Center key={item.id}>
                         <ButtonGroup isAttached width='85%'>
                             {isMaster &&
                                 <Button borderWidth='1px' colorScheme={item["npc"] ? "teal" : "gray"} width="4rem"
                                         borderRadius='lg'
                                         onClick={() => setNPC(item)}>{item["npc"] && <>NPC</>}{!item["npc"] && <>PC</>}</Button>}
-                            <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
-                                    onClick={() => openCharacter(item['_id'])}>
+                            <Button borderWidth='1px' borderRadius='lg' width='100%'
+                                    onClick={() => openCharacter(item.id)}>
                                 <HStack>
                                     <Text color='gray'>Name:</Text>
                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
@@ -138,9 +128,9 @@ const App = () => {
                                     <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
                                 </HStack>
                             </Button>
-                            <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg' colorScheme='red'
+                            <Button borderWidth='1px' borderRadius='lg' colorScheme='red'
                                     onClick={() => {
-                                        setDeleteID(item['_id'])
+                                        setDeleteID(item.id)
                                         setIsOwn(true)
                                         setIsOpen(true)
                                     }}>
@@ -167,18 +157,18 @@ const App = () => {
                         </Heading>
                     </Center>
                     {
-                        charData.map((item: { _id: string, character: DnDCharacter, npc: boolean }) => {
+                        charData.map((item: Player) => {
                             if (item.npc && !isMaster) {
                                 return (
                                     <></>
                                 )
                             } else {
                                 return (
-                                    <Center key={item['_id']}>
+                                    <Center key={item.id}>
                                         <ButtonGroup isAttached width='85%'>
-                                            <Button key={item['_id']} borderWidth='1px' borderRadius='lg' width='100%'
+                                            <Button key={item.id} borderWidth='1px' borderRadius='lg' width='100%'
                                                     bg={item.npc ? "rgba(49,150,148,0.60)" : "#ebf0f5"}
-                                                    onClick={() => openCharacter(item['_id'])}>
+                                                    onClick={() => openCharacter(item.id)}>
                                                 <HStack>
                                                     <Text color='gray'>Name:</Text>
                                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
@@ -190,10 +180,10 @@ const App = () => {
                                                     <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
                                                 </HStack>
                                             </Button>
-                                            <Button key={item['_id'] + '-del'} borderWidth='1px' borderRadius='lg'
+                                            <Button borderWidth='1px' borderRadius='lg'
                                                     colorScheme='red'
                                                     onClick={() => {
-                                                        setDeleteID(item['_id'])
+                                                        setDeleteID(item.id)
                                                         setIsOwn(true)
                                                         setIsOpen(true)
                                                     }}>
