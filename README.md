@@ -74,7 +74,7 @@ everytime they're changed.
 
 [ ] Export character sheets  
 [ ] Import character sheets  
-[ ] Duplicate character sheets  
+[ ] Duplicate character sheets (won't do)  
 [ ] Reassign character sheets to other users (only one at a time)  
 [ ] Delete another user account  
 [ ] Change another user's password  
