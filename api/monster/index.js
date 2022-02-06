@@ -25,7 +25,7 @@ const saveMonster = async (req, res) => {
 }
 
 const getMonsterList = async (req, res) => {
-    const monList = await Monster.find()
+    const monList = await Monster.find().sort({'monster.name': 1})
     res.send(filterMonsterListe(monList))
 }
 

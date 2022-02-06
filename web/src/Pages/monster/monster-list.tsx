@@ -28,18 +28,8 @@ const App = () => {
     const update = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list')
             .then((data) => {
-                const temp: Monster[] = _.cloneDeep(data.data)
                 setMonster([])
-                // @ts-ignore
-                setMonster(temp.sort(function (a, b) {
-                    if (a.monster.name < b.monster.name) {
-                        return -1
-                    }
-                    if (a.monster.name > b.monster.name) {
-                        return 1
-                    }
-                    return 0
-                }))
+                setMonster(data.data)
             })
     }
 
