@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import WithAuth from "../login/withAuth";
 import {Button, Grid, GridItem, Text} from "@chakra-ui/react";
-import User from "./user";
+import User from "./user/user";
 import {AdminViewEnum} from "./admin-view.enum";
 
 const App = () => {

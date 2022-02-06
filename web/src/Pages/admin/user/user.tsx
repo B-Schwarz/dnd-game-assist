@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import {Divider} from "@chakra-ui/layout";
 import axios from "axios";
-import {User} from "./user.type";
+import {User} from "../user.type";
 
 const App = () => {
 
@@ -37,6 +37,12 @@ const App = () => {
             })
     }
 
+    const clearRegisterInput = () => {
+        setRegUser("")
+        setRegUserPass("")
+        setRegUserPassWdh("")
+    }
+
     const doRegister = () => {
         if (regUserPass === regUserPassWdh) {
             axios.post(process.env.REACT_APP_API_PREFIX + '/api/auth/register', {
@@ -45,6 +51,8 @@ const App = () => {
             }).then(() => {
                 setWrong(false)
                 setDuplicate(false)
+                clearRegisterInput()
+                getUser()
             }).catch(() => {
                 setDuplicate(true)
             })
