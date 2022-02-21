@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import WithAuth from "../login/withAuth";
 import {Divider, Text} from "@chakra-ui/layout";
 import InitiaveEntry from "./initiave-entry";
@@ -24,46 +24,6 @@ import Add from "./add/add";
 
 const App = () => {
 
-    async function createMasterPlayer() {
-        const p1 = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/get/61bde2e1d908d9469fee4030')
-            .then((c) => {
-                return {
-                    hidden: false, initiative: 20, isMaster: true, npc: false, statusEffects: [],
-                    character: c.data.character, isTurn: false, turn: 0, isTurnSet: false, id: c.data._id
-                }
-            })
-
-        const p2 = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/get/61c866303282743779bba3d0')
-            .then((c) => {
-                return {
-                    character: c.data.character,
-                    initiative: 12,
-                    isMaster: true,
-                    statusEffects: [StatusEffectsEnum.PRONE],
-                    isTurn: false,
-                    turn: 0,
-                    isTurnSet: false,
-                    id: c.data._id
-                }
-            })
-
-        const p3 = await axios.get(process.env.REACT_APP_API_PREFIX + '/api/char/get/61c866343282743779bba421')
-            .then((c) => {
-                return {
-                    character: c.data.character,
-                    initiative: 11,
-                    isMaster: true,
-                    statusEffects: [StatusEffectsEnum.POISONED, StatusEffectsEnum.BLIND],
-                    isTurn: true,
-                    turn: 0,
-                    isTurnSet: false,
-                    id: c.data._id
-                }
-            })
-
-        return [p1, p2, p3]
-    }
-
     const [player, setPlayer] = useState<Player[]>([])
     const [isMaster, setIsMaster] = useState(false)
     const [updateInterval, setUpdateInterval] = useState<number>(0)
@@ -72,15 +32,6 @@ const App = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     function save(p: Player[]) {
-        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative', {player: p})
-            .then(() => update())
-            .catch(() => {
-            })
-    }
-
-    // TODO: DEV
-    async function create() {
-        const p = await createMasterPlayer()
         axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative', {player: p})
             .then(() => update())
             .catch(() => {
@@ -130,7 +81,7 @@ const App = () => {
         save(temp)
     }
 
-    function get(master: boolean) {
+    const get = (master: boolean) => {
         if (master) {
             try {
                 axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/master')
@@ -150,7 +101,7 @@ const App = () => {
                 .catch(() => {
                 })
         }
-    }
+    };
 
     function updatePlayer(newPlayer: Player[]) {
         if (player.length === 0) {
@@ -190,6 +141,10 @@ const App = () => {
         setRound(0)
     }
 
+    const update = useCallback(() => {
+        get(isMaster)
+    }, [get, isMaster])
+
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => {
@@ -209,7 +164,7 @@ const App = () => {
         if (updateInterval === 0) {
             let i = 350
             window.setTimeout(() => {
-                get(isMaster)
+                update()
                 setUpdateInterval(0)
             }, i)
             if (!isMaster) {
@@ -217,11 +172,7 @@ const App = () => {
             }
 
         }
-    }, [isMaster, updateInterval])
-
-    const update = () => {
-        get(isMaster)
-    }
+    }, [isMaster, update, updateInterval])
 
     return (
         <>
@@ -254,7 +205,6 @@ const App = () => {
                 </Accordion>
             </Center>
             <Modal isOpen={isOpen} onClose={() => {
-                update()
                 onClose()
             }} closeOnEsc isCentered
                    scrollBehavior='inside'>

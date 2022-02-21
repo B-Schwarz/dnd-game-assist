@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     AccordionButton,
     AccordionItem,
@@ -66,6 +66,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const [hide, setHide] = useState(hidden)
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
+
+    const saveTimer = useRef(null)
 
     const onHpEdit = (val: string) => {
         props.p.character.hp = val
@@ -334,7 +336,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             e.push(StatusEffectsEnum.UNCONSCIOUS)
         }
 
-
         if (isMaster) {
             props.p.statusEffects = e
             savePlayer()
@@ -346,11 +347,16 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function savePlayer() {
-        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: props.p})
-            .then(() => props.u())
-            .catch((e) => {
-                console.log(e)
-            })
+        // @ts-ignore
+        clearTimeout(saveTimer.current)
+        // @ts-ignore
+        saveTimer.current = setTimeout(() => {
+            axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: props.p})
+                .then(() => props.u())
+                .catch((e) => {
+                    console.log(e)
+                })
+        }, 650)
     }
 
     function toggleEffects(s: StatusEffectsEnum) {
@@ -403,6 +409,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
         createStatusIcons()
     }
+
+    // Clear Timer
+    useEffect(() => {
+        // @ts-ignore
+        return () => clearTimeout(saveTimer.current)
+    }, [])
 
     useEffect(() => {
         for (let e of statusEffects) {
