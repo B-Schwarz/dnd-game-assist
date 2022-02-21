@@ -4,6 +4,12 @@ import {
     AccordionButton,
     AccordionItem,
     AccordionPanel,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
     Box,
     Button,
     Center,
@@ -30,10 +36,26 @@ const App = () => {
     const [wrong, setWrong] = useState(false)
     const [duplicate, setDuplicate] = useState(false)
 
+    const [delUser, setDelUser] = useState("")
+    const [isOpen, setIsOpen] = useState(false)
+    const cancelRef = React.useRef()
+
+    const closePopup = () => setIsOpen(false)
+
     const getUser = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/user')
             .then((r) => {
                 setUser(r.data)
+            })
+    }
+
+    const deleteUser = () => {
+        axios.delete(process.env.REACT_APP_API_PREFIX + '/api/account/delete', {
+            data: {
+                userID: delUser
+            }
+        }).then(() => getUser())
+            .catch(() => {
             })
     }
 
@@ -66,7 +88,8 @@ const App = () => {
             .then(() => {
                 getUser()
             })
-            .catch(() => {})
+            .catch(() => {
+            })
     }
 
     const setMaster = (id: string, val: boolean) => {
@@ -74,7 +97,8 @@ const App = () => {
             .then(() => {
                 getUser()
             })
-            .catch(() => {})
+            .catch(() => {
+            })
     }
 
     useEffect(() => {
@@ -98,7 +122,8 @@ const App = () => {
                     <FormControl isInvalid={wrong}>
                         <Input placeholder='Password' minLength={8} type='password' value={regUserPass} id='reg-pass'
                                autoComplete='new-password' onChange={(val) => setRegUserPass(val.currentTarget.value)}/>
-                        <Input placeholder='Password Wiederholen' minLength={8} type='password' value={regUserPassWdh} id='reg-pass-wdh'
+                        <Input placeholder='Password Wiederholen' minLength={8} type='password' value={regUserPassWdh}
+                               id='reg-pass-wdh'
                                onChange={(val) => setRegUserPassWdh(val.currentTarget.value)}/>
                         {wrong && <FormErrorMessage>
                             Die Passwörter stimmen nicht überein
@@ -127,13 +152,17 @@ const App = () => {
 
                                     <AccordionPanel>
                                         <Switch isChecked={value.admin}
-                                            onChange={(val) => setAdmin(value._id, val.currentTarget.checked)}>
+                                                onChange={(val) => setAdmin(value._id, val.currentTarget.checked)}>
                                             Admin
                                         </Switch><br/>
                                         <Switch isChecked={value.master}
                                                 onChange={(val) => setMaster(value._id, val.currentTarget.checked)}>
                                             Master
                                         </Switch><br/>
+                                        <Button colorScheme='red' onClick={() => {
+                                            setDelUser(value._id)
+                                            setIsOpen(true)
+                                        }}>LÖSCHEN</Button>
                                     </AccordionPanel>
                                 </AccordionItem>
                             ))
@@ -141,6 +170,33 @@ const App = () => {
                     </Accordion>
                 </Center>
             </GridItem>
+
+            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            Delete Character
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Bist du sicher?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef.current} onClick={closePopup}>
+                                Abbrechen
+                            </Button>
+                            <Button colorScheme='red' onClick={() => {
+                                deleteUser()
+                                closePopup()
+                            }} ml={3}>
+                                Löschen
+                            </Button>
+                        </AlertDialogFooter>
+
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </>
     )
 
