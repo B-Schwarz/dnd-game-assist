@@ -15,6 +15,7 @@ const connectDB = async () => {
                         master: false,
                         admin: true
                     }).save()
+                    console.error('Standard Admin created')
                 }
             })
     }).catch((e) => {
