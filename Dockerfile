@@ -19,7 +19,7 @@ COPY web/package-lock.json temp/
 COPY web/tsconfig.json temp/
 COPY web/.env.production temp/
 RUN cd temp \
-    && npm ci \
+    && npm ci --production \
     && npm run build \
     && cp -r build/ /app/ \
     && cd /app \
