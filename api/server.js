@@ -50,6 +50,7 @@ const sess = session({
     saveUninitialized: false,
     resave: true,
     store: store,
+    proxy: (process.env.NODE_ENV === 'production'),
     cookie: {
         httpOnly: true,
         maxAge: 99999999999999,
