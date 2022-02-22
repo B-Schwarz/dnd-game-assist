@@ -3,6 +3,7 @@ const app = express();
 const {connectDB} = require('./db')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
+const RateLimit = require('express-rate-limit')
 
 const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
 const {
@@ -53,11 +54,19 @@ const sess = session({
         httpOnly: true,
         maxAge: 99999999999999,
         sameSite: 'lax',
-        secure: false
+        secure: (process.env.NODE_ENV === 'production')
     }
 })
 
 app.use(sess)
+
+const limiter = RateLimit({
+    windowMs: 1*60*1000,
+    max: 300,
+    standardHeaders: true
+})
+
+app.use('/api', limiter)
 
 //
 //  CHARACTER LIST
