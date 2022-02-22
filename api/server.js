@@ -3,6 +3,8 @@ const app = express();
 const {connectDB} = require('./db')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
+const RateLimit = require('express-rate-limit')
+const csrf = require('csurf')
 
 const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
 const {
@@ -19,6 +21,7 @@ const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./m
 const {getUserList, setAdmin, setMaster} = require("./admin");
 const {getBookList, getBook} = require("./books");
 const path = require("path");
+const rateLimit = require("express-rate-limit");
 
 const port = 4000;
 const url = process.env.NODE_ENV === 'production' ? "https://dnd.saltyk.de" : "http://localhost:3000"
@@ -53,11 +56,23 @@ const sess = session({
         httpOnly: true,
         maxAge: 99999999999999,
         sameSite: 'lax',
-        secure: false
+        secure: (process.env.NODE_ENV === 'production')
     }
 })
 
 app.use(sess)
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(csrf({cookie: true}))
+}
+
+const limiter = RateLimit({
+    windowMs: 1*60*1000,
+    max: 300,
+    standardHeaders: true
+})
+
+app.use('/api', limiter)
 
 //
 //  CHARACTER LIST
@@ -156,7 +171,8 @@ const start = async () => {
 //
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('build')))
-    app.get('*', (req, res) => {
+    app.get('*', rateLimit, (req, res) => {
+        res.cookie('XSRF-TOKEN', req.csrfToken())
         res.sendFile(path.resolve('build/index.html'))
     })
 }
