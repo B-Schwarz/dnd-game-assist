@@ -45,7 +45,7 @@ const store = MongoStore.create({
 
 const sess = session({
     name: 'dnd.sid',
-    secret: process.env.COOKIE_SECRET,
+    secret: process.env.DND_COOKIE_SECRET,
     saveUninitialized: false,
     resave: true,
     store: store,

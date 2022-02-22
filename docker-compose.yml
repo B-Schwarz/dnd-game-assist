@@ -9,7 +9,7 @@ services:
     environment:
       - NODE_ENV=production
       - DB_URI=mongodb://db:27017/dnd
-      - COOKIE_SECRET=${DND_COOKIE_SECRET}
+      - DND_COOKIE_SECRET=${DND_COOKIE_SECRET}
   db:
     image: mongo:4.4.11-rc1
     volumes:
