@@ -63,7 +63,7 @@ const sess = session({
 app.use(sess)
 
 if (process.env.NODE_ENV === 'production') {
-    app.use(csrf({cookie: true}))
+    app.use(csrf({cookie: true, sessionKey: 'dnd.sid'}))
 }
 
 const limiter = RateLimit({
