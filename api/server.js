@@ -4,7 +4,6 @@ const {connectDB} = require('./db')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const RateLimit = require('express-rate-limit')
-const csrf = require('csurf')
 
 const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
 const {
@@ -48,6 +47,7 @@ const store = MongoStore.create({
 
 const sess = session({
     name: 'dnd.sid',
+    cookieName: 'dnd.sid',
     secret: process.env.DND_COOKIE_SECRET,
     saveUninitialized: false,
     resave: true,
@@ -61,10 +61,6 @@ const sess = session({
 })
 
 app.use(sess)
-
-if (process.env.NODE_ENV === 'production') {
-    app.use(csrf({cookie: true, sessionKey: 'dnd.sid'}))
-}
 
 const limiter = RateLimit({
     windowMs: 1*60*1000,
@@ -172,7 +168,6 @@ const start = async () => {
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('build')))
     app.get('*', rateLimit, (req, res) => {
-        res.cookie('XSRF-TOKEN', req.csrfToken())
         res.sendFile(path.resolve('build/index.html'))
     })
 }
