@@ -20,7 +20,6 @@ const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./m
 const {getUserList, setAdmin, setMaster} = require("./admin");
 const {getBookList, getBook} = require("./books");
 const path = require("path");
-const rateLimit = require("express-rate-limit");
 
 const port = 4000;
 const url = process.env.NODE_ENV === 'production' ? "https://dnd.saltyk.de" : "http://localhost:3000"
@@ -47,7 +46,6 @@ const store = MongoStore.create({
 
 const sess = session({
     name: 'dnd.sid',
-    cookieName: 'dnd.sid',
     secret: process.env.DND_COOKIE_SECRET,
     saveUninitialized: false,
     resave: true,
@@ -167,7 +165,7 @@ const start = async () => {
 //
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('build')))
-    app.get('*', rateLimit, (req, res) => {
+    app.get('*', limiter, (req, res) => {
         res.sendFile(path.resolve('build/index.html'))
     })
 }
