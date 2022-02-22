@@ -44,12 +44,17 @@ const store = MongoStore.create({
     collectionName: 'sessions'
 })
 
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1)
+}
+
 const sess = session({
     name: 'dnd.sid',
     secret: process.env.DND_COOKIE_SECRET,
     saveUninitialized: false,
     resave: true,
     store: store,
+    proxy: (process.env.NODE_ENV === 'production'),
     cookie: {
         httpOnly: true,
         maxAge: 99999999999999,
