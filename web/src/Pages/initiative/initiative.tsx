@@ -1,8 +1,7 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import WithAuth from "../login/withAuth";
 import {Divider, Text} from "@chakra-ui/layout";
 import InitiaveEntry from "./initiave-entry";
-import {StatusEffectsEnum} from "./status-effects.enum";
 import {
     Accordion,
     Button,
@@ -26,8 +25,10 @@ const App = () => {
 
     const [player, setPlayer] = useState<Player[]>([])
     const [isMaster, setIsMaster] = useState(false)
-    const [updateInterval, setUpdateInterval] = useState<number>(0)
     const [round, setRound] = useState<number>(0)
+
+    const [updatePing, setUpdatePing] = useState(0)
+    const updateTimer = useRef(null)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -81,6 +82,25 @@ const App = () => {
         save(temp)
     }
 
+    const updatePlayer = (newPlayer: Player[]) => {
+        if (player.length === 0) {
+            setPlayer(newPlayer)
+        } else {
+            if (newPlayer.length !== player.length) {
+                setPlayer([])
+                setPlayer(newPlayer)
+            } else {
+                for (let i = 0; i < player.length; i++) {
+                    if (!_.isEqual(player[i], newPlayer[i])) {
+                        setPlayer([])
+                        setPlayer(newPlayer)
+                        break
+                    }
+                }
+            }
+        }
+    }
+
     const get = (master: boolean) => {
         if (master) {
             try {
@@ -100,25 +120,6 @@ const App = () => {
                 })
                 .catch(() => {
                 })
-        }
-    };
-
-    function updatePlayer(newPlayer: Player[]) {
-        if (player.length === 0) {
-            setPlayer(newPlayer)
-        } else {
-            if (newPlayer.length !== player.length) {
-                setPlayer([])
-                setPlayer(newPlayer)
-            } else {
-                for (let i = 0; i < player.length; i++) {
-                    if (!_.isEqual(player[i], newPlayer[i])) {
-                        setPlayer([])
-                        setPlayer(newPlayer)
-                        break
-                    }
-                }
-            }
         }
     }
 
@@ -141,9 +142,9 @@ const App = () => {
         setRound(0)
     }
 
-    const update = useCallback(() => {
+    const update = () => {
         get(isMaster)
-    }, [get, isMaster])
+    }
 
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
@@ -155,24 +156,25 @@ const App = () => {
                     })
                     .catch(() => {
                     })
+                get(true)
             })
             .catch(() => {
             })
+
+        // @ts-ignore
+        return () => clearTimeout(updateTimer.current)
     }, [])
 
     useEffect(() => {
-        if (updateInterval === 0) {
-            let i = 350
-            window.setTimeout(() => {
-                update()
-                setUpdateInterval(0)
-            }, i)
+        // @ts-ignore
+        updateTimer.current = setTimeout(() => {
             if (!isMaster) {
-                setUpdateInterval(1)
+                setUpdatePing((updatePing) => updatePing + 1)
             }
+        }, 350)
 
-        }
-    }, [isMaster, update, updateInterval])
+        update()
+    }, [isMaster, updatePing])
 
     return (
         <>

@@ -349,14 +349,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     function savePlayer() {
         // @ts-ignore
         clearTimeout(saveTimer.current)
-        // @ts-ignore
-        saveTimer.current = setTimeout(() => {
-            axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: props.p})
-                .then(() => props.u())
-                .catch((e) => {
-                    console.log(e)
+
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: props.p})
+                // @ts-ignore
+                .then(() => saveTimer.current = setTimeout(() => {props.u()}, 650))
+                .catch(() => {
                 })
-        }, 650)
     }
 
     function toggleEffects(s: StatusEffectsEnum) {
