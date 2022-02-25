@@ -11,6 +11,7 @@ import 'dnd-character-sheets/dist/index.css'
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
+import TitleService from "../../Service/titleService";
 
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
@@ -114,8 +115,10 @@ const App = () => {
         }
     }, [change, isMaster])
 
+
     return (
         <>
+            <TitleService title={character.name || ''}/>
             <div>
                 {statsSheet}
                 {profileSheet}

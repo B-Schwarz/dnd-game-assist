@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import WithAuth from "../login/withAuth";
 import {Button, Center, VStack} from "@chakra-ui/react";
 import axios from "axios";
+import TitleService from "../../Service/titleService";
 
 const App = () => {
 
@@ -17,7 +18,7 @@ const App = () => {
     }
 
     const openBook = (b: string) => {
-      window.open(process.env.REACT_APP_API_PREFIX + '/api/books/' + b)
+        window.open(process.env.REACT_APP_API_PREFIX + '/api/books/' + b)
     }
 
     useEffect(() => {
@@ -25,13 +26,16 @@ const App = () => {
     }, [])
 
     return (
-        <Center>
-            <VStack>
-                {books.map((value, index) => (
-                    <Button w='100%' key={index} onClick={() => openBook(value)}>{value}</Button>
-                ))}
-            </VStack>
-        </Center>
+        <React.Fragment>
+            <TitleService title={'Bücher'}/>
+            <Center>
+                <VStack>
+                    {books.map((value, index) => (
+                        <Button w='100%' key={index} onClick={() => openBook(value)}>{value}</Button>
+                    ))}
+                </VStack>
+            </Center>
+        </React.Fragment>
     )
 
 }

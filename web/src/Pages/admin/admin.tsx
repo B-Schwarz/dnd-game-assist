@@ -3,6 +3,7 @@ import WithAuth from "../login/withAuth";
 import {Button, Grid, GridItem, Text} from "@chakra-ui/react";
 import User from "./user/user";
 import {AdminViewEnum} from "./admin-view.enum";
+import TitleService from "../../Service/titleService";
 
 const App = () => {
 
@@ -19,6 +20,7 @@ const App = () => {
 
     return (
         <>
+            <TitleService title={'Admin'}/>
             <Grid
                 templateRows='repeat(5, 1fr)'
                 templateColumns='repeat(5, 1fr)'

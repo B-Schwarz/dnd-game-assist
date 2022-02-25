@@ -20,6 +20,7 @@ import {Divider} from "@chakra-ui/layout";
 import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
 import WithAuth from "../login/withAuth";
 import {Player} from "../initiative/player.type";
+import TitleService from "../../Service/titleService";
 
 const App = () => {
 
@@ -136,6 +137,7 @@ const App = () => {
 
     return (
         <>
+            <TitleService title={'Charakter Liste'}/>
             <Center marginBottom={'1rem'}>
                 <Heading>
                     Meine Charactere
