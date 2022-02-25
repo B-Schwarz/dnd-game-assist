@@ -22,6 +22,8 @@ import {DeleteIcon} from "@chakra-ui/icons";
 import WithAuth from "../login/withAuth";
 import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
 import TitleService from "../../Service/titleService";
+import packageJSON from "../../../package.json";
+import {Text} from "@chakra-ui/layout";
 
 const App = () => {
 
@@ -118,6 +120,7 @@ const App = () => {
                                                     isInvalid={form.errors.password !== undefined && form.touched.password !== undefined}>
                                                     <FormLabel htmlFor="password">Aktuelles Passwort</FormLabel>
                                                     <Input {...field} id="pass" type="password"
+                                                           autoComplete='current-password'
                                                            placeholder="Aktuelles Passwort"/>
                                                     <FormErrorMessage>{form.errors.password}</FormErrorMessage>
                                                 </FormControl>
@@ -130,6 +133,7 @@ const App = () => {
                                                     <FormLabel htmlFor="newPassword">Neues Passwort</FormLabel>
                                                     <Input {...field} id="newPass" type="password" value={newPassVal}
                                                            onChange={evt => setNewPassVal(evt.target.value)}
+                                                           autoComplete='new-password'
                                                            placeholder="Neues Passwort"/>
                                                     <FormErrorMessage>{form.errors.newPassword}</FormErrorMessage>
                                                 </FormControl>
@@ -142,6 +146,7 @@ const App = () => {
                                                     <FormLabel htmlFor="newPasswordRepeat">Neues Passwort
                                                         Wiederholen</FormLabel>
                                                     <Input {...field} id="newPassRep" type="password"
+                                                           autoComplete='new-password'
                                                            placeholder="Neues Passwort Wiederholen"/>
                                                     <FormErrorMessage>{form.errors.newPasswordRepeat}</FormErrorMessage>
                                                 </FormControl>
@@ -192,6 +197,9 @@ const App = () => {
                             </AlertDialogOverlay>
                         </AlertDialog>
                     </Container>
+                    <Text>
+                        Version: {packageJSON.version}
+                    </Text>
                 </VStack>
             </Center>
         </React.Fragment>
