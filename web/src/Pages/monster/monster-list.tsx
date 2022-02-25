@@ -6,6 +6,7 @@ import {Accordion, HStack, IconButton, Input, VStack} from "@chakra-ui/react";
 import _ from "lodash";
 import axios from "axios";
 import {AddIcon} from "@chakra-ui/icons";
+import TitleService from "../../Service/titleService";
 
 const App = () => {
 
@@ -54,6 +55,7 @@ const App = () => {
 
     return (
         <React.Fragment>
+            <TitleService title={'Monster Liste'}/>
             <VStack w='80%' margin='auto'>
                 <HStack w='100%'>
                     <Input placeholder='Suchen...' onChange={async (evt) => {

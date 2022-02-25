@@ -20,6 +20,7 @@ import {Player} from "./player.type";
 import axios from "axios";
 import _ from "lodash";
 import Add from "./add/add";
+import TitleService from "../../Service/titleService";
 
 const App = () => {
 
@@ -178,6 +179,7 @@ const App = () => {
 
     return (
         <>
+            <TitleService title={'Initiative'}/>
             {
                 isMaster &&
                 <VStack>

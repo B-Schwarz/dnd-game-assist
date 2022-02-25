@@ -1,25 +1,45 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import reportWebVitals from './reportWebVitals';
 import App from "./App";
 import {ChakraProvider} from '@chakra-ui/react';
 import axios from "axios";
+import {Helmet, HelmetProvider} from "react-helmet-async";
 
 axios.defaults.withCredentials = true
 
-document.title = 'DnD'
-
 ReactDOM.render(
-  <React.StrictMode>
-      <ChakraProvider>
-          <App />
-      </ChakraProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    <React.StrictMode>
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+        <HelmetProvider>
+            <Helmet>
+                {/*Primary Meta Tags*/}
+                <title>D&D Companion</title>
+                <meta name="title" content="D&D Companion"/>
+                <meta name="description" content="This is a private D&D Companion used in our home game"/>
+
+                {/*Open Graph / Facebook*/}
+                <meta property="og:type" content="website"/>
+                <meta property="og:url" content="https://dnd.saltyk.de/"/>
+                <meta property="og:title" content="D&D Companion"/>
+                <meta property="og:description"
+                      content="This is a private D&D Companion used in our home game"/>
+                <meta property="og:image" content=""/>
+
+                {/*Twitter*/}
+                <meta property="twitter:card" content="summary_large_image"/>
+                <meta property="twitter:url" content="https://dnd.saltyk.de/"/>
+                <meta property="twitter:title" content="D&D Companion"/>
+                <meta property="twitter:description"
+                      content="This is a private D&D Companion used in our home game"/>
+                <meta property="twitter:image" content=""/>
+            </Helmet>
+        </HelmetProvider>
+
+        <ChakraProvider>
+            <App/>
+        </ChakraProvider>
+    </React.StrictMode>
+    ,
+    document.getElementById('root')
+);

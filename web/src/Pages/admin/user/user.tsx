@@ -110,26 +110,32 @@ const App = () => {
             <GridItem rowSpan={1} colSpan={2}>
                 <VStack w='80%'>
                     <Text>REGISTER</Text>
-                    <FormControl isInvalid={duplicate}>
-                        <Input placeholder='Username' minLength={3} value={regUser}
-                               onChange={(val) => setRegUser(val.currentTarget.value)}/>
-                        {duplicate &&
-                            <FormErrorMessage>
-                                Dieser Username existiert bereits
-                            </FormErrorMessage>
-                        }
-                    </FormControl>
-                    <FormControl isInvalid={wrong}>
-                        <Input placeholder='Password' minLength={8} type='password' value={regUserPass} id='reg-pass'
-                               autoComplete='new-password' onChange={(val) => setRegUserPass(val.currentTarget.value)}/>
-                        <Input placeholder='Password Wiederholen' minLength={8} type='password' value={regUserPassWdh}
-                               id='reg-pass-wdh'
-                               onChange={(val) => setRegUserPassWdh(val.currentTarget.value)}/>
-                        {wrong && <FormErrorMessage>
-                            Die Passwörter stimmen nicht überein
-                        </FormErrorMessage>}
-                    </FormControl>
-                    <Button onClick={doRegister}>Register</Button>
+                    <form>
+                        <FormControl isInvalid={duplicate}>
+                            <Input placeholder='Username' minLength={3} value={regUser} autoComplete='section-register username'
+                                   onChange={(val) => setRegUser(val.currentTarget.value)}/>
+                            {duplicate &&
+                                <FormErrorMessage>
+                                    Dieser Username existiert bereits
+                                </FormErrorMessage>
+                            }
+                        </FormControl><br/>
+                        <FormControl isInvalid={wrong}>
+                            <Input placeholder='Password' minLength={8} type='password' value={regUserPass}
+                                   id='reg-pass'
+                                   autoComplete='section-register new-password'
+                                   onChange={(val) => setRegUserPass(val.currentTarget.value)}/>
+                            <Input placeholder='Password Wiederholen' minLength={8} type='password'
+                                   autoComplete='section-register new-password'
+                                   value={regUserPassWdh}
+                                   id='reg-pass-wdh'
+                                   onChange={(val) => setRegUserPassWdh(val.currentTarget.value)}/>
+                            {wrong && <FormErrorMessage>
+                                Die Passwörter stimmen nicht überein
+                            </FormErrorMessage>}
+                        </FormControl><br/>
+                        <Button onClick={doRegister} type='button'>Register</Button>
+                    </form>
                 </VStack>
             </GridItem>
             {/*Not Yet Implemented*/}
@@ -175,7 +181,7 @@ const App = () => {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            Delete Character
+                            Delete User
                         </AlertDialogHeader>
 
                         <AlertDialogBody>

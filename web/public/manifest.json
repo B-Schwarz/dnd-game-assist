@@ -1,6 +1,6 @@
 {
-  "short_name": "D&D GameAssist",
-  "name": "D&D Webbased GameAssist",
+  "short_name": "D&D Companion",
+  "name": "D&D Companion",
   "icons": [
     {
       "src": "favicon.ico",
@@ -19,7 +19,7 @@
     }
   ],
   "start_url": "/",
-  "description": "Eine Webbasierte Unterstützung für das Spielen von D&D.",
+  "description": "This is a private D&D Companion used in our home game",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
