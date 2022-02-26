@@ -14,11 +14,12 @@ import {
     FormErrorMessage,
     FormLabel,
     Input,
+    Link,
     useToast,
     VStack
 } from "@chakra-ui/react";
 import axios from "axios";
-import {DeleteIcon} from "@chakra-ui/icons";
+import {DeleteIcon, ExternalLinkIcon} from "@chakra-ui/icons";
 import WithAuth from "../login/withAuth";
 import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
 import TitleService from "../../Service/titleService";
@@ -163,7 +164,7 @@ const App = () => {
                     </Container>
                     <Container>
                         <Button leftIcon={<DeleteIcon/>} borderWidth='1px' borderRadius='lg' colorScheme='red'
-                                float='right' position='relative' marginTop='100%' size='sm' onClick={() => {
+                                float='right' position='relative' marginTop='100%' marginBottom='1rem' size='sm' onClick={() => {
                             setIsOpen(true)
                         }}>
                             ACCOUNT LÖSCHEN
@@ -198,7 +199,9 @@ const App = () => {
                         </AlertDialog>
                     </Container>
                     <Text>
-                        Version: {packageJSON.version}
+                        Version: {packageJSON.version} &#8226; <Link href='https://github.com/B-Schwarz/dnd-game-assist' isExternal={true}>
+                            Github <ExternalLinkIcon mx='2px' />
+                        </Link>
                     </Text>
                 </VStack>
             </Center>
