@@ -9,7 +9,7 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, createNPCharacter, setNPC
+    deleteOwnCharacter, setNPC
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
@@ -83,7 +83,6 @@ app.get('/api/charlist/me', isAuth, getOwnCharacterList)
 //  CHARACTER
 //
 app.get('/api/char/new', isAuth, createCharacter)
-app.get('/api/char/new/npc', isAuth, isMaster, createNPCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
 app.put('/api/char/npc/toggle', isAuth, isMaster, setNPC)
