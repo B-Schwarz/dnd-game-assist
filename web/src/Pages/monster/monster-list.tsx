@@ -77,7 +77,7 @@ const App = () => {
 
     useEffect(() => {
         update()
-    }, [update])
+    }, [])
 
     return (
         <React.Fragment>
