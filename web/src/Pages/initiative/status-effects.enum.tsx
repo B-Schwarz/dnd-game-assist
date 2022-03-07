@@ -12,5 +12,7 @@ export enum StatusEffectsEnum {
     PETRIFIED,
     RESTRAINED,
     STUNNED,
-    UNCONSCIOUS
+    UNCONSCIOUS,
+    HEX,
+    HEXBLADE
 }
