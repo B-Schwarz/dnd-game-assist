@@ -24,7 +24,6 @@ Start the server by first installing all modules with ``npm install`` and then r
 | URL                  |  METHOD  |                PARAMETER                 |         ROLE         | DESCR.                                          | Return                              |
 |----------------------|:--------:|:----------------------------------------:|:--------------------:|-------------------------------------------------|-------------------------------------|
 | /api/char/new        |  `GET`   |                  `none`                  |        `user`        | Creates a new character, links it with the user | `{_id:ObjectID}`                    |
-| /api/char/new/npc    |  `GET`   |                  `none`                  |       `master`       | Creates a new NPC, links it with the user       | `{_id:ObjectID}`                    |
 | /api/char/get/:id    |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets a specified character sheet from anyone    | `{_id:ObjectID, character:Player }` |
 | /api/char/me/get/:id |  `GET`   |                  `none`                  |        `user`        | Gets a specified character sheet from me        | `{_id:ObjectID, character:Player }` |
 | /api/char            |  `POST`  | `character:Player`<br/>`charID:ObjectID` | `admin`<br/>`master` | Saves the someones character sheet              | `none`                              |

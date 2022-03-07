@@ -50,22 +50,6 @@ const createCharacter = async (req, res) => {
     res.send({id: char._id})
 }
 
-// @deprecated
-// REQUIRES MASTER
-const createNPCharacter = async (req, res) => {
-    const char = await Character.create({
-        character: {
-            name: ''
-        },
-        npc: true
-    })
-
-    req.user.character.push(char._id)
-    req.user.save()
-
-    res.send({id: char._id})
-}
-
 // REQUIRES MASTER
 const setNPC = async (req, res) => {
     const charID = req.body.charID
@@ -134,6 +118,9 @@ const getOwnCharacter = async (req, res) => {
 // REQUIRES MASTER OR ADMIN
 const getCharacterList = async (req, res) => {
     const charList = await Character.find({
+        _id: {
+            "$nin": req.user.character
+        }
     })
     res.send(filterCharacterListe(charList))
 }
@@ -203,7 +190,6 @@ module.exports = {
     getCharacterList,
     getOwnCharacterList,
     createCharacter,
-    createNPCharacter,
     deleteCharacter,
     deleteOwnCharacter,
     setNPC
