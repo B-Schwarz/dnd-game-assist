@@ -67,7 +67,7 @@ app.use(sess)
 
 const limiter = RateLimit({
     windowMs: 1*60*1000,
-    max: 300,
+    max: 10000,
     standardHeaders: true
 })
 
