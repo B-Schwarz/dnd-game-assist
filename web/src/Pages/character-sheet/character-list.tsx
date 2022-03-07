@@ -67,7 +67,8 @@ const App = () => {
                         isTurn: false,
                         isTurnSet: false,
                         statusEffects: [],
-                        turn: 0
+                        turn: 0,
+                        npc: char['npc']
                     }
                     // @ts-ignore
                     setOwnCharData(charData => [...charData, c])
@@ -82,20 +83,19 @@ const App = () => {
             .then(r => {
                 setCharData([])
                 for (let char of r.data) {
-                    if (ownCharData.filter(c => c.id === char['_id']).length === 0) {
-                        const c: Player = {
-                            character: char['character'],
-                            id: char['_id'],
-                            initiative: 0,
-                            isMaster: false,
-                            isTurn: false,
-                            isTurnSet: false,
-                            statusEffects: [],
-                            turn: 0
-                        }
-                        // @ts-ignore
-                        setCharData(charData => [...charData, c])
+                    const c: Player = {
+                        character: char['character'],
+                        id: char['_id'],
+                        initiative: 0,
+                        isMaster: false,
+                        isTurn: false,
+                        isTurnSet: false,
+                        statusEffects: [],
+                        turn: 0,
+                        npc: char['npc']
                     }
+                    // @ts-ignore
+                    setCharData(charData => [...charData, c])
                 }
             })
             .catch(() => {
@@ -107,16 +107,13 @@ const App = () => {
             .then(() => {
                 setIsMaster(true)
             })
-            .catch(() => {})
+            .catch(() => {
+            })
+            .finally(() => {
+                updateOwnCharList()
+                updateOtherCharList()
+            })
     }, [])
-
-    useEffect(() => {
-        updateOwnCharList()
-    }, [isMaster])
-
-    useEffect(() => {
-        updateOtherCharList()
-    }, [ownCharData])
 
     function openCharacter(id: string) {
         navigate("/character/" + id)
@@ -132,7 +129,8 @@ const App = () => {
             charID: p.id
         })
             .then(() => updateOwnCharList())
-            .catch(() => {})
+            .catch(() => {
+            })
     }
 
     return (
@@ -148,9 +146,9 @@ const App = () => {
                     <Center key={item.id}>
                         <ButtonGroup isAttached width='85%'>
                             {isMaster &&
-                                <Button borderWidth='1px' colorScheme={item["npc"] ? "teal" : "gray"} width="4rem"
+                                <Button borderWidth='1px' colorScheme={item.npc ? "teal" : "gray"} width="4rem"
                                         borderRadius='lg'
-                                        onClick={() => setNPC(item)}>{item["npc"] && <>NPC</>}{!item["npc"] && <>PC</>}</Button>}
+                                        onClick={() => setNPC(item)}>{item.npc ? <>NPC</> : <>PC</>}</Button>}
                             <Button borderWidth='1px' borderRadius='lg' width='100%'
                                     onClick={() => openCharacter(item.id)}>
                                 <HStack>
@@ -162,6 +160,7 @@ const App = () => {
                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
                                     <Text color='gray'>Player:</Text>
                                     <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                    <Text>{item.npc}</Text>
                                 </HStack>
                             </Button>
                             <Button borderWidth='1px' borderRadius='lg' colorScheme='red'

@@ -118,6 +118,9 @@ const getOwnCharacter = async (req, res) => {
 // REQUIRES MASTER OR ADMIN
 const getCharacterList = async (req, res) => {
     const charList = await Character.find({
+        _id: {
+            "$nin": req.user.character
+        }
     })
     res.send(filterCharacterListe(charList))
 }
