@@ -69,6 +69,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [hide, setHide] = useState(hidden)
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
+    const [schaden, setSchaden] = useState(0)
+
     const saveTimer = useRef(null)
 
     const onHpEdit = (val: string) => {
@@ -427,6 +429,41 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
         createStatusIcons()
     }
 
+    const doSchaden = () => {
+        let dmg = schaden
+        try {
+            const tempHPval = Number(tempHp)
+            if (tempHPval > 0) {
+
+                if (tempHPval > schaden) {
+                    onTempHpEdit(String(Number(tempHp) - dmg))
+                    dmg = 0
+                } else {
+                    onTempHpEdit('0')
+                    dmg -= tempHPval
+                }
+            }
+        } catch (_) {
+        }
+
+        if (dmg > 0) {
+            try {
+                const hpVal = Number(hp) - dmg
+
+                if (hpVal > 0) {
+                    onHpEdit(String(hpVal))
+                } else {
+                    onHpEdit('0')
+                }
+            } catch (_) {
+            }
+        }
+
+        setSchaden(0)
+        updatePlayer()
+
+    }
+
     // Clear Timer
     useEffect(() => {
         // @ts-ignore
@@ -646,14 +683,27 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 </Table>
                             </GridItem>
                             <GridItem>
-                                Geschwindigkeit: {geschwindigkeit}
+                                Geschwindigkeit: {geschwindigkeit}<br/>
+                                <HStack w='88%'>
+                                    <Text width='120px'>Schaden:</Text>
+                                    <NumberInput defaultValue={0} min={0}
+                                                 onChange={(_, val) => setSchaden(val)}
+                                                 value={schaden}>
+                                        <NumberInputField/>
+                                        <NumberInputStepper>
+                                            <NumberIncrementStepper/>
+                                            <NumberDecrementStepper/>
+                                        </NumberInputStepper>
+                                    </NumberInput>
+                                </HStack>
+                                <Button colorScheme='red' onClick={doSchaden} w='88%'>Schaden</Button>
                             </GridItem>
                             <GridItem>
                                 <VStack>
                                     <HStack>
                                         <Text width='120px'>HP:</Text>
                                         <NumberInput defaultValue={props.p.character.hp || 0} min={0}
-                                                     onChange={onHpEdit}
+                                                     onChange={onHpEdit} value={hp}
                                                      max={Number(props.p.character.maxHp)}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
@@ -665,7 +715,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     <HStack>
                                         <Text width='120px'>Temp HP:</Text>
                                         <NumberInput defaultValue={props.p.character.tempHp || 0} min={0}
-                                                     onChange={onTempHpEdit}>
+                                                     onChange={onTempHpEdit} value={tempHp}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
                                                 <NumberIncrementStepper/>
