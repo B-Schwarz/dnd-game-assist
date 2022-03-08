@@ -10,6 +10,8 @@ import {
     GiInvisible,
     GiKnockedOutStars,
     GiKnockout,
+    GiPentacle,
+    GiPentagramRose,
     GiSpiderWeb,
     GiStoneBlock,
     GiThunderStruck
@@ -162,9 +164,31 @@ const unconscious = (
     <React.Fragment key='unconscious'>
         <Box marginLeft='0.5rem'/>
         <Tooltip label='Bewusstlos' hasArrow size='md' placement='top'>
+            <span>
+                <Icon as={GiKnockout} color='darkred'/>
+            </span>
+        </Tooltip>
+    </React.Fragment>
+)
+
+const hex = (
+    <React.Fragment key='hex'>
+        <Box marginLeft='0.5rem'/>
+        <Tooltip label='Hex' hasArrow size='md' placement='top'>
+            <span>
+                <Icon as={GiPentagramRose} color='darkred'/>
+            </span>
+        </Tooltip>
+    </React.Fragment>
+)
+
+const hexblade = (
+    <React.Fragment key='unconscious'>
+        <Box marginLeft='0.5rem'/>
+        <Tooltip label="Hexblade's Curse" hasArrow size='md' placement='top'>
         <span>
-        <Icon as={GiKnockout} color='darkred'/>
-                </span>
+            <Icon as={GiPentacle} color='purple'/>
+        </span>
         </Tooltip>
     </React.Fragment>
 )
@@ -200,6 +224,10 @@ export const getIcon = (effect: StatusEffectsEnum) => {
             return stunned
         case StatusEffectsEnum.UNCONSCIOUS:
             return unconscious
+        case StatusEffectsEnum.HEX:
+            return hex
+        case StatusEffectsEnum.HEXBLADE:
+            return hexblade
         default:
             return
     }

@@ -61,6 +61,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [restrained, setRestrained] = useState(false)
     const [stunned, setStunned] = useState(false)
     const [unconscious, setUnconscious] = useState(false)
+    const [hex, setHex] = useState(false)
+    const [hexblade, setHexblade] = useState(false)
 
     const [effects, setEffects] = useState([])
 
@@ -335,6 +337,16 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             setEffects(e => [...e, getIcon(StatusEffectsEnum.UNCONSCIOUS)])
             e.push(StatusEffectsEnum.UNCONSCIOUS)
         }
+        if (hex) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.HEX)])
+            e.push(StatusEffectsEnum.HEX)
+        }
+        if (hexblade) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.HEXBLADE)])
+            e.push(StatusEffectsEnum.HEXBLADE)
+        }
 
         if (isMaster) {
             props.p.statusEffects = e
@@ -402,6 +414,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             case StatusEffectsEnum.UNCONSCIOUS:
                 setUnconscious(!unconscious)
                 break
+            case StatusEffectsEnum.HEX:
+                setHex(!hex)
+                break
+            case StatusEffectsEnum.HEXBLADE:
+                setHexblade(!hexblade)
+                break
             default:
                 break
         }
@@ -423,7 +441,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, isMaster])
 
     useEffect(() => {
         props.p.hidden = hide
@@ -553,6 +571,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.GRAPPLED)} isChecked={grappled}>
                                     Gepackt
                                 </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEX)} isChecked={hex}>
+                                    Hex
+                                </Switch>
                             </GridItem>
                             <GridItem>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.INCAPACITATED)}
@@ -575,13 +596,18 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                         isChecked={restrained}>
                                     Festgesetzt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.STUNNED)} isChecked={stunned}>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.STUNNED)}
+                                        isChecked={stunned}>
                                     Betäubt
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNCONSCIOUS)}
                                         isChecked={unconscious}>
                                     Bewusstlos
                                 </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEXBLADE)}
+                                        isChecked={hexblade}>
+                                    Hexblade
+                                </Switch>
                             </GridItem>
                             <GridItem>
                                 <Table size='sm'>
