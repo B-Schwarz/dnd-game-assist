@@ -14,7 +14,8 @@ import {
     GiPentagramRose,
     GiSpiderWeb,
     GiStoneBlock,
-    GiThunderStruck
+    GiThunderStruck,
+    GiDropWeapon
 } from "react-icons/gi";
 
 const prone = (
@@ -193,6 +194,17 @@ const hexblade = (
     </React.Fragment>
 )
 
+const unarmed = (
+    <React.Fragment key='unarmed'>
+        <Box marginLeft='0.5rem'/>
+        <Tooltip label="Unbewaffnet" hasArrow size='md' placement='top'>
+        <span>
+            <Icon as={GiDropWeapon} color='red'/>
+        </span>
+        </Tooltip>
+    </React.Fragment>
+)
+
 export const getIcon = (effect: StatusEffectsEnum) => {
 
     switch (effect) {
@@ -228,6 +240,8 @@ export const getIcon = (effect: StatusEffectsEnum) => {
             return hex
         case StatusEffectsEnum.HEXBLADE:
             return hexblade
+        case StatusEffectsEnum.UNARMED:
+            return unarmed
         default:
             return
     }

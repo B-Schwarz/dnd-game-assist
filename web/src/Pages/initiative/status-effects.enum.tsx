@@ -14,5 +14,6 @@ export enum StatusEffectsEnum {
     STUNNED,
     UNCONSCIOUS,
     HEX,
-    HEXBLADE
+    HEXBLADE,
+    UNARMED
 }
