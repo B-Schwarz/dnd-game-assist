@@ -21,6 +21,7 @@ import axios from "axios";
 import _ from "lodash";
 import Add from "./add/add";
 import TitleService from "../../Service/titleService";
+import {ColorMarkerEnum} from "./color-marker.enum";
 
 const App = () => {
 
