@@ -16,6 +16,7 @@ import {
     NumberInputField,
     NumberInputStepper,
     Progress,
+    Select,
     Spacer,
     Switch,
     Table,
@@ -33,6 +34,7 @@ import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
+import {ColorMarkerEnum} from "./color-marker.enum";
 
 const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => void }) => {
 
@@ -71,6 +73,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
     const [schaden, setSchaden] = useState(0)
+
+    const [colorMarker, setColorMarker] = useState<ColorMarkerEnum>(props.p.colorMarker ?? ColorMarkerEnum.NONE)
 
     const saveTimer = useRef(null)
 
@@ -558,6 +562,34 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             })
     }
 
+    const getColor = (color: ColorMarkerEnum) => {
+        switch (color) {
+            case ColorMarkerEnum.BLACK:
+                return 'black'
+            case ColorMarkerEnum.GREY:
+                return 'grey'
+            case ColorMarkerEnum.PURPLE:
+                return 'purple'
+            case ColorMarkerEnum.RED:
+                return 'red'
+            case ColorMarkerEnum.PINK:
+                return 'pink'
+            case ColorMarkerEnum.ORANGE:
+                return 'orange'
+            case ColorMarkerEnum.YELLOW:
+                return 'yellow'
+            case ColorMarkerEnum.GREEN:
+                return 'green'
+            case ColorMarkerEnum.BLUE:
+                return 'blue'
+            case ColorMarkerEnum.WHITE:
+                return 'white'
+            default:
+                return ''
+        }
+    }
+
+    // @ts-ignore
     return (
         <>
             <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
@@ -580,6 +612,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 <Box marginLeft='0.5rem'/><Badge colorScheme='green'>NPC</Badge><Box
                                 marginRight='0.5rem'/>
                             </>
+                        }
+                        {
+                            colorMarker !== ColorMarkerEnum.NONE ? <Badge variant='solid' bg={getColor(colorMarker)}
+                                                                          textColor={getColor(colorMarker)}
+                                                                          borderColor='black' borderWidth='1px'
+                                                                          width='2rem'>_</Badge> : <></>
                         }
                         {effects}
                         <Spacer/>
@@ -713,6 +751,27 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </NumberInput>
                                 </HStack>
                                 <Button colorScheme='red' onClick={doSchaden} w='88%'>Schaden</Button>
+                                <Select variant='flushed' marginTop='1rem'
+                                        onChange={(evt) => {
+                                            const color = Number(evt.currentTarget.value)
+                                            setColorMarker(color)
+                                            props.p.colorMarker = color
+                                            savePlayer()
+                                        }}
+                                        placeholder='Markierung' value={colorMarker}
+                                        >
+                                    <option value={ColorMarkerEnum.NONE}>Nichts</option>
+                                    <option value={ColorMarkerEnum.BLACK}>Schwarz</option>
+                                    <option value={ColorMarkerEnum.GREY}>Grau</option>
+                                    <option value={ColorMarkerEnum.PURPLE}>Lila</option>
+                                    <option value={ColorMarkerEnum.RED}>Rot</option>
+                                    <option value={ColorMarkerEnum.PINK}>Rosa</option>
+                                    <option value={ColorMarkerEnum.ORANGE}>Orange</option>
+                                    <option value={ColorMarkerEnum.YELLOW}>Gelb</option>
+                                    <option value={ColorMarkerEnum.GREEN}>Grün</option>
+                                    <option value={ColorMarkerEnum.BLUE}>Blau</option>
+                                    <option value={ColorMarkerEnum.WHITE}>Weiß</option>
+                                </Select>
                             </GridItem>
                             <GridItem>
                                 <VStack>
