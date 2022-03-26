@@ -11,6 +11,7 @@ import {
     Modal,
     ModalContent,
     ModalFooter,
+    ModalHeader,
     ModalOverlay,
     StackItem,
     useDisclosure,
@@ -21,7 +22,11 @@ import axios from "axios";
 import _ from "lodash";
 import Add from "./add/add";
 import TitleService from "../../Service/titleService";
-import {ColorMarkerEnum} from "./color-marker.enum";
+
+enum confirmType {
+    RESET,
+    SORT
+}
 
 const App = () => {
 
@@ -32,7 +37,10 @@ const App = () => {
     const [updatePing, setUpdatePing] = useState(0)
     const updateTimer = useRef(null)
 
+    const [confirm, setConfirm] = useState<confirmType>()
+
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose} = useDisclosure()
 
     function save(p: Player[]) {
         axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative', {player: p})
@@ -187,13 +195,19 @@ const App = () => {
                     <Text fontSize='2xl'>Runde: {round}</Text>
                     <StackItem>
                         <Grid templateColumns='repeat(4, 1fr)' gap={3}>
-                            <Button colorScheme='red' onClick={reset}>RESET</Button>
-                            <Button colorScheme='blue' onClick={sort}>Sort</Button>
+                            <Button colorScheme='red' onClick={() => {
+                                setConfirm(confirmType.RESET)
+                                onConfirmOpen()
+                            }}>Board Löschen</Button>
+                            <Button colorScheme='blue' onClick={() => {
+                                setConfirm(confirmType.SORT)
+                                onConfirmOpen()
+                            }}>Sortieren</Button>
                             <GridItem>
                                 <Button colorScheme='blue' onClick={prevTurn}>Vorheriger</Button>
                                 <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
                             </GridItem>
-                            <Button colorScheme='green' onClick={onOpen}>Add</Button>
+                            <Button colorScheme='green' onClick={onOpen}>Hinzufügen</Button>
                         </Grid>
                     </StackItem>
 
@@ -221,6 +235,37 @@ const App = () => {
                             update()
                             onClose()
                         }}>Schließen</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+            <Modal isOpen={isConfirmOpen} onClose={() => {
+                onConfirmClose()
+            }} closeOnEsc isCentered>
+                <ModalOverlay/>
+                <ModalContent maxW='35rem' maxH='40rem'>
+                    <ModalHeader textAlign='center'>
+                        Bist Du sicher?
+                    </ModalHeader>
+                    <ModalFooter m='auto'>
+                            {
+                                confirm === confirmType.SORT && <Button onClick={() => {
+                                    sort()
+                                    onConfirmClose()
+                                }} marginRight='1rem' colorScheme='blue'>
+                                    Sortieren
+                                </Button>
+                            }
+                            {
+                                confirm === confirmType.RESET && <Button onClick={() => {
+                                    reset()
+                                    onConfirmClose()
+                                }} marginRight='1rem' colorScheme='red'>
+                                    Board Löschen
+                                </Button>
+                            }
+                            <Button onClick={() => {
+                                onConfirmClose()
+                            }}>Schließen</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
