@@ -15,7 +15,8 @@ import {
     GiSpiderWeb,
     GiStoneBlock,
     GiThunderStruck,
-    GiDropWeapon
+    GiDropWeapon,
+    GiChewedSkull
 } from "react-icons/gi";
 
 const prone = (
@@ -205,6 +206,17 @@ const unarmed = (
     </React.Fragment>
 )
 
+const dead = (
+    <React.Fragment key='unarmed'>
+        <Box marginLeft='0.5rem'/>
+        <Tooltip label="Unbewaffnet" hasArrow size='md' placement='top'>
+        <span>
+            <Icon as={GiChewedSkull} color='red'/>
+        </span>
+        </Tooltip>
+    </React.Fragment>
+)
+
 export const getIcon = (effect: StatusEffectsEnum) => {
 
     switch (effect) {
@@ -246,4 +258,8 @@ export const getIcon = (effect: StatusEffectsEnum) => {
             return
     }
 
+}
+
+export const getDeadIcon = () => {
+  return dead
 }
