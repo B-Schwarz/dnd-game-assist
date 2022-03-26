@@ -63,6 +63,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [unconscious, setUnconscious] = useState(false)
     const [hex, setHex] = useState(false)
     const [hexblade, setHexblade] = useState(false)
+    const [unarmed, setUnarmed] = useState(false)
 
     const [effects, setEffects] = useState([])
 
@@ -349,6 +350,11 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             setEffects(e => [...e, getIcon(StatusEffectsEnum.HEXBLADE)])
             e.push(StatusEffectsEnum.HEXBLADE)
         }
+        if (unarmed) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.UNARMED)])
+            e.push(StatusEffectsEnum.UNARMED)
+        }
 
         if (isMaster) {
             props.p.statusEffects = e
@@ -422,6 +428,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             case StatusEffectsEnum.HEXBLADE:
                 setHexblade(!hexblade)
                 break
+            case StatusEffectsEnum.UNARMED:
+                setUnarmed(!unarmed)
+                break
             default:
                 break
         }
@@ -478,7 +487,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, isMaster])
 
     useEffect(() => {
         props.p.hidden = hide
@@ -589,9 +598,13 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                         <Grid templateColumns='repeat(5, 1fr)' gap={0}>
                             <GridItem>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
-                                        isChecked={blind}>Blind</Switch><br/>
+                                        isChecked={blind}>
+                                    Blind
+                                </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
-                                        isChecked={poison}>Vergifted</Switch><br/>
+                                        isChecked={poison}>
+                                    Vergifted
+                                </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.PRONE)} isChecked={down}>
                                     Liegend
                                 </Switch><br/>
@@ -610,6 +623,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 </Switch><br/>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEX)} isChecked={hex}>
                                     Hex
+                                </Switch><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNARMED)} isChecked={unarmed}>
+                                    Unbewaffnet
                                 </Switch>
                             </GridItem>
                             <GridItem>
