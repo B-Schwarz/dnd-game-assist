@@ -29,7 +29,7 @@ import {
     VStack
 } from "@chakra-ui/react";
 import {StatusEffectsEnum} from "./status-effects.enum";
-import {getIcon} from "./status-icons";
+import {getDeadIcon, getIcon} from "./status-icons";
 import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
@@ -73,6 +73,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
     const [schaden, setSchaden] = useState(0)
+    const [dead, setDead] = useState(Number(hp) === 0)
 
     const [colorMarker, setColorMarker] = useState<ColorMarkerEnum>(props.p.colorMarker ?? ColorMarkerEnum.NONE)
 
@@ -494,6 +495,14 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, isMaster])
 
     useEffect(() => {
+        if (Number(hp) === 0) {
+            setDead(true)
+        } else {
+            setDead(false)
+        }
+    }, [hp])
+
+    useEffect(() => {
         props.p.hidden = hide
         if (props.p.isMaster)
             savePlayer()
@@ -505,7 +514,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
         )
     }
 
-    function writePlayerMetadata() {
+    function writePlayerHP() {
         if (!npc || props.p.isMaster) {
             return (
                 <React.Fragment>
@@ -600,7 +609,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <AccordionButton _expanded={props.p.isMaster ? {bg: '#ebebeb'} : undefined}
                                      style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
                         {write('', props.p.character.name!)}
-                        {writePlayerMetadata()}
+                        {writePlayerHP()}
                         {hide &&
                             <>
                                 <Box marginLeft='0.5rem'/><Badge colorScheme='teal'>VERSTECKT</Badge><Box
@@ -613,6 +622,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 marginRight='0.5rem'/>
                             </>
                         }
+                        {dead && getDeadIcon()}
                         {
                             colorMarker !== ColorMarkerEnum.NONE ? <Badge variant='solid' bg={getColor(colorMarker)}
                                                                           textColor={getColor(colorMarker)}
