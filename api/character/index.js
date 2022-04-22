@@ -24,6 +24,9 @@ const saveOwnCharacter = async (req, res) => {
 
     if (isOwnedByUser(req.user.character, charID)) {
         try {
+
+            console.log(char)
+
             await Character.findOneAndUpdate({
                 _id: charID
             }, {character: char})
