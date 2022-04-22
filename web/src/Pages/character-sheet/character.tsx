@@ -12,6 +12,7 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
 import TitleService from "../../Service/titleService";
+import LZString from "lz-string";
 
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
@@ -53,14 +54,15 @@ const App = () => {
         return character
     }
 
-    function updateCharacter(character: DnDCharacter) {
-        setCharacter(character)
-        localStorage.setItem('dnd-character-data', JSON.stringify(character))
+    function updateCharacter(char: DnDCharacter) {
+        setCharacter(char)
+        localStorage.setItem('dnd-character-data', JSON.stringify(char))
         setChange(true)
     }
 
     async function send() {
         const data = {character: character, charID: id}
+
         if (isMaster) {
             axios.post(process.env.REACT_APP_API_PREFIX + '/api/char', data, {
                 headers: {
@@ -79,16 +81,20 @@ const App = () => {
         }
     }
 
+    function initUpdate(char: DnDCharacter) {
+        updateCharacter(char)
+    }
+
     async function recv() {
         if (isMaster) {
             axios.get(process.env.REACT_APP_API_PREFIX + `/api/char/get/${id}`)
                 .then((data) => {
-                    updateCharacter(data.data.character)
+                    initUpdate(data.data.character);
                 })
                 .catch(() => {
                     axios.get(process.env.REACT_APP_API_PREFIX + `/api/char/me/get/${id}`)
                         .then((data) => {
-                            updateCharacter(data.data.character)
+                            initUpdate(data.data.character);
                         })
                         .catch(() => {
                         })
@@ -96,7 +102,7 @@ const App = () => {
         } else {
             axios.get(process.env.REACT_APP_API_PREFIX + `/api/char/me/get/${id}`)
                 .then((data) => {
-                    updateCharacter(data.data.character)
+                    initUpdate(data.data.character);
                 })
                 .catch(() => {
                 })

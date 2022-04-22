@@ -22,9 +22,8 @@ const {getBookList, getBook} = require("./books");
 const path = require("path");
 
 const port = 4000;
-const url = process.env.NODE_ENV === 'production' ? "https://dnd.saltyk.de" : "http://localhost:3000"
 
-app.use(express.json());
+app.use(express.json({limit: '2mb'}));
 app.use(express.urlencoded({extended: false}));
 
 app.disable('x-powered-by');

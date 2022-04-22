@@ -2,7 +2,7 @@
   "env": {
     "CORS_URL": "http://localhost:3000",
     "NODE_ENV": "development",
-    "DB_URI": "mongodb://localhost:27017/dnd",
+    "DB_URI": "mongodb://127.0.0.1:27017/dnd",
     "DND_COOKIE_SECRET": "safesecret"
   }
 }
