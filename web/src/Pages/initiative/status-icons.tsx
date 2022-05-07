@@ -209,7 +209,7 @@ const unarmed = (
 const dead = (
     <React.Fragment key='unarmed'>
         <Box marginLeft='0.5rem'/>
-        <Tooltip label="Unbewaffnet" hasArrow size='md' placement='top'>
+        <Tooltip label="Tot" hasArrow size='md' placement='top'>
         <span>
             <Icon as={GiChewedSkull} color='red'/>
         </span>

@@ -9,7 +9,7 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, setNPC
+    deleteOwnCharacter, setNPC, getNPCList
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
@@ -77,6 +77,7 @@ app.use('/api', limiter)
 //
 app.get('/api/charlist', isAuth, isMasterOrAdmin, getCharacterList)
 app.get('/api/charlist/me', isAuth, getOwnCharacterList)
+app.get('/api/charlist/npc', isAuth, isMaster, getNPCList)
 
 //
 //  CHARACTER

@@ -18,7 +18,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const getPlayer = () => {
-        axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist/npc')
             .then((d) => {
                 d.data.forEach((c: {
                     character: DnDCharacter;

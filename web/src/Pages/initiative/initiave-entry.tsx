@@ -622,13 +622,14 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 marginRight='0.5rem'/>
                             </>
                         }
-                        {dead && getDeadIcon()}
                         {
                             colorMarker !== ColorMarkerEnum.NONE ? <Badge variant='solid' bg={getColor(colorMarker)}
                                                                           textColor={getColor(colorMarker)}
                                                                           borderColor='black' borderWidth='1px'
+                                                                          marginLeft='0.5rem' marginRight='0.5rem'
                                                                           width='2rem'>_</Badge> : <></>
                         }
+                        {dead && getDeadIcon()}
                         {effects}
                         <Spacer/>
                         {(!npc || props.p.isMaster) && write('AC:', String(ac))}

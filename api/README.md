@@ -14,10 +14,11 @@ Start the server by first installing all modules with ``npm install`` and then r
 
 ## Char List
 
-| URL              | METHOD | PARAMETER |         ROLE         | DESCR.                   | Return                               |
-|------------------|:------:|:---------:|:--------------------:|--------------------------|--------------------------------------|
-| /api/charlist    | `GET`  |  `none`   | `admin`<br/>`master` | List with all characters | `[{_id:ObjectID, character:Player}]` |
-| /api/charlist/me | `GET`  |  `none`   |        `user`        | List with my characters  | `[{_id:ObjectID, character:Player}]` |
+| URL               | METHOD | PARAMETER |         ROLE         | DESCR.                   | Return                               |
+|-------------------|:------:|:---------:|:--------------------:|--------------------------|--------------------------------------|
+| /api/charlist     | `GET`  |  `none`   | `admin`<br/>`master` | List with all characters | `[{_id:ObjectID, character:Player}]` |
+| /api/charlist/me  | `GET`  |  `none`   |        `user`        | List with my characters  | `[{_id:ObjectID, character:Player}]` |
+| /api/charlist/npc | `GET`  |  `none`   |       `master`       | List with all my npcs    | `[{_id:ObjectID, character:Player}]` |
 
 ## Character
 
