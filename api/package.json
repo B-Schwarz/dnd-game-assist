@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "connect-mongo": "^4.6.0",
