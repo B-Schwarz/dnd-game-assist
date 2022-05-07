@@ -138,6 +138,16 @@ const getOwnCharacterList = async (req, res) => {
     res.send(filterCharacterListe(charList))
 }
 
+const getNPCList = async (req, res) => {
+    const charList = await Character.find({
+        _id: {
+            "$in": req.user.character
+        },
+        npc: true
+    })
+    res.send(filterCharacterListe(charList))
+}
+
 // REQUIRES MASTER OR ADMIN
 const deleteCharacter = async (req, res) => {
     const charID = req.params.id
@@ -195,5 +205,6 @@ module.exports = {
     createCharacter,
     deleteCharacter,
     deleteOwnCharacter,
-    setNPC
+    setNPC,
+    getNPCList
 }
