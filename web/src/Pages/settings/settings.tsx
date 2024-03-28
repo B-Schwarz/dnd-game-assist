@@ -31,7 +31,7 @@ const App = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [newPassVal, setNewPassVal] = useState('')
 
-    const cancelRef = React.useRef()
+    const cancelRef = React.useRef(null)
     const toast = useToast()
 
     const closePopup = () => {
@@ -123,7 +123,7 @@ const App = () => {
                                                     <Input {...field} id="pass" type="password"
                                                            autoComplete='current-password'
                                                            placeholder="Aktuelles Passwort"/>
-                                                    <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                                                    <FormErrorMessage>{form.errors.password?.toString()}</FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
@@ -136,7 +136,7 @@ const App = () => {
                                                            onChange={evt => setNewPassVal(evt.target.value)}
                                                            autoComplete='new-password'
                                                            placeholder="Neues Passwort"/>
-                                                    <FormErrorMessage>{form.errors.newPassword}</FormErrorMessage>
+                                                    <FormErrorMessage>{form.errors.newPassword?.toString()}</FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
@@ -149,7 +149,7 @@ const App = () => {
                                                     <Input {...field} id="newPassRep" type="password"
                                                            autoComplete='new-password'
                                                            placeholder="Neues Passwort Wiederholen"/>
-                                                    <FormErrorMessage>{form.errors.newPasswordRepeat}</FormErrorMessage>
+                                                    <FormErrorMessage>{form.errors.newPasswordRepeat?.toString()}</FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
@@ -170,7 +170,7 @@ const App = () => {
                             ACCOUNT LÖSCHEN
                         </Button>
 
-                        <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+                        <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef}>
                             <AlertDialogOverlay>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
@@ -183,7 +183,7 @@ const App = () => {
                                     </AlertDialogBody>
 
                                     <AlertDialogFooter>
-                                        <Button ref={cancelRef.current} onClick={closePopup}>
+                                        <Button ref={cancelRef} onClick={closePopup}>
                                             Abbrechen
                                         </Button>
                                         <Button colorScheme='red' onClick={async () => {

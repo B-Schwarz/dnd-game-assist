@@ -5,14 +5,13 @@ import {
     DnDCharacterProfileSheet,
     DnDCharacterSpellSheet,
     DnDCharacterStatsSheet
-} from 'dnd-character-sheets'
-import 'dnd-character-sheets/dist/index.css'
+} from '../../dnd-character-sheets'
+import '../../dnd-character-sheets/index.css'
 
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
 import TitleService from "../../Service/titleService";
-import LZString from "lz-string";
 
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
@@ -25,13 +24,14 @@ const App = () => {
         <DnDCharacterStatsSheet
             character={character}
             onCharacterChanged={updateCharacter}
-        />
+            german={true}/>
     )
 
     const profileSheet = (
         <DnDCharacterProfileSheet
             character={character}
             onCharacterChanged={updateCharacter}
+            german={true}
         />
     )
 
@@ -39,6 +39,7 @@ const App = () => {
         <DnDCharacterSpellSheet
             character={character}
             onCharacterChanged={updateCharacter}
+            german={true}
         />
     )
 

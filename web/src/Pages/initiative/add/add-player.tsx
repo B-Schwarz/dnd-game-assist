@@ -17,7 +17,7 @@ import {AddIcon} from "@chakra-ui/icons";
 import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
-import {DnDCharacter} from "dnd-character-sheets";
+import {DnDCharacter} from "../../../dnd-character-sheets";
 
 const App = (props: {u: () => void}) => {
 

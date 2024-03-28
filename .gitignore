@@ -154,3 +154,5 @@ api/build
 web/build
 *.pdf
 mongo_volume
+web/src/dnd-character-sheets/*
+!web/src/dnd-character-sheets/.gitkeep
