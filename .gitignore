@@ -156,3 +156,5 @@ web/build
 mongo_volume
 web/src/dnd-character-sheets/*
 !web/src/dnd-character-sheets/.gitkeep
+.vscode
+go.ps1

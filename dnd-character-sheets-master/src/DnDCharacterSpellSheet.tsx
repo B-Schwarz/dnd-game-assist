@@ -117,7 +117,7 @@ class DnDCharacterSpellsSheet extends React.Component<
                         marginBottom: '0'
                       }}
                     >
-                      {this.props.german ? 'Attribut zum' : 'Spellcasting'}
+                      {this.props.german ? 'Max. Vorbereitete' : 'Prepared Spells'}
                     </label>
                     <label
                       style={{
@@ -127,7 +127,7 @@ class DnDCharacterSpellsSheet extends React.Component<
                         marginBottom: '0'
                       }}
                     >
-                      {this.props.german ? 'Zauberwirken' : 'Ability'}
+                      {this.props.german ? 'Zauber' : 'Total'}
                     </label>
                   </div>
                   <div className='col-4 pr-4 pl-4'>

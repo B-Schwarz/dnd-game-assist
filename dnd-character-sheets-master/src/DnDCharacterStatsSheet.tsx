@@ -50,7 +50,10 @@ class DnDCharacterStatsSheet extends React.Component<
     const oldCharacter = this.getCharacter()
     const newCharacter: DnDCharacter = {}
     Object.assign(newCharacter, oldCharacter)
-    newCharacter[name] = value
+
+    if (name !== 'REFRESH') {
+      newCharacter[name] = value
+    }
 
     if (!this.props.character) {
       // NOT CONTROLLED
@@ -72,243 +75,292 @@ class DnDCharacterStatsSheet extends React.Component<
     return character
   }
 
-  calculateTalents() {
-    const character = this.props.character
+  calculateTalents(char: DnDCharacter) {
+    if (char) {
+      const tempStr: string = String(Math.floor((Number(char.str) - 10) / 2))
+      const tempDex: string = String(Math.floor((Number(char.dex) - 10) / 2))
+      const tempCon: string = String(Math.floor((Number(char.con) - 10) / 2))
+      const tempInt: string = String(Math.floor((Number(char.int) - 10) / 2))
+      const tempWis: string = String(Math.floor((Number(char.wis) - 10) / 2))
+      const tempCha: string = String(Math.floor((Number(char.cha) - 10) / 2))
 
-    if (character) {
-      character.skillAcrobatics = character.dex
-      if (character.skillAcrobaticsExpert) {
-        character.skillAcrobatics = String(
-          Number(character.dex) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillAcrobatics = tempDex
+      if (char.skillAcrobaticsChecked === 'expert') {
+        char.skillAcrobatics = String(
+          Number(tempDex) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillAcrobaticsChecked) {
-        character.skillAcrobatics = String(
-          Number(character.dex) + Number(character.proficiencyBonus)
+      } else if (char.skillAcrobaticsChecked === 'normal') {
+        char.skillAcrobatics = String(
+          Number(tempDex) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillAnimalHandling = character.wis
-      if (character.skillAnimalHandlingExpert) {
-        character.skillAnimalHandling = String(
-          Number(character.wis) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillAnimalHandling = tempWis
+      if (char.skillAnimalHandlingChecked === 'expert') {
+        char.skillAnimalHandling = String(
+          Number(tempWis) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillAnimalHandlingChecked) {
-        character.skillAnimalHandling = String(
-          Number(character.wis) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillArcana = character.int
-      if (character.skillArcanaExpert) {
-        character.skillArcana = String(
-          Number(character.int) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillArcanaChecked) {
-        character.skillArcana = String(
-          Number(character.int) + Number(character.proficiencyBonus)
+      } else if (char.skillAnimalHandlingChecked === 'normal') {
+        char.skillAnimalHandling = String(
+          Number(tempWis) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillAthletics = character.str
-      if (character.skillAthleticsExpert) {
-        character.skillAthletics = String(
-          Number(character.str) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillArcana = tempInt
+      if (char.skillArcanaChecked === 'expert') {
+        char.skillArcana = String(
+          Number(tempInt) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillAthleticsChecked) {
-        character.skillAthletics = String(
-          Number(character.str) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillDeception = character.cha
-      if (character.skillDeceptionExpert) {
-        character.skillDeception = String(
-          Number(character.cha) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillDeceptionChecked) {
-        character.skillDeception = String(
-          Number(character.cha) + Number(character.proficiencyBonus)
+      } else if (char.skillArcanaChecked === 'normal') {
+        char.skillArcana = String(
+          Number(tempInt) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillHistory = character.int
-      if (character.skillHistoryExpert) {
-        character.skillHistory = String(
-          Number(character.int) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillAthletics = tempStr
+      if (char.skillAthleticsChecked === 'expert') {
+        char.skillAthletics = String(
+          Number(tempStr) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillHistoryChecked) {
-        character.skillHistory = String(
-          Number(character.int) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillInsight = character.wis
-      if (character.skillInsightExpert) {
-        character.skillInsight = String(
-          Number(character.wis) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillInsightChecked) {
-        character.skillInsight = String(
-          Number(character.wis) + Number(character.proficiencyBonus)
+      } else if (char.skillAthleticsChecked === 'normal') {
+        char.skillAthletics = String(
+          Number(tempStr) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillIntimidation = character.cha
-      if (character.skillIntimidationExpert) {
-        character.skillIntimidation = String(
-          Number(character.cha) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillDeception = tempCha
+      if (char.skillDeceptionChecked === 'expert') {
+        char.skillDeception = String(
+          Number(tempCha) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillIntimidationChecked) {
-        character.skillIntimidation = String(
-          Number(character.cha) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillInvestigation = character.int
-      if (character.skillInvestigationExpert) {
-        character.skillInvestigation = String(
-          Number(character.int) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillInvestigationChecked) {
-        character.skillInvestigation = String(
-          Number(character.int) + Number(character.proficiencyBonus)
+      } else if (char.skillDeceptionChecked === 'normal') {
+        char.skillDeception = String(
+          Number(tempCha) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillMedicine = character.wis
-      if (character.skillMedicineExpert) {
-        character.skillMedicine = String(
-          Number(character.wis) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillHistory = tempInt
+      if (char.skillHistoryChecked === 'expert') {
+        char.skillHistory = String(
+          Number(tempInt) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillMedicineChecked) {
-        character.skillMedicine = String(
-          Number(character.wis) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillNature = character.int
-      if (character.skillNatureExpert) {
-        character.skillMedicine = String(
-          Number(character.int) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillNatureChecked) {
-        character.skillNature = String(
-          Number(character.int) + Number(character.proficiencyBonus)
+      } else if (char.skillHistoryChecked === 'normal') {
+        char.skillHistory = String(
+          Number(tempInt) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillPerception = character.wis
-      if (character.skillPerceptionExpert) {
-        character.skillPerception = String(
-          Number(character.wis) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillInsight = tempWis
+      if (char.skillInsightChecked === 'expert') {
+        char.skillInsight = String(
+          Number(tempWis) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillPerceptionChecked) {
-        character.skillPerception = String(
-          Number(character.wis) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillPerformance = character.cha
-      if (character.skillPerformanceExpert) {
-        character.skillPerformance = String(
-          Number(character.cha) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillPerformanceChecked) {
-        character.skillPerformance = String(
-          Number(character.cha) + Number(character.proficiencyBonus)
+      } else if (char.skillInsightChecked === 'normal') {
+        char.skillInsight = String(
+          Number(tempWis) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillPersuasion = character.cha
-      if (character.skillPersuasionExpert) {
-        character.skillPersuasion = String(
-          Number(character.cha) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillIntimidation = tempCha
+      if (char.skillIntimidationChecked === 'expert') {
+        char.skillIntimidation = String(
+          Number(tempCha) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillPersuasionChecked) {
-        character.skillPersuasion = String(
-          Number(character.cha) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillReligion = character.int
-      if (character.skillReligionExpert) {
-        character.skillReligion = String(
-          Number(character.int) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillReligionChecked) {
-        character.skillReligion = String(
-          Number(character.int) + Number(character.proficiencyBonus)
+      } else if (char.skillIntimidationChecked === 'normal') {
+        char.skillIntimidation = String(
+          Number(tempCha) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillSlightOfHand = character.dex
-      if (character.skillSlightOfHandExpert) {
-        character.skillSlightOfHand = String(
-          Number(character.dex) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillInvestigation = tempInt
+      if (char.skillInvestigationChecked === 'expert') {
+        char.skillInvestigation = String(
+          Number(tempInt) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillSlightOfHandChecked) {
-        character.skillSlightOfHand = String(
-          Number(character.dex) + Number(character.proficiencyBonus)
-        )
-      }
-
-      character.skillStealth = character.dex
-      if (character.skillStealthExpert) {
-        character.skillStealth = String(
-          Number(character.dex) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
-        )
-      } else if (character.skillStealthChecked) {
-        character.skillStealth = String(
-          Number(character.dex) + Number(character.proficiencyBonus)
+      } else if (char.skillInvestigationChecked === 'normal') {
+        char.skillInvestigation = String(
+          Number(tempInt) + Number(char.proficiencyBonus)
         )
       }
 
-      character.skillSurvival = character.wis
-      if (character.skillSurvivalExpert) {
-        character.skillSurvival = String(
-          Number(character.wis) +
-            Number(character.proficiencyBonus) +
-            Number(character.proficiencyBonus)
+      char.skillMedicine = tempWis
+      if (char.skillMedicineChecked === 'expert') {
+        char.skillMedicine = String(
+          Number(tempWis) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
         )
-      } else if (character.skillSurvivalChecked) {
-        character.skillSurvival = String(
-          Number(character.wis) + Number(character.proficiencyBonus)
+      } else if (char.skillMedicineChecked === 'normal') {
+        char.skillMedicine = String(
+          Number(tempWis) + Number(char.proficiencyBonus)
         )
       }
+
+      char.skillNature = tempInt
+      if (char.skillNatureChecked === 'expert') {
+        char.skillMedicine = String(
+          Number(tempInt) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillNatureChecked === 'normal') {
+        char.skillNature = String(
+          Number(tempInt) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillPerception = tempWis
+      if (char.skillPerceptionChecked === 'expert') {
+        char.skillPerception = String(
+          Number(tempWis) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillPerceptionChecked === 'normal') {
+        char.skillPerception = String(
+          Number(tempWis) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillPerformance = tempCha
+      if (char.skillPerformanceChecked === 'expert') {
+        char.skillPerformance = String(
+          Number(tempCha) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillPerformanceChecked === 'normal') {
+        char.skillPerformance = String(
+          Number(tempCha) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillPersuasion = tempCha
+      if (char.skillPersuasionChecked === 'expert') {
+        char.skillPersuasion = String(
+          Number(tempCha) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillPersuasionChecked === 'normal') {
+        char.skillPersuasion = String(
+          Number(tempCha) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillReligion = tempInt
+      if (char.skillReligionChecked === 'expert') {
+        char.skillReligion = String(
+          Number(tempInt) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillReligionChecked === 'normal') {
+        char.skillReligion = String(
+          Number(tempInt) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillSlightOfHand = tempDex
+      if (char.skillSlightOfHandChecked === 'expert') {
+        char.skillSlightOfHand = String(
+          Number(tempDex) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillSlightOfHandChecked === 'normal') {
+        char.skillSlightOfHand = String(
+          Number(tempDex) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillStealth = tempDex
+      if (char.skillStealthChecked === 'expert') {
+        char.skillStealth = String(
+          Number(tempDex) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillStealthChecked === 'normal') {
+        char.skillStealth = String(
+          Number(tempDex) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.skillSurvival = tempWis
+      if (char.skillSurvivalChecked === 'expert') {
+        char.skillSurvival = String(
+          Number(tempWis) +
+            Number(char.proficiencyBonus) +
+            Number(char.proficiencyBonus)
+        )
+      } else if (char.skillSurvivalChecked === 'normal') {
+        char.skillSurvival = String(
+          Number(tempWis) + Number(char.proficiencyBonus)
+        )
+      }
+
+      char.strSave = tempStr
+      if (char.strSaveChecked === 'expert') {
+        char.strSave = String(Number(tempStr) + Number(char.proficiencyBonus) + Number(char.proficiencyBonus))
+      } else if (char.strSaveChecked === 'normal') {
+        char.strSave = String(Number(tempStr) + Number(char.proficiencyBonus))
+      }
+
+      char.dexSave = tempDex
+      if (char.dexSaveChecked === 'expert') {
+        char.dexSave = String(Number(tempDex) + Number(char.proficiencyBonus) + Number(char.proficiencyBonus))
+      } else if (char.dexSaveChecked === 'normal') {
+        char.dexSave = String(Number(tempDex) + Number(char.proficiencyBonus))
+      }
+
+      char.conSave = tempCon
+      if (char.conSaveChecked === 'expert') {
+        char.conSave = String(Number(tempCon) + Number(char.proficiencyBonus) + Number(char.proficiencyBonus))
+      } else if (char.conSaveChecked === 'normal') {
+        char.conSave = String(Number(tempCon) + Number(char.proficiencyBonus))
+      }
+
+      char.intSave = tempInt
+      if (char.intSaveChecked === 'expert') {
+        char.intSave = String(Number(tempInt) + Number(char.proficiencyBonus) + Number(char.proficiencyBonus))
+      } else if (char.intSaveChecked === 'normal') {
+        char.intSave = String(Number(tempInt) + Number(char.proficiencyBonus))
+      }
+
+      char.wisSave = tempWis
+      if (char.wisSaveChecked === 'expert') {
+        char.wisSave = String(Number(tempWis) + Number(char.proficiencyBonus) + Number(char.proficiencyBonus))
+      } else if (char.wisSaveChecked === 'normal') {
+        char.wisSave = String(Number(tempWis) + Number(char.proficiencyBonus))
+      }
+
+      char.chaSave = tempCha
+      if (char.chaSaveChecked === 'expert') {
+        char.chaSave = String(Number(tempCha) + Number(char.proficiencyBonus) + Number(char.proficiencyBonus))
+      } else if (char.chaSaveChecked === 'normal') {
+        char.chaSave = String(Number(tempCha) + Number(char.proficiencyBonus))
+      }
+
+      this.updateCharacter('REFRESH', 0)
     }
   }
 
@@ -498,6 +550,9 @@ class DnDCharacterStatsSheet extends React.Component<
                         this.updateCharacter(name, value)
                       }}
                     />
+                    <button onClick={() => this.calculateTalents(character)}>
+                      <TfiReload/> {this.props.german ? 'Neu Berechnen' : 'Re-Calculate'}
+                    </button>
                   </div>
                 </div>
                 <div className='col-8'>
@@ -795,9 +850,6 @@ class DnDCharacterStatsSheet extends React.Component<
                     >
                       {this.props.german ? 'Fertigkeiten' : 'Skills'}
                     </label>
-                    <button onClick={this.calculateTalents}>
-                      <TfiReload />
-                    </button>
                   </div>
                 </div>
               </div>
@@ -885,7 +937,7 @@ class DnDCharacterStatsSheet extends React.Component<
                   <div className='d-and-d-gray-text'>
                     <label style={{ width: '95px' }}>
                       {this.props.german
-                        ? 'Trefferpunkte Maximum'
+                        ? 'Maximale Trefferpunkte'
                         : 'Hit Point Maximum'}
                     </label>
                     <input

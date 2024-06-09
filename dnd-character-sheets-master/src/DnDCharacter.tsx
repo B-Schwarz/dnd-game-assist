@@ -20,72 +20,53 @@ export default class DnDCharacter {
   proficiencyBonus?: string
 
   strSave?: string
-  strSaveChecked?: boolean
+  strSaveChecked?: string
   dexSave?: string
-  dexSaveChecked?: boolean
+  dexSaveChecked?: string
   conSave?: string
-  conSaveChecked?: boolean
+  conSaveChecked?: string
   intSave?: string
-  intSaveChecked?: boolean
+  intSaveChecked?: string
   wisSave?: string
-  wisSaveChecked?: boolean
+  wisSaveChecked?: string
   chaSave?: string
-  chaSaveChecked?: boolean
-
+  chaSaveChecked?: string
   skillAcrobatics?: string
-  skillAcrobaticsChecked?: boolean
-  skillAcrobaticsExpert?: boolean
+  skillAcrobaticsChecked?: string
   skillAnimalHandling?: string
-  skillAnimalHandlingChecked?: boolean
-  skillAnimalHandlingExpert?: boolean
+  skillAnimalHandlingChecked?: string
   skillArcana?: string
-  skillArcanaChecked?: boolean
-  skillArcanaExpert?: boolean
+  skillArcanaChecked?: string
   skillAthletics?: string
-  skillAthleticsChecked?: boolean
-  skillAthleticsExpert?: boolean
+  skillAthleticsChecked?: string
   skillDeception?: string
-  skillDeceptionChecked?: boolean
-  skillDeceptionExpert?: boolean
+  skillDeceptionChecked?: string
   skillHistory?: string
-  skillHistoryChecked?: boolean
-  skillHistoryExpert?: boolean
+  skillHistoryChecked?: string
   skillInsight?: string
-  skillInsightChecked?: boolean
-  skillInsightExpert?: boolean
+  skillInsightChecked?: string
   skillIntimidation?: string
-  skillIntimidationChecked?: boolean
-  skillIntimidationExpert?: boolean
+  skillIntimidationChecked?: string
   skillInvestigation?: string
-  skillInvestigationChecked?: boolean
-  skillInvestigationExpert?: boolean
+  skillInvestigationChecked?: string
   skillMedicine?: string
-  skillMedicineChecked?: boolean
-  skillMedicineExpert?: boolean
+  skillMedicineChecked?: string
   skillNature?: string
-  skillNatureChecked?: boolean
-  skillNatureExpert?: boolean
+  skillNatureChecked?: string
   skillPerception?: string
-  skillPerceptionChecked?: boolean
-  skillPerceptionExpert?: boolean
+  skillPerceptionChecked?: string
   skillPerformance?: string
-  skillPerformanceChecked?: boolean
-  skillPerformanceExpert?: boolean
+  skillPerformanceChecked?: string
   skillPersuasion?: string
-  skillPersuasionChecked?: boolean
-  skillPersuasionExpert?: boolean
+  skillPersuasionChecked?: string
   skillReligion?: string
-  skillReligionChecked?: boolean
-  skillReligionExpert?: boolean
+  skillReligionChecked?: string
   skillSlightOfHand?: string
-  skillSlightOfHandChecked?: boolean
-  skillSlightOfHandExpert?: boolean
+  skillSlightOfHandChecked?: string
   skillStealth?: string
-  skillStealthChecked?: boolean
-  skillStealthExpert?: boolean
+  skillStealthChecked?: string
   skillSurvival?: string
-  skillSurvivalChecked?: boolean
-  skillSurvivalExpert?: boolean
+  skillSurvivalChecked?: string
 
   passivePerception?: string
   otherProficiencies?: string

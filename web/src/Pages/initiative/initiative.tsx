@@ -32,7 +32,8 @@ const App = () => {
 
     const [player, setPlayer] = useState<Player[]>([])
     const [isMaster, setIsMaster] = useState(false)
-    const [round, setRound] = useState<number>(0)
+    const [round, setRound] = useState<number>(1)
+    const [turnBtnActive, setTurnBtnActive] = useState<boolean>(false)
 
     const [updatePing, setUpdatePing] = useState(0)
     const updateTimer = useRef(null)
@@ -146,10 +147,10 @@ const App = () => {
             .then(() => update())
             .catch(() => {
             })
-        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: 0})
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: 1})
             .catch(() => {
             })
-        setRound(0)
+        setRound(1)
     }
 
     const update = () => {
@@ -189,31 +190,29 @@ const App = () => {
     return (
         <>
             <TitleService title={'Initiative'}/>
-            {
-                isMaster &&
                 <VStack>
                     <Text fontSize='2xl'>Runde: {round}</Text>
-                    <StackItem>
-                        <Grid templateColumns='repeat(4, 1fr)' gap={3}>
-                            <Button colorScheme='red' onClick={() => {
-                                setConfirm(confirmType.RESET)
-                                onConfirmOpen()
-                            }}>Board Löschen</Button>
-                            <Button colorScheme='blue' onClick={() => {
-                                setConfirm(confirmType.SORT)
-                                onConfirmOpen()
-                            }}>Sortieren</Button>
-                            <GridItem>
-                                <Button colorScheme='blue' onClick={prevTurn}>Vorheriger</Button>
-                                <Button colorScheme='blue' onClick={nextTurn}>Nächster</Button>
-                            </GridItem>
-                            <Button colorScheme='green' onClick={onOpen}>Hinzufügen</Button>
-                        </Grid>
-                    </StackItem>
-
+                    { isMaster &&
+                        <StackItem>
+                            <Grid templateColumns='repeat(4, 1fr)' gap={3}>
+                                <Button colorScheme='red' onClick={() => {
+                                    setConfirm(confirmType.RESET)
+                                    onConfirmOpen()
+                                }}>Board Löschen</Button>
+                                <Button colorScheme='blue' onClick={() => {
+                                    setConfirm(confirmType.SORT)
+                                    onConfirmOpen()
+                                }}>Sortieren</Button>
+                                <GridItem>
+                                    <Button colorScheme='blue' onClick={prevTurn} isDisabled={turnBtnActive}>Vorheriger</Button>
+                                    <Button colorScheme='blue' onClick={nextTurn} isDisabled={turnBtnActive}>Nächster</Button>
+                                </GridItem>
+                                <Button colorScheme='green' onClick={onOpen}>Hinzufügen</Button>
+                            </Grid>
+                        </StackItem>
+                    }
                     <Divider marginTop='1rem'/>
                 </VStack>
-            }
             <Center marginTop='2rem'>
                 <Accordion allowToggle width='80%'>
                     {
