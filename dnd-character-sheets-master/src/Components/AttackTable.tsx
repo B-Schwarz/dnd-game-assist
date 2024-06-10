@@ -30,15 +30,17 @@ function AttackTable(props: {
     classes += ' ' + props.classes
   }
 
+  const dmgType: string = props.german ? 'Schaden / Art' : 'Damage / Type'
+
   return (
     <table className={classes}>
       <thead>
         <tr>
-          <th>Name</th>
-          <th style={{ width: '70px' }}>
+          <th style={{width: '40%'}}>Name</th>
+          <th style={{ width: '15%' }}>
             {props.german ? 'Bonus' : 'Atk Bonus'}
           </th>
-          <th>{props.german ? 'Schaden / Art' : 'Damage / Type'}</th>
+          <th style={{width: '45%'}}>{dmgType}</th>
         </tr>
       </thead>
       <tbody>

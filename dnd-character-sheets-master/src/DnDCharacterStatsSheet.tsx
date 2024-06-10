@@ -30,7 +30,7 @@ const App = (props: {
   const [character, setCharacter] = useState<DnDCharacter>(new DnDCharacter())
 
   useEffect(() => {
-    if (props.character instanceof DnDCharacter) {
+    if (props.character) {
       setCharacter(props.character)
     }
   }, []);
@@ -53,6 +53,8 @@ const App = (props: {
       props.onCharacterChanged(newCharacter, name, value)
     }
   }
+
+
 
   const calculateTalents = (char: DnDCharacter) => {
     if (char) {
