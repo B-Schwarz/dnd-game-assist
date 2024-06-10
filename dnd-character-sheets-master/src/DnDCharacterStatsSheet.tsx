@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 
 // eslint-disable-next-line no-unused-vars
 import DnDCharacter from './DnDCharacter'
@@ -15,6 +15,7 @@ import Currency from './Components/Currency'
 import './dndstyles.css'
 
 
+
 // class DnDCharacterStatsSheet extends React.Component<
 //   IDnDCharacterStatsSheetProps,
 //   IDnDCharacterStatsSheetState
@@ -27,13 +28,7 @@ const App = (props: {
 }): React.JSX.Element => {
 
 
-  const [character, setCharacter] = useState<DnDCharacter>(new DnDCharacter())
-
-  useEffect(() => {
-    if (props.character) {
-      setCharacter(props.character)
-    }
-  }, []);
+  const [character, setCharacter] = useState<DnDCharacter>(props.character || new DnDCharacter())
 
   const updateCharacter = (name: string, value: any) => {
     const oldCharacter = character
@@ -53,7 +48,6 @@ const App = (props: {
       props.onCharacterChanged(newCharacter, name, value)
     }
   }
-
 
 
   const calculateTalents = (char: DnDCharacter) => {
