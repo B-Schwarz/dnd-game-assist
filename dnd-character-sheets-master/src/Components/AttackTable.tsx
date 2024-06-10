@@ -10,7 +10,7 @@ function AttackTable(props: {
 }) {
   function updateValue(index: React.Key, field: string, v: string) {
     const value = getValue().slice()
-    value[index][field] = v
+    value[String(index)][field] = v
     props.onChange(props.name, value)
   }
 

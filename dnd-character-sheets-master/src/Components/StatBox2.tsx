@@ -25,7 +25,7 @@ function StatBox2(props: {
         </div>
         {props.labelTop != null ? (
           <div>
-            <label className='label-top'>{props.labelTop}</label>
+            <label className='label-top'>{String(props.labelTop)}</label>
           </div>
         ) : null}
         {props.label != null ? (

@@ -14,37 +14,40 @@ COPY api/yarn.lock app/
 COPY api/server.js app/
 # BOOKS
 COPY Books/* app/books/pdf/
+# DND SHEETS
+RUN mkdir -p /temp/dnd
+COPY dnd-character-sheets-master/src temp/dnd-character-sheets-master/src
+COPY dnd-character-sheets-master/.editorconfig temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/.eslintignore temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/.eslintrc temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/.prettierrc temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/.travis.yml temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/yarn.lock temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/package.json temp/dnd-character-sheets-master
+COPY dnd-character-sheets-master/tsconfig.json temp/dnd-character-sheets-master
+
+# BUILD DND SHEETS
+RUN cd /temp/dnd-character-sheets-master \
+    && yarn install --ignore-engines \
+    && yarn run build
+#    && rm -rf /temp/web/src/dnd-character-sheets \
+#    && mkdir -p /temp/web/src/dnd-character-sheets \
+#    && mv dist/* /temp/web/src/dnd-character-sheets
+
 # WEB
 RUN mkdir -p /temp/web
-COPY web/public temp/web/public
-COPY web/src temp/web/src
 COPY web/package.json temp/web
 COPY web/yarn.lock temp/web
 COPY web/tsconfig.json temp/web
 COPY web/.env.production temp/web
-# DND SHEETS
-RUN mkdir /temp/dnd
-COPY dnd-character-sheets-master/src temp/dnd/src
-COPY dnd-character-sheets-master/.editorconfig temp/dnd
-COPY dnd-character-sheets-master/.eslintignore temp/dnd
-COPY dnd-character-sheets-master/.eslintrc temp/dnd
-COPY dnd-character-sheets-master/.prettierrc temp/dnd
-COPY dnd-character-sheets-master/.travis.yml temp/dnd
-COPY dnd-character-sheets-master/yarn.lock temp/dnd
-COPY dnd-character-sheets-master/package.json temp/dnd
-COPY dnd-character-sheets-master/tsconfig.json temp/dnd
+COPY web/public temp/web/public
+RUN cd /temp/web \
+    && yarn install --ignore-engines
 
-# BUILD DND SHEETS
-RUN cd temp/dnd \
-    && yarn install --ignore-engines \
-    && yarn run build \
-    && rm -rf /temp/web/src/dnd-character-sheets \
-    && mkdir -p /temp/web/src/dnd-character-sheets \
-    && mv dist/* /temp/web/src/dnd-character-sheets
+COPY web/src temp/web/src
 
 # BUILD WEB
-RUN cd temp/web \
-    && yarn install --ignore-engines \
+RUN cd /temp/web \
     && yarn run build \
     && cp -r build/ /app/
 

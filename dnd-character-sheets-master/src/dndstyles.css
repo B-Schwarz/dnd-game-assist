@@ -214,6 +214,31 @@
   padding-bottom: 5px;
   background-color: white;
 }
+
+.d-and-d-character-sheet .pr-0 {
+  padding-right: 0 !important;
+}
+
+.d-and-d-character-sheet .pl-0 {
+  padding-left: 0 !important;
+}
+
+.d-and-d-character-sheet .pr-2 {
+  padding-right: 0.5rem !important;
+}
+
+.d-and-d-character-sheet .pl-2 {
+  padding-left: 0.5rem !important;
+}
+
+.d-and-d-character-sheet .pr-3 {
+  padding-right: 1rem !important;
+}
+
+.d-and-d-character-sheet .pl-3 {
+  padding-left:1rem !important;
+}
+
 .d-and-d-character-sheet .d-and-d-attribute-collection.gray {
   background-color: rgb(207, 207, 207);
 }
@@ -348,7 +373,7 @@
   z-index: 1;
   position: absolute;
   top: -5px;
-  left: 15px;
+  left: 18px;
 }
 .d-and-d-character-sheet .d-and-d-currency .d-and-d-currency-value input {
   margin: 3px 0;
