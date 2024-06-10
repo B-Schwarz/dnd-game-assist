@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {
     AlertDialog,
     AlertDialogBody,
@@ -15,6 +15,7 @@ import {
     FormLabel,
     Input,
     Link,
+    Select,
     useToast,
     VStack
 } from "@chakra-ui/react";
@@ -25,14 +26,36 @@ import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
 import TitleService from "../../Service/titleService";
 import packageJSON from "../../../package.json";
 import {Text} from "@chakra-ui/layout";
+import {LanguageType} from "./language.type";
 
 const App = () => {
 
     const [isOpen, setIsOpen] = useState(false)
     const [newPassVal, setNewPassVal] = useState('')
+    const [languageSelected, setLanguageSelected] = useState<LanguageType>(LanguageType.en)
 
-    const cancelRef = React.useRef()
+    const cancelRef = React.useRef(null)
     const toast = useToast()
+
+    useEffect(() => {
+        let lang: LanguageType = LanguageType.en
+        const lsData = localStorage.getItem('dnd-character-language')
+        if (lsData) {
+            if (lsData in LanguageType) {
+                lang = LanguageType[lsData as keyof typeof LanguageType]
+            } else {
+                localStorage.setItem('dnd-character-language', lang.toString())
+            }
+        } else {
+            localStorage.setItem('dnd-character-language', lang.toString())
+        }
+        setLanguageSelected(lang)
+    }, []);
+
+    const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setLanguageSelected(LanguageType[event.target.value as keyof typeof LanguageType])
+        localStorage.setItem('dnd-character-language', event.target.value)
+    }
 
     const closePopup = () => {
         setIsOpen(false)
@@ -123,7 +146,7 @@ const App = () => {
                                                     <Input {...field} id="pass" type="password"
                                                            autoComplete='current-password'
                                                            placeholder="Aktuelles Passwort"/>
-                                                    <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                                                    <FormErrorMessage>{form.errors.password?.toString()}</FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
@@ -136,7 +159,7 @@ const App = () => {
                                                            onChange={evt => setNewPassVal(evt.target.value)}
                                                            autoComplete='new-password'
                                                            placeholder="Neues Passwort"/>
-                                                    <FormErrorMessage>{form.errors.newPassword}</FormErrorMessage>
+                                                    <FormErrorMessage>{form.errors.newPassword?.toString()}</FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
@@ -149,7 +172,7 @@ const App = () => {
                                                     <Input {...field} id="newPassRep" type="password"
                                                            autoComplete='new-password'
                                                            placeholder="Neues Passwort Wiederholen"/>
-                                                    <FormErrorMessage>{form.errors.newPasswordRepeat}</FormErrorMessage>
+                                                    <FormErrorMessage>{form.errors.newPasswordRepeat?.toString()}</FormErrorMessage>
                                                 </FormControl>
                                             )}
                                         </Field>
@@ -163,6 +186,12 @@ const App = () => {
                         </Formik>
                     </Container>
                     <Container>
+                        <Select value={languageSelected} onChange={handleLanguageChange}>
+                            <option value={LanguageType.de} selected={languageSelected === LanguageType.de}>Deutsch</option>
+                            <option value={LanguageType.en} selected={languageSelected === LanguageType.en}>Englisch</option>
+                        </Select>
+                    </Container>
+                    <Container>
                         <Button leftIcon={<DeleteIcon/>} borderWidth='1px' borderRadius='lg' colorScheme='red'
                                 float='right' position='relative' marginTop='100%' marginBottom='1rem' size='sm' onClick={() => {
                             setIsOpen(true)
@@ -170,7 +199,7 @@ const App = () => {
                             ACCOUNT LÖSCHEN
                         </Button>
 
-                        <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+                        <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef}>
                             <AlertDialogOverlay>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
@@ -183,7 +212,7 @@ const App = () => {
                                     </AlertDialogBody>
 
                                     <AlertDialogFooter>
-                                        <Button ref={cancelRef.current} onClick={closePopup}>
+                                        <Button ref={cancelRef} onClick={closePopup}>
                                             Abbrechen
                                         </Button>
                                         <Button colorScheme='red' onClick={async () => {

@@ -50,7 +50,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [watched, setWatched] = useState(false)
 
-    const cancelRef = React.useRef()
+    const cancelRef = React.useRef(null)
     const toast = useToast()
 
     useEffect(() => {
@@ -336,7 +336,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
                 </AccordionPanel>
             </AccordionItem>
 
-            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef}>
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -348,7 +348,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
-                            <Button ref={cancelRef.current} onClick={closePopup}>
+                            <Button ref={cancelRef} onClick={closePopup}>
                                 Abbrechen
                             </Button>
                             <Button colorScheme='red' onClick={() => {

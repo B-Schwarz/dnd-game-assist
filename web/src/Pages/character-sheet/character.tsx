@@ -6,18 +6,19 @@ import {
     DnDCharacterSpellSheet,
     DnDCharacterStatsSheet
 } from 'dnd-character-sheets'
-import 'dnd-character-sheets/dist/index.css'
+import 'dnd-character-sheets/index.css'
 
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
 import TitleService from "../../Service/titleService";
-import LZString from "lz-string";
+import {LanguageType} from "../settings/language.type";
 
 const App = () => {
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
     const [change, setChange] = useState(false)
     const [isMaster, setIsMaster] = useState(true)
+    const [german, setGerman] = useState<boolean>(loadDefaultLanguage())
 
     const id = useParams().id
 
@@ -25,13 +26,15 @@ const App = () => {
         <DnDCharacterStatsSheet
             character={character}
             onCharacterChanged={updateCharacter}
-        />
+            german={german}
+            />
     )
 
     const profileSheet = (
         <DnDCharacterProfileSheet
             character={character}
             onCharacterChanged={updateCharacter}
+            german={german}
         />
     )
 
@@ -39,6 +42,7 @@ const App = () => {
         <DnDCharacterSpellSheet
             character={character}
             onCharacterChanged={updateCharacter}
+            german={german}
         />
     )
 
@@ -52,6 +56,21 @@ const App = () => {
             }
         }
         return character
+    }
+
+    function loadDefaultLanguage() {
+        let lang: LanguageType = LanguageType.en
+        const lsData = localStorage.getItem('dnd-character-language')
+        if (lsData) {
+            if (lsData in LanguageType) {
+                lang = LanguageType[lsData as keyof typeof LanguageType]
+            } else {
+                localStorage.setItem('dnd-character-language', lang.toString())
+            }
+        } else {
+            localStorage.setItem('dnd-character-language', lang.toString())
+        }
+        return lang === LanguageType.de
     }
 
     function updateCharacter(char: DnDCharacter) {
@@ -125,7 +144,7 @@ const App = () => {
     return (
         <>
             <TitleService title={character.name || ''}/>
-            <div>
+            <div style={{"marginLeft": "auto", "marginRight": "auto", maxWidth: "1200px"}}>
                 {statsSheet}
                 {profileSheet}
                 {spellSheet}

@@ -65,7 +65,7 @@ const Login: React.FC<LoginProps> = () => {
                                                 isInvalid={form.errors.name !== undefined && form.touched.name !== undefined}>
                                                 <FormLabel htmlFor="name">Benutzername</FormLabel>
                                                 <Input {...field} id="name" placeholder="Name"/>
-                                                <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                                                <FormErrorMessage>{form.errors.name?.toString()}</FormErrorMessage>
                                             </FormControl>
                                         )}
                                     </Field>
@@ -75,7 +75,7 @@ const Login: React.FC<LoginProps> = () => {
                                                          isInvalid={form.errors.password !== undefined && form.touched.password !== undefined}>
                                                 <FormLabel htmlFor="password">Passwort</FormLabel>
                                                 <Input {...field} id="password" type="password" placeholder="Passwort"/>
-                                                <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                                                <FormErrorMessage>{form.errors.password?.toString()}</FormErrorMessage>
                                             </FormControl>
                                         )}
                                     </Field>

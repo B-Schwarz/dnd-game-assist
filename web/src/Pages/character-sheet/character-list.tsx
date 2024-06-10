@@ -32,7 +32,7 @@ const App = () => {
     const [isMaster, setIsMaster] = useState(false)
 
     const navigate = useNavigate()
-    const cancelRef = React.useRef()
+    const cancelRef = React.useRef(null)
 
     const closePopup = () => setIsOpen(false)
 
@@ -233,7 +233,7 @@ const App = () => {
                 </>
             }
 
-            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef.current}>
+            <AlertDialog isOpen={isOpen} onClose={closePopup} leastDestructiveRef={cancelRef}>
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -245,7 +245,7 @@ const App = () => {
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
-                            <Button ref={cancelRef.current} onClick={closePopup}>
+                            <Button ref={cancelRef} onClick={closePopup}>
                                 Abbrechen
                             </Button>
                             <Button colorScheme='red' onClick={async () => {

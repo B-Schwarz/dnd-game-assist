@@ -23,7 +23,7 @@ const path = require("path");
 
 const port = 4000;
 
-app.use(express.json({limit: '2mb'}));
+app.use(express.json({limit: '20mb'}));
 app.use(express.urlencoded({extended: false}));
 
 app.disable('x-powered-by');
@@ -44,7 +44,7 @@ const store = MongoStore.create({
 })
 
 if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1)
+    app.set('trust proxy', 'loopback')
 }
 
 const sess = session({
@@ -58,14 +58,14 @@ const sess = session({
         httpOnly: true,
         maxAge: 99999999999999,
         sameSite: 'lax',
-        secure: (process.env.NODE_ENV === 'production')
+        secure: false //(process.env.NODE_ENV === 'production')
     }
 })
 
 app.use(sess)
 
 const limiter = RateLimit({
-    windowMs: 1*60*1000,
+    windowMs: 60*1000,
     max: 10000,
     standardHeaders: true
 })
