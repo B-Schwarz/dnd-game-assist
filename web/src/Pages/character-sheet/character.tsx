@@ -48,13 +48,7 @@ const App = () => {
 
     function loadDefaultCharacter() {
         let character: DnDCharacter = {}
-        const lsData = localStorage.getItem('dnd-character-data')
-        if (lsData) {
-            try {
-                character = JSON.parse(lsData)
-            } catch {
-            }
-        }
+        recv()
         return character
     }
 
@@ -75,7 +69,6 @@ const App = () => {
 
     function updateCharacter(char: DnDCharacter) {
         setCharacter(char)
-        localStorage.setItem('dnd-character-data', JSON.stringify(char))
         setChange(true)
     }
 

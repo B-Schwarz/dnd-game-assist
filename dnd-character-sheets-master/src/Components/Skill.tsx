@@ -14,10 +14,9 @@ function Skill(props: {
     classes += ' ' + props.classes
   }
 
-  const [checked, setChecked] = React.useState<string>('d-and-d-skill-circle')
-
   let checkedClass = 'd-and-d-skill-circle'
 
+  const [checked, setChecked] = React.useState<string>(checkedClass)
 
   useEffect(() => {
     if (props.checked === 'normal') {
@@ -28,7 +27,7 @@ function Skill(props: {
       setChecked(checkedClass + ' expert')
     }
 
-  }, [])
+  }, [checked, props.checked])
 
   function skillToggle() {
     switch (props.checked) {
