@@ -2,7 +2,7 @@ const _ = require('lodash')
 
 let master = []
 let player = []
-let round = 0
+let round = 1
 
 // set master
 // REQUIRES MASTER

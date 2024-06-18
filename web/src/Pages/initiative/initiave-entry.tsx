@@ -67,6 +67,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [hexblade, setHexblade] = useState(false)
     const [unarmed, setUnarmed] = useState(false)
 
+    const [rage, setRage] = useState(false)
+    const [concentration, setConcentration] = useState(false)
+
     const [effects, setEffects] = useState([])
 
     const [hide, setHide] = useState(hidden)
@@ -125,10 +128,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const strSave = () => {
         try {
             let save = Number(props.p.character.strSave)
-            if (props.p.character.strSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
-
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -147,9 +146,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const dexSave = () => {
         try {
             let save = Number(props.p.character.dexSave)
-            if (props.p.character.dexSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -166,9 +162,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const conSave = () => {
         try {
             let save = Number(props.p.character.conSave)
-            if (props.p.character.conSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -185,9 +178,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const intSave = () => {
         try {
             let save = Number(props.p.character.intSave)
-            if (props.p.character.intSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -204,9 +194,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const wisSave = () => {
         try {
             let save = Number(props.p.character.wisSave)
-            if (props.p.character.wisSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -223,9 +210,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const chaSave = () => {
         try {
             let save = Number(props.p.character.chaSave)
-            if (props.p.character.chaSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -360,6 +344,16 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             setEffects(e => [...e, getIcon(StatusEffectsEnum.UNARMED)])
             e.push(StatusEffectsEnum.UNARMED)
         }
+        if (rage) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.RAGE)])
+            e.push(StatusEffectsEnum.RAGE)
+        }
+        if (concentration) {
+            // @ts-ignore
+            setEffects(e => [...e, getIcon(StatusEffectsEnum.CONCENTRATION)])
+            e.push(StatusEffectsEnum.CONCENTRATION)
+        }
 
         if (isMaster) {
             props.p.statusEffects = e
@@ -436,6 +430,12 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             case StatusEffectsEnum.UNARMED:
                 setUnarmed(!unarmed)
                 break
+            case StatusEffectsEnum.RAGE:
+                setRage(!rage)
+                break
+            case StatusEffectsEnum.CONCENTRATION:
+                setConcentration(!concentration)
+                break
             default:
                 break
         }
@@ -478,6 +478,15 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     }
 
+    const doHeal = () => {
+        let heal = schaden
+
+        const hpVal = Math.min(Number(hp) + heal, Number(maxHp))
+        onHpEdit(String(hpVal))
+        setSchaden(0)
+        updatePlayer()
+    }
+
     // Clear Timer
     useEffect(() => {
         // @ts-ignore
@@ -492,7 +501,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, isMaster])
 
     useEffect(() => {
         if (Number(hp) === 0) {
@@ -676,6 +685,11 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNARMED)} isChecked={unarmed}>
                                     Unbewaffnet
                                 </Switch>
+                                <br />
+                                <br />
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.RAGE)} isChecked={rage}>
+                                    Rage
+                                </Switch>
                             </GridItem>
                             <GridItem>
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.INCAPACITATED)}
@@ -709,6 +723,11 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEXBLADE)}
                                         isChecked={hexblade}>
                                     Hexblade
+                                </Switch>
+                                <br/><br/>
+                                <br/><br/>
+                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.CONCENTRATION)} isChecked={concentration}>
+                                    Konzentration
                                 </Switch>
                             </GridItem>
                             <GridItem>
@@ -762,6 +781,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </NumberInput>
                                 </HStack>
                                 <Button colorScheme='red' onClick={doSchaden} w='88%'>Schaden</Button>
+                                <Button colorScheme='green' onClick={doHeal} w='88%'>Heilen</Button>
                                 <Select variant='flushed' marginTop='1rem'
                                         onChange={(evt) => {
                                             const color = Number(evt.currentTarget.value)
