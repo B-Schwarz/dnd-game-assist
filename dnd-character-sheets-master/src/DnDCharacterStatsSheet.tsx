@@ -1,6 +1,5 @@
 import React from 'react'
 
-// eslint-disable-next-line no-unused-vars
 import DnDCharacter from './DnDCharacter'
 
 import Statbox from './Components/StatBox'
@@ -10,7 +9,7 @@ import StatBox2 from './Components/StatBox2'
 import DeathSave from './Components/DeathSave'
 import AttackTable from './Components/AttackTable'
 import Currency from './Components/Currency'
-
+import {Color} from './Components/color.enum'
 
 import './dndstyles.css'
 
@@ -26,11 +25,13 @@ interface IDnDCharacterStatsSheetProps {
 }
 
 interface IDnDCharacterStatsSheetState {
-  character: DnDCharacter
+  character: DnDCharacter,
+  color: number
 }
 
 const initialState: IDnDCharacterStatsSheetState = {
-  character: {}
+  character: {},
+  color: Color.NONE,
 }
 
 class DnDCharacterStatsSheet extends React.Component<
@@ -41,6 +42,10 @@ class DnDCharacterStatsSheet extends React.Component<
     super(props)
     if (props.defaultCharacter) {
       initialState.character = props.defaultCharacter
+    }
+    if (props.character) {
+      initialState.character = props.character
+      initialState.color = props.character.color || Color.NONE
     }
     this.state = initialState
   }
@@ -73,6 +78,7 @@ class DnDCharacterStatsSheet extends React.Component<
     }
     return character
   }
+
 
   render() {
 
@@ -365,6 +371,12 @@ class DnDCharacterStatsSheet extends React.Component<
       }
     }
 
+    const changeColor = (color: Color) => {
+      console.log(this.state)
+      this.setState({color: Color[color as unknown as keyof typeof Color]})
+      this.updateCharacter('color', Color[color as unknown as keyof typeof Color])
+    }
+
     const character = this.getCharacter()
 
     return (
@@ -479,14 +491,24 @@ class DnDCharacterStatsSheet extends React.Component<
                     </label>
                   </div>
                   <div className='col-md-3 col-6 pl-0 pr-0'>
-                    <input
-                      type='text'
-                      value={character.dciNo ? character.dciNo : ''}
-                      onChange={(e) =>
-                        this.updateCharacter('dciNo', e.target.value)
-                      }
-                    />
-                    <label>DCI Number</label>
+                    <label className='color-select'>
+                      <select value={this.state.color} onChange={evt => changeColor(Color[evt.target.value as keyof typeof Color])}>
+                        <option value={Color.NONE}>Keine</option>
+                        <option value={Color.BLACK}>Schwarz</option>
+                        <option value={Color.GREY}>Grau</option>
+                        <option value={Color.PURPLE}>Lila</option>
+                        <option value={Color.RED}>Rot</option>
+                        <option value={Color.PINK}>Pink</option>
+                        <option value={Color.ORANGE}>Orange</option>
+                        <option value={Color.YELLOW}>Gelb</option>
+                        <option value={Color.GREEN}>Grün</option>
+                        <option value={Color.BLUE}>Blau</option>
+                        <option value={Color.WHITE}>Weiß</option>
+                      </select>
+                    </label>
+                    <label>
+                      {this.props.german ? 'Farbe' : 'Color'}
+                    </label>
                   </div>
                 </div>
               </div>

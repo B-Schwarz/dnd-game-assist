@@ -1,3 +1,5 @@
+import {Color} from './Components/color.enum'
+
 export default class DnDCharacter {
   name?: string
   classLevel?: string
@@ -8,6 +10,7 @@ export default class DnDCharacter {
   alignment?: string
   xp?: string
   dciNo?: string
+  color?: Color
 
   str?: string
   dex?: string

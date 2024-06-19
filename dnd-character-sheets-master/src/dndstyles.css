@@ -253,6 +253,21 @@
   text-transform: uppercase;
 }
 
+.d-and-d-character-sheet .d-and-d-attribute-collection .color-select {
+  border-bottom: 1px solid black;
+  width: 100%;
+  margin-top: 15px;
+  font-size: 16px;
+}
+.d-and-d-character-sheet .d-and-d-attribute-collection .color-select select{
+  width: 90%;
+}
+
+.d-and-d-character-sheet .d-and-d-attribute-collection .color-select select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
 @media (min-width: 768px) {
   .d-and-d-character-sheet .d-and-d-attribute-collection.char-name {
     width: calc(100% + 50px);
