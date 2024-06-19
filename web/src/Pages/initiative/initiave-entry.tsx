@@ -115,13 +115,13 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     function write(key: string, value: string) {
         return (
-            <><Text color='gray'>{key}</Text><Box w='0.5rem'/><Text>{value}</Text></>
+            <><Text color='gray' style={{marginBottom: '0'}}>{key}</Text><Box w='0.5rem'/><Text style={{marginBottom: '0'}}>{value}</Text></>
         )
     }
 
     function divider() {
         return (
-            <><Box marginLeft='0.5rem'/><Text>|</Text><Box marginRight='0.5rem'/></>
+            <><Box marginLeft='0.5rem'/><Text style={{marginBottom: '0'}}>|</Text><Box marginRight='0.5rem'/></>
         )
     }
 

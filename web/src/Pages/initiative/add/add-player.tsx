@@ -18,6 +18,7 @@ import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
 import {DnDCharacter} from "dnd-character-sheets";
+import {ColorMarkerEnum} from "../color-marker.enum";
 
 const App = (props: {u: () => void}) => {
 
@@ -58,7 +59,11 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (p: Player) => {
-        axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: p})
+        let _p = p
+        if (_p.character.color) {
+            _p.colorMarker = Number(_p.character.color)
+        }
+        axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: _p})
             .then(() => props.u())
             .catch(() => {
             })

@@ -45,7 +45,7 @@ class DnDCharacterStatsSheet extends React.Component<
     }
     if (props.character) {
       initialState.character = props.character
-      initialState.color = props.character.color || Color.NONE
+      initialState.color = props.character.color ?? Color.NONE
     }
     this.state = initialState
   }
@@ -372,7 +372,6 @@ class DnDCharacterStatsSheet extends React.Component<
     }
 
     const changeColor = (color: Color) => {
-      console.log(this.state)
       this.setState({color: Color[color as unknown as keyof typeof Color]})
       this.updateCharacter('color', Color[color as unknown as keyof typeof Color])
     }
