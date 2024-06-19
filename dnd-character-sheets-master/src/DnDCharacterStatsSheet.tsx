@@ -26,12 +26,14 @@ interface IDnDCharacterStatsSheetProps {
 
 interface IDnDCharacterStatsSheetState {
   character: DnDCharacter,
-  color: number
+  color: number,
+  init: boolean
 }
 
 const initialState: IDnDCharacterStatsSheetState = {
   character: {},
   color: Color.NONE,
+  init: false
 }
 
 class DnDCharacterStatsSheet extends React.Component<
@@ -377,6 +379,10 @@ class DnDCharacterStatsSheet extends React.Component<
     }
 
     const character = this.getCharacter()
+
+    if (character.color && !this.state.init) {
+      this.setState({color: character.color, init: true})
+    }
 
     return (
       <div className='d-and-d-character-sheet container-xl mt-5 mb-5'>
