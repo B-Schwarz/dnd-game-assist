@@ -379,7 +379,7 @@
 .d-and-d-character-sheet .d-and-d-currency .d-and-d-currency-value {
   border: 2px solid black;
   background-color: white;
-  width: 82px;
+  width: 80px;
   height: 45px;
   border-top-left-radius: 15px 50%;
   border-bottom-left-radius: 15px 50%;
@@ -388,7 +388,7 @@
   z-index: 1;
   position: absolute;
   top: -5px;
-  left: 18px;
+  left: 16px;
 }
 .d-and-d-character-sheet .d-and-d-currency .d-and-d-currency-value input {
   margin: 3px 0;
