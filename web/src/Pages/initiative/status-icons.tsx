@@ -16,7 +16,9 @@ import {
     GiStoneBlock,
     GiThunderStruck,
     GiDropWeapon,
-    GiChewedSkull
+    GiChewedSkull,
+    GiEnrage,
+    GiBrain
 } from "react-icons/gi";
 
 const prone = (
@@ -217,6 +219,28 @@ const dead = (
     </React.Fragment>
 )
 
+const rage = (
+    <React.Fragment key='unarmed'>
+        <Box marginLeft='0.5rem'/>
+        <Tooltip label="Rage" hasArrow size='md' placement='top'>
+        <span>
+            <Icon as={GiEnrage} color='red'/>
+        </span>
+        </Tooltip>
+    </React.Fragment>
+)
+
+const concentration = (
+    <React.Fragment key='unarmed'>
+        <Box marginLeft='0.5rem'/>
+        <Tooltip label="Konzentration" hasArrow size='md' placement='top'>
+        <span>
+            <Icon as={GiBrain} color='green'/>
+        </span>
+        </Tooltip>
+    </React.Fragment>
+)
+
 export const getIcon = (effect: StatusEffectsEnum) => {
 
     switch (effect) {
@@ -254,6 +278,10 @@ export const getIcon = (effect: StatusEffectsEnum) => {
             return hexblade
         case StatusEffectsEnum.UNARMED:
             return unarmed
+        case StatusEffectsEnum.RAGE:
+            return rage
+        case StatusEffectsEnum.CONCENTRATION:
+            return concentration
         default:
             return
     }

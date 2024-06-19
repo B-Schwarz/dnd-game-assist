@@ -35,6 +35,7 @@ import axios from "axios";
 import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
+import {Mutex} from "async-mutex"
 
 const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => void }) => {
 
@@ -67,6 +68,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [hexblade, setHexblade] = useState(false)
     const [unarmed, setUnarmed] = useState(false)
 
+    const [rage, setRage] = useState(false)
+    const [concentration, setConcentration] = useState(false)
+
     const [effects, setEffects] = useState([])
 
     const [hide, setHide] = useState(hidden)
@@ -78,6 +82,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [colorMarker, setColorMarker] = useState<ColorMarkerEnum>(props.p.colorMarker ?? ColorMarkerEnum.NONE)
 
     const saveTimer = useRef(null)
+
+    const effectMutex = useRef(new Mutex())
 
     const onHpEdit = (val: string) => {
         props.p.character.hp = val
@@ -112,23 +118,20 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     function write(key: string, value: string) {
         return (
-            <><Text color='gray'>{key}</Text><Box w='0.5rem'/><Text>{value}</Text></>
+            <><Text color='gray' style={{marginBottom: '0'}}>{key}</Text><Box w='0.5rem'/><Text
+                style={{marginBottom: '0'}}>{value}</Text></>
         )
     }
 
     function divider() {
         return (
-            <><Box marginLeft='0.5rem'/><Text>|</Text><Box marginRight='0.5rem'/></>
+            <><Box marginLeft='0.5rem'/><Text style={{marginBottom: '0'}}>|</Text><Box marginRight='0.5rem'/></>
         )
     }
 
     const strSave = () => {
         try {
             let save = Number(props.p.character.strSave)
-            if (props.p.character.strSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
-
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -147,9 +150,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const dexSave = () => {
         try {
             let save = Number(props.p.character.dexSave)
-            if (props.p.character.dexSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -166,9 +166,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const conSave = () => {
         try {
             let save = Number(props.p.character.conSave)
-            if (props.p.character.conSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -185,9 +182,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const intSave = () => {
         try {
             let save = Number(props.p.character.intSave)
-            if (props.p.character.intSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -204,9 +198,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const wisSave = () => {
         try {
             let save = Number(props.p.character.wisSave)
-            if (props.p.character.wisSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -223,9 +214,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const chaSave = () => {
         try {
             let save = Number(props.p.character.chaSave)
-            if (props.p.character.chaSaveChecked!) {
-                save += Number(props.p.character.proficiencyBonus)
-            }
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -272,99 +260,111 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function createStatusIcons() {
-        setEffects([])
-        const e = []
+        effectMutex.current.runExclusive(() => {
+            setEffects([])
+            const e = []
 
-        if (down) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.PRONE)])
-            e.push(StatusEffectsEnum.PRONE)
-        }
-        if (blind) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.BLIND)])
-            e.push(StatusEffectsEnum.BLIND)
-        }
-        if (poison) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.POISONED)])
-            e.push(StatusEffectsEnum.POISONED)
-        }
-        if (charmed) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.CHARMED)])
-            e.push(StatusEffectsEnum.CHARMED)
-        }
-        if (deafened) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.DEAFENED)])
-            e.push(StatusEffectsEnum.DEAFENED)
-        }
-        if (frightened) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.FRIGHTENED)])
-            e.push(StatusEffectsEnum.FRIGHTENED)
-        }
-        if (grappled) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.GRAPPLED)])
-            e.push(StatusEffectsEnum.GRAPPLED)
-        }
-        if (incapacitated) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.INCAPACITATED)])
-            e.push(StatusEffectsEnum.INCAPACITATED)
-        }
-        if (invisible) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.INVISIBLE)])
-            e.push(StatusEffectsEnum.INVISIBLE)
-        }
-        if (paralyzed) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.PARALYZED)])
-            e.push(StatusEffectsEnum.PARALYZED)
-        }
-        if (petrified) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.PETRIFIED)])
-            e.push(StatusEffectsEnum.PETRIFIED)
-        }
-        if (restrained) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.RESTRAINED)])
-            e.push(StatusEffectsEnum.RESTRAINED)
-        }
-        if (stunned) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.STUNNED)])
-            e.push(StatusEffectsEnum.STUNNED)
-        }
-        if (unconscious) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.UNCONSCIOUS)])
-            e.push(StatusEffectsEnum.UNCONSCIOUS)
-        }
-        if (hex) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.HEX)])
-            e.push(StatusEffectsEnum.HEX)
-        }
-        if (hexblade) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.HEXBLADE)])
-            e.push(StatusEffectsEnum.HEXBLADE)
-        }
-        if (unarmed) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.UNARMED)])
-            e.push(StatusEffectsEnum.UNARMED)
-        }
+            if (down) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.PRONE)])
+                e.push(StatusEffectsEnum.PRONE)
+            }
+            if (blind) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.BLIND)])
+                e.push(StatusEffectsEnum.BLIND)
+            }
+            if (poison) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.POISONED)])
+                e.push(StatusEffectsEnum.POISONED)
+            }
+            if (charmed) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.CHARMED)])
+                e.push(StatusEffectsEnum.CHARMED)
+            }
+            if (deafened) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.DEAFENED)])
+                e.push(StatusEffectsEnum.DEAFENED)
+            }
+            if (frightened) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.FRIGHTENED)])
+                e.push(StatusEffectsEnum.FRIGHTENED)
+            }
+            if (grappled) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.GRAPPLED)])
+                e.push(StatusEffectsEnum.GRAPPLED)
+            }
+            if (incapacitated) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.INCAPACITATED)])
+                e.push(StatusEffectsEnum.INCAPACITATED)
+            }
+            if (invisible) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.INVISIBLE)])
+                e.push(StatusEffectsEnum.INVISIBLE)
+            }
+            if (paralyzed) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.PARALYZED)])
+                e.push(StatusEffectsEnum.PARALYZED)
+            }
+            if (petrified) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.PETRIFIED)])
+                e.push(StatusEffectsEnum.PETRIFIED)
+            }
+            if (restrained) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.RESTRAINED)])
+                e.push(StatusEffectsEnum.RESTRAINED)
+            }
+            if (stunned) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.STUNNED)])
+                e.push(StatusEffectsEnum.STUNNED)
+            }
+            if (unconscious) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.UNCONSCIOUS)])
+                e.push(StatusEffectsEnum.UNCONSCIOUS)
+            }
+            if (hex) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.HEX)])
+                e.push(StatusEffectsEnum.HEX)
+            }
+            if (hexblade) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.HEXBLADE)])
+                e.push(StatusEffectsEnum.HEXBLADE)
+            }
+            if (unarmed) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.UNARMED)])
+                e.push(StatusEffectsEnum.UNARMED)
+            }
+            if (rage) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.RAGE)])
+                e.push(StatusEffectsEnum.RAGE)
+            }
+            if (concentration) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.CONCENTRATION)])
+                e.push(StatusEffectsEnum.CONCENTRATION)
+            }
 
-        if (isMaster) {
-            props.p.statusEffects = e
-            savePlayer()
-        }
+            if (isMaster) {
+                props.p.statusEffects = e
+                savePlayer()
+            }
+        })
     }
 
     function updatePlayer() {
@@ -436,11 +436,15 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             case StatusEffectsEnum.UNARMED:
                 setUnarmed(!unarmed)
                 break
+            case StatusEffectsEnum.RAGE:
+                setRage(!rage)
+                break
+            case StatusEffectsEnum.CONCENTRATION:
+                setConcentration(!concentration)
+                break
             default:
                 break
         }
-
-        createStatusIcons()
     }
 
     const doSchaden = () => {
@@ -478,6 +482,15 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     }
 
+    const doHeal = () => {
+        let heal = schaden
+
+        const hpVal = Math.min(Number(hp) + heal, Number(maxHp))
+        onHpEdit(String(hpVal))
+        setSchaden(0)
+        updatePlayer()
+    }
+
     // Clear Timer
     useEffect(() => {
         // @ts-ignore
@@ -492,7 +505,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, isMaster])
 
     useEffect(() => {
         if (Number(hp) === 0) {
@@ -646,69 +659,80 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <AccordionPanel>
                         <Grid templateColumns='repeat(5, 1fr)' gap={0}>
                             <GridItem>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
+                                <Switch onChange={() => setBlind(!blind)}
                                         isChecked={blind}>
                                     Blind
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
+                                <Switch onChange={() => setPoison(!poison)}
                                         isChecked={poison}>
                                     Vergifted
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PRONE)} isChecked={down}>
+                                <Switch onChange={() => setDown(!down)} isChecked={down}>
                                     Liegend
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.CHARMED)} isChecked={charmed}>
+                                <Switch onChange={() => setCharmed(!charmed)} isChecked={charmed}>
                                     Bezaubert
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.DEAFENED)} isChecked={deafened}>
+                                <Switch onChange={() => setDeafened(!deafened)} isChecked={deafened}>
                                     Taub
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.FRIGHTENED)}
+                                <Switch onChange={() => setFrightened(!frightened)}
                                         isChecked={frightened}>
                                     Verängstigt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.GRAPPLED)} isChecked={grappled}>
+                                <Switch onChange={() => setGrappled(!grappled)} isChecked={grappled}>
                                     Gepackt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEX)} isChecked={hex}>
+                                <Switch onChange={() => setHex(!hex)} isChecked={hex}>
                                     Hex
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNARMED)} isChecked={unarmed}>
+                                <Switch onChange={() => setUnarmed(!unarmed)} isChecked={unarmed}>
                                     Unbewaffnet
+                                </Switch>
+                                <br/>
+                                <br/>
+                                <Switch onChange={() => setRage(!rage)} isChecked={rage}>
+                                    Rage
                                 </Switch>
                             </GridItem>
                             <GridItem>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.INCAPACITATED)}
+                                <Switch onChange={() => setIncapacitated(!incapacitated)}
                                         isChecked={incapacitated}>
                                     Kampfunfähig
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.INVISIBLE)}
+                                <Switch onChange={() => setInvisible(!invisible)}
                                         isChecked={invisible}>
                                     Unsichtbar
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PARALYZED)}
+                                <Switch onChange={() => setParalyzed(!paralyzed)}
                                         isChecked={paralyzed}>
                                     Gelähmt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PETRIFIED)}
+                                <Switch onChange={() => setPetrified(!petrified)}
                                         isChecked={petrified}>
                                     Versteinert
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.RESTRAINED)}
+                                <Switch onChange={() => setRestrained(!restrained)}
                                         isChecked={restrained}>
                                     Festgesetzt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.STUNNED)}
+                                <Switch onChange={() => setStunned(!stunned)}
                                         isChecked={stunned}>
                                     Betäubt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNCONSCIOUS)}
+                                <Switch onChange={() => setUnconscious(!unconscious)}
                                         isChecked={unconscious}>
                                     Bewusstlos
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEXBLADE)}
+                                <Switch onChange={() => setHexblade(!hexblade)}
                                         isChecked={hexblade}>
                                     Hexblade
+                                </Switch>
+                                <br/><br/>
+                                <br/>
+                                <Switch onChange={() => setConcentration(!concentration)}
+                                        isChecked={concentration}>
+                                    Konzentration
                                 </Switch>
                             </GridItem>
                             <GridItem>
@@ -762,6 +786,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </NumberInput>
                                 </HStack>
                                 <Button colorScheme='red' onClick={doSchaden} w='88%'>Schaden</Button>
+                                <Button colorScheme='green' onClick={doHeal} w='88%'>Heilen</Button>
                                 <Select variant='flushed' marginTop='1rem'
                                         onChange={(evt) => {
                                             const color = Number(evt.currentTarget.value)
@@ -770,7 +795,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                             savePlayer()
                                         }}
                                         placeholder='Markierung' value={colorMarker}
-                                        >
+                                >
                                     <option value={ColorMarkerEnum.NONE}>Nichts</option>
                                     <option value={ColorMarkerEnum.BLACK}>Schwarz</option>
                                     <option value={ColorMarkerEnum.GREY}>Grau</option>
