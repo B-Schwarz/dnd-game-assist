@@ -35,6 +35,7 @@ import axios from "axios";
 import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
+import {Mutex} from "async-mutex"
 
 const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => void }) => {
 
@@ -82,6 +83,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const saveTimer = useRef(null)
 
+    const effectMutex = useRef(new Mutex())
+
     const onHpEdit = (val: string) => {
         props.p.character.hp = val
         setHp(val)
@@ -115,7 +118,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     function write(key: string, value: string) {
         return (
-            <><Text color='gray' style={{marginBottom: '0'}}>{key}</Text><Box w='0.5rem'/><Text style={{marginBottom: '0'}}>{value}</Text></>
+            <><Text color='gray' style={{marginBottom: '0'}}>{key}</Text><Box w='0.5rem'/><Text
+                style={{marginBottom: '0'}}>{value}</Text></>
         )
     }
 
@@ -256,109 +260,111 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function createStatusIcons() {
-        setEffects([])
-        const e = []
+        effectMutex.current.runExclusive(() => {
+            setEffects([])
+            const e = []
 
-        if (down) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.PRONE)])
-            e.push(StatusEffectsEnum.PRONE)
-        }
-        if (blind) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.BLIND)])
-            e.push(StatusEffectsEnum.BLIND)
-        }
-        if (poison) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.POISONED)])
-            e.push(StatusEffectsEnum.POISONED)
-        }
-        if (charmed) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.CHARMED)])
-            e.push(StatusEffectsEnum.CHARMED)
-        }
-        if (deafened) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.DEAFENED)])
-            e.push(StatusEffectsEnum.DEAFENED)
-        }
-        if (frightened) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.FRIGHTENED)])
-            e.push(StatusEffectsEnum.FRIGHTENED)
-        }
-        if (grappled) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.GRAPPLED)])
-            e.push(StatusEffectsEnum.GRAPPLED)
-        }
-        if (incapacitated) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.INCAPACITATED)])
-            e.push(StatusEffectsEnum.INCAPACITATED)
-        }
-        if (invisible) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.INVISIBLE)])
-            e.push(StatusEffectsEnum.INVISIBLE)
-        }
-        if (paralyzed) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.PARALYZED)])
-            e.push(StatusEffectsEnum.PARALYZED)
-        }
-        if (petrified) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.PETRIFIED)])
-            e.push(StatusEffectsEnum.PETRIFIED)
-        }
-        if (restrained) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.RESTRAINED)])
-            e.push(StatusEffectsEnum.RESTRAINED)
-        }
-        if (stunned) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.STUNNED)])
-            e.push(StatusEffectsEnum.STUNNED)
-        }
-        if (unconscious) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.UNCONSCIOUS)])
-            e.push(StatusEffectsEnum.UNCONSCIOUS)
-        }
-        if (hex) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.HEX)])
-            e.push(StatusEffectsEnum.HEX)
-        }
-        if (hexblade) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.HEXBLADE)])
-            e.push(StatusEffectsEnum.HEXBLADE)
-        }
-        if (unarmed) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.UNARMED)])
-            e.push(StatusEffectsEnum.UNARMED)
-        }
-        if (rage) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.RAGE)])
-            e.push(StatusEffectsEnum.RAGE)
-        }
-        if (concentration) {
-            // @ts-ignore
-            setEffects(e => [...e, getIcon(StatusEffectsEnum.CONCENTRATION)])
-            e.push(StatusEffectsEnum.CONCENTRATION)
-        }
+            if (down) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.PRONE)])
+                e.push(StatusEffectsEnum.PRONE)
+            }
+            if (blind) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.BLIND)])
+                e.push(StatusEffectsEnum.BLIND)
+            }
+            if (poison) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.POISONED)])
+                e.push(StatusEffectsEnum.POISONED)
+            }
+            if (charmed) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.CHARMED)])
+                e.push(StatusEffectsEnum.CHARMED)
+            }
+            if (deafened) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.DEAFENED)])
+                e.push(StatusEffectsEnum.DEAFENED)
+            }
+            if (frightened) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.FRIGHTENED)])
+                e.push(StatusEffectsEnum.FRIGHTENED)
+            }
+            if (grappled) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.GRAPPLED)])
+                e.push(StatusEffectsEnum.GRAPPLED)
+            }
+            if (incapacitated) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.INCAPACITATED)])
+                e.push(StatusEffectsEnum.INCAPACITATED)
+            }
+            if (invisible) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.INVISIBLE)])
+                e.push(StatusEffectsEnum.INVISIBLE)
+            }
+            if (paralyzed) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.PARALYZED)])
+                e.push(StatusEffectsEnum.PARALYZED)
+            }
+            if (petrified) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.PETRIFIED)])
+                e.push(StatusEffectsEnum.PETRIFIED)
+            }
+            if (restrained) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.RESTRAINED)])
+                e.push(StatusEffectsEnum.RESTRAINED)
+            }
+            if (stunned) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.STUNNED)])
+                e.push(StatusEffectsEnum.STUNNED)
+            }
+            if (unconscious) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.UNCONSCIOUS)])
+                e.push(StatusEffectsEnum.UNCONSCIOUS)
+            }
+            if (hex) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.HEX)])
+                e.push(StatusEffectsEnum.HEX)
+            }
+            if (hexblade) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.HEXBLADE)])
+                e.push(StatusEffectsEnum.HEXBLADE)
+            }
+            if (unarmed) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.UNARMED)])
+                e.push(StatusEffectsEnum.UNARMED)
+            }
+            if (rage) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.RAGE)])
+                e.push(StatusEffectsEnum.RAGE)
+            }
+            if (concentration) {
+                // @ts-ignore
+                setEffects(e => [...e, getIcon(StatusEffectsEnum.CONCENTRATION)])
+                e.push(StatusEffectsEnum.CONCENTRATION)
+            }
 
-        if (isMaster) {
-            props.p.statusEffects = e
-            savePlayer()
-        }
+            if (isMaster) {
+                props.p.statusEffects = e
+                savePlayer()
+            }
+        })
     }
 
     function updatePlayer() {
@@ -439,8 +445,6 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
             default:
                 break
         }
-
-        createStatusIcons()
     }
 
     const doSchaden = () => {
@@ -655,78 +659,79 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                     <AccordionPanel>
                         <Grid templateColumns='repeat(5, 1fr)' gap={0}>
                             <GridItem>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.BLIND)}
+                                <Switch onChange={() => setBlind(!blind)}
                                         isChecked={blind}>
                                     Blind
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.POISONED)}
+                                <Switch onChange={() => setPoison(!poison)}
                                         isChecked={poison}>
                                     Vergifted
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PRONE)} isChecked={down}>
+                                <Switch onChange={() => setDown(!down)} isChecked={down}>
                                     Liegend
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.CHARMED)} isChecked={charmed}>
+                                <Switch onChange={() => setCharmed(!charmed)} isChecked={charmed}>
                                     Bezaubert
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.DEAFENED)} isChecked={deafened}>
+                                <Switch onChange={() => setDeafened(!deafened)} isChecked={deafened}>
                                     Taub
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.FRIGHTENED)}
+                                <Switch onChange={() => setFrightened(!frightened)}
                                         isChecked={frightened}>
                                     Verängstigt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.GRAPPLED)} isChecked={grappled}>
+                                <Switch onChange={() => setGrappled(!grappled)} isChecked={grappled}>
                                     Gepackt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEX)} isChecked={hex}>
+                                <Switch onChange={() => setHex(!hex)} isChecked={hex}>
                                     Hex
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNARMED)} isChecked={unarmed}>
+                                <Switch onChange={() => setUnarmed(!unarmed)} isChecked={unarmed}>
                                     Unbewaffnet
                                 </Switch>
-                                <br />
-                                <br />
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.RAGE)} isChecked={rage}>
+                                <br/>
+                                <br/>
+                                <Switch onChange={() => setRage(!rage)} isChecked={rage}>
                                     Rage
                                 </Switch>
                             </GridItem>
                             <GridItem>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.INCAPACITATED)}
+                                <Switch onChange={() => setIncapacitated(!incapacitated)}
                                         isChecked={incapacitated}>
                                     Kampfunfähig
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.INVISIBLE)}
+                                <Switch onChange={() => setInvisible(!invisible)}
                                         isChecked={invisible}>
                                     Unsichtbar
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PARALYZED)}
+                                <Switch onChange={() => setParalyzed(!paralyzed)}
                                         isChecked={paralyzed}>
                                     Gelähmt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.PETRIFIED)}
+                                <Switch onChange={() => setPetrified(!petrified)}
                                         isChecked={petrified}>
                                     Versteinert
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.RESTRAINED)}
+                                <Switch onChange={() => setRestrained(!restrained)}
                                         isChecked={restrained}>
                                     Festgesetzt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.STUNNED)}
+                                <Switch onChange={() => setStunned(!stunned)}
                                         isChecked={stunned}>
                                     Betäubt
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.UNCONSCIOUS)}
+                                <Switch onChange={() => setUnconscious(!unconscious)}
                                         isChecked={unconscious}>
                                     Bewusstlos
                                 </Switch><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.HEXBLADE)}
+                                <Switch onChange={() => setHexblade(!hexblade)}
                                         isChecked={hexblade}>
                                     Hexblade
                                 </Switch>
                                 <br/><br/>
-                                <br/><br/>
-                                <Switch onChange={() => toggleEffects(StatusEffectsEnum.CONCENTRATION)} isChecked={concentration}>
+                                <br/>
+                                <Switch onChange={() => setConcentration(!concentration)}
+                                        isChecked={concentration}>
                                     Konzentration
                                 </Switch>
                             </GridItem>
@@ -790,7 +795,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                             savePlayer()
                                         }}
                                         placeholder='Markierung' value={colorMarker}
-                                        >
+                                >
                                     <option value={ColorMarkerEnum.NONE}>Nichts</option>
                                     <option value={ColorMarkerEnum.BLACK}>Schwarz</option>
                                     <option value={ColorMarkerEnum.GREY}>Grau</option>
