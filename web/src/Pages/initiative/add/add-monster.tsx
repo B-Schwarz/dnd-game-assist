@@ -20,8 +20,10 @@ const App = (props: {u: () => void}) => {
     const getMonster = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list')
             .then((d) => {
+                setValue([])
+                let monsters: Player[] = []
                 d.data.forEach((m: Monster) => {
-                    data.push({
+                    monsters.push({
                         character: {
                             name: m.monster.name,
                             ac: m.monster.ac,
@@ -48,7 +50,7 @@ const App = (props: {u: () => void}) => {
                         npc: true
                     })
                 })
-                setValue(data)
+                setValue(monsters)
             })
             .catch(() => {
             })
