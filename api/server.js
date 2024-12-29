@@ -14,7 +14,8 @@ const {
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
     setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, movePlayer,
-    setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster
+    setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster,
+    nextTurn, prevTurn
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
 const {getUserList, setAdmin, setMaster} = require("./admin");
@@ -140,6 +141,8 @@ app.delete('/api/initiative/player', isAuth, isMaster, deleteAllMaster)
 app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
 app.put('/api/initiative/round', isAuth, isMaster, setRound)
 app.get('/api/initiative/round', isAuth, getRound)
+app.get('/api/initiative/turn/next', isAuth, isMaster, nextTurn)
+app.get('/api/initiative/turn/prev', isAuth, isMaster, prevTurn)
 
 //
 //  MONSTER

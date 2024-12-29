@@ -33,10 +33,9 @@ const App = (props: {u: () => void}) => {
                             id: c._id,
                             initiative: 0,
                             isMaster: false,
-                            isTurn: false,
                             isTurnSet: false,
                             statusEffects: [],
-                            turn: 0,
+                            turnId: 0,
                             hidden: false,
                             npc: true
                         })
