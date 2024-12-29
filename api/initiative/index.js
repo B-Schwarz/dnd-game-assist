@@ -6,7 +6,8 @@ let round = 1
 let turn = 0
 let playerTurn = 0
 
-let colorMarker = 1
+let colorMarkerIndex = 0
+let colorMarkers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 // set master
 // REQUIRES MASTER
@@ -35,7 +36,8 @@ const deleteAllMaster = (req, res) => {
     turn = 0
     player = []
     playerTurn = 0
-    colorMarker = 1
+    colorMarkerIndex = 0
+    colorMarkers = _.shuffle(colorMarkers)
     res.sendStatus(200)
 }
 
@@ -86,8 +88,8 @@ const addMaster = (req, res) => {
             p.isMaster = true
 
             if (p.npc && !p.colorMarker) {
-                p.colorMarker = colorMarker
-                colorMarker = Math.max((colorMarker + 1) % 11, 1)
+                p.colorMarker = colorMarkers[colorMarkerIndex]
+                colorMarkerIndex += 1
             }
 
             master.push(p)
