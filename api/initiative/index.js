@@ -158,7 +158,6 @@ const setRound = (req, res) => {
     }
 }
 
-// REQUIRES MASTER
 const getRound = (req, res) => {
     res.send({round: round})
 }

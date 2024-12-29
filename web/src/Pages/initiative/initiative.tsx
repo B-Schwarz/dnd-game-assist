@@ -132,6 +132,13 @@ const App = () => {
                 .catch(() => {
                 })
         }
+
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
+            .then((r) => {
+                setRound(r.data.round)
+            })
+            .catch(() => {
+            })
     }
 
     function sort() {
@@ -161,13 +168,14 @@ const App = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => {
                 setIsMaster(true)
-                axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
-                    .then((r) => {
-                        setRound(r.data.round)
-                    })
-                    .catch(() => {
-                    })
                 get(true)
+            })
+            .catch(() => {
+            })
+
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
+            .then((r) => {
+                setRound(r.data.round)
             })
             .catch(() => {
             })

@@ -139,7 +139,7 @@ app.delete('/api/initiative/player/:id', isAuth, isMaster, deleteMaster)
 app.delete('/api/initiative/player', isAuth, isMaster, deleteAllMaster)
 app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
 app.put('/api/initiative/round', isAuth, isMaster, setRound)
-app.get('/api/initiative/round', isAuth, isMaster, getRound)
+app.get('/api/initiative/round', isAuth, getRound)
 
 //
 //  MONSTER
