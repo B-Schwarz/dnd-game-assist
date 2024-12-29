@@ -37,7 +37,7 @@ import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
 import {Mutex} from "async-mutex"
 
-const App = (props: { player: Player, index: number, first: boolean, last: boolean, isTurn: boolean, update: () => void }) => {
+const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index: number, first: boolean, last: boolean, isMaster: boolean, isTurn: boolean, update: () => void }) => {
 
     const [hp, setHp] = useState(props.player.character.hp || '0')
     const [tempHp, setTempHp] = useState(props.player.character.tempHp || '0')
@@ -45,7 +45,6 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
 
     const geschwindigkeit = props.player.character.speed || 'UNBEKANNT'
     const [ac, setAc] = useState(props.player.character.ac || '0')
-    const statusEffects = props.player.statusEffects || []
 
     const npc = props.player.npc || false
     const hidden = props.player.hidden || false
@@ -74,7 +73,6 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
     const [effects, setEffects] = useState([])
 
     const [hide, setHide] = useState(hidden)
-    const [isMaster, setIsMaster] = useState(props.player.isMaster)
 
     const [schaden, setSchaden] = useState(0)
     const [dead, setDead] = useState(Number(hp) === 0)
@@ -360,7 +358,7 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
                 e.push(StatusEffectsEnum.CONCENTRATION)
             }
 
-            if (isMaster) {
+            if (props.isMaster) {
                 props.player.statusEffects = e
                 savePlayer()
             }
@@ -386,61 +384,61 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
     function toggleEffects(s: StatusEffectsEnum) {
         switch (s) {
             case StatusEffectsEnum.BLIND:
-                setBlind(!blind)
+                setBlind(true)
                 break
             case StatusEffectsEnum.POISONED:
-                setPoison(!poison)
+                setPoison(true)
                 break
             case StatusEffectsEnum.PRONE:
-                setDown(!down)
+                setDown(true)
                 break
             case StatusEffectsEnum.CHARMED:
-                setCharmed(!charmed)
+                setCharmed(true)
                 break
             case StatusEffectsEnum.DEAFENED:
-                setDeafened(!deafened)
+                setDeafened(true)
                 break
             case StatusEffectsEnum.FRIGHTENED:
-                setFrightened(!frightened)
+                setFrightened(true)
                 break
             case StatusEffectsEnum.GRAPPLED:
-                setGrappled(!grappled)
+                setGrappled(true)
                 break
             case StatusEffectsEnum.INCAPACITATED:
-                setIncapacitated(!incapacitated)
+                setIncapacitated(true)
                 break
             case StatusEffectsEnum.INVISIBLE:
-                setInvisible(!invisible)
+                setInvisible(true)
                 break
             case StatusEffectsEnum.PARALYZED:
-                setParalyzed(!paralyzed)
+                setParalyzed(true)
                 break
             case StatusEffectsEnum.PETRIFIED:
-                setPetrified(!petrified)
+                setPetrified(true)
                 break
             case StatusEffectsEnum.RESTRAINED:
-                setRestrained(!restrained)
+                setRestrained(true)
                 break
             case StatusEffectsEnum.STUNNED:
-                setStunned(!stunned)
+                setStunned(true)
                 break
             case StatusEffectsEnum.UNCONSCIOUS:
-                setUnconscious(!unconscious)
+                setUnconscious(true)
                 break
             case StatusEffectsEnum.HEX:
-                setHex(!hex)
+                setHex(true)
                 break
             case StatusEffectsEnum.HEXBLADE:
-                setHexblade(!hexblade)
+                setHexblade(true)
                 break
             case StatusEffectsEnum.UNARMED:
-                setUnarmed(!unarmed)
+                setUnarmed(true)
                 break
             case StatusEffectsEnum.RAGE:
-                setRage(!rage)
+                setRage(true)
                 break
             case StatusEffectsEnum.CONCENTRATION:
-                setConcentration(!concentration)
+                setConcentration(true)
                 break
             default:
                 break
@@ -498,14 +496,33 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
     }, [])
 
     useEffect(() => {
-        for (let e of statusEffects) {
+        setBlind(false)
+        setPoison(false)
+        setDown(false)
+        setCharmed(false)
+        setDeafened(false)
+        setFrightened(false)
+        setGrappled(false)
+        setIncapacitated(false)
+        setInvisible(false)
+        setParalyzed(false)
+        setPetrified(false)
+        setRestrained(false)
+        setStunned(false)
+        setUnconscious(false)
+        setHex(false)
+        setHexblade(false)
+        setUnarmed(false)
+        setRage(false)
+        setConcentration(false)
+        for (let e of props.statusEffects) {
             toggleEffects(e)
         }
-    }, [isMaster])
+    }, [props.statusEffects])
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, props.isMaster])
 
     useEffect(() => {
         if (Number(hp) === 0) {
@@ -517,18 +534,18 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
 
     useEffect(() => {
         props.player.hidden = hide
-        if (props.player.isMaster)
+        if (props.isMaster)
             savePlayer()
     }, [hide])
 
-    if (!props.player.isMaster && hidden) {
+    if (!props.isMaster && hidden) {
         return (
             <></>
         )
     }
 
     function writePlayerHP() {
-        if (!npc || props.player.isMaster) {
+        if (!npc || props.isMaster) {
             return (
                 <React.Fragment>
                     {divider()}
@@ -541,7 +558,7 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
     }
 
     function createHPBar() {
-        if (!npc || props.player.isMaster) {
+        if (!npc || props.isMaster) {
             return (
                 <React.Fragment>
                     <Progress size='sm' colorScheme='yellow'
@@ -618,8 +635,8 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
                            padding='0.4rem 0.75rem' background={(props.isTurn) ? '#fff9e1' : '#fafafa'}
                            borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
                 <ButtonGroup isAttached w='100%'>
-                    {props.player.isMaster && createHideButton()}
-                    <AccordionButton _expanded={props.player.isMaster ? {bg: '#ebebeb'} : undefined}
+                    {props.isMaster && createHideButton()}
+                    <AccordionButton _expanded={props.isMaster ? {bg: '#ebebeb'} : undefined}
                                      style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
                         {write('', props.player.character.name!)}
                         {writePlayerHP()}
@@ -645,17 +662,17 @@ const App = (props: { player: Player, index: number, first: boolean, last: boole
                         {dead && getDeadIcon()}
                         {effects}
                         <Spacer/>
-                        {(!npc || props.player.isMaster) && write('AC:', String(ac))}
-                        {(!npc || props.player.isMaster) && divider()}
+                        {(!npc || props.isMaster) && write('AC:', String(ac))}
+                        {(!npc || props.isMaster) && divider()}
                         {write('Initiative:', String(props.player.initiative))}
                     </AccordionButton>
-                    {props.player.isMaster && <React.Fragment><ButtonGroup isAttached>
+                    {props.isMaster && <React.Fragment><ButtonGroup isAttached>
                         <Button size='sm' isDisabled={props.first} onClick={() => move('up')}><ArrowUpIcon/></Button>
                         <Button size='sm' isDisabled={props.last} onClick={() => move('down')}><ArrowDownIcon/></Button>
                     </ButtonGroup></React.Fragment>}
                 </ButtonGroup>
                 {createHPBar()}
-                {props.player.isMaster &&
+                {props.isMaster &&
                     <AccordionPanel>
                         <Grid templateColumns='repeat(5, 1fr)' gap={0}>
                             <GridItem>

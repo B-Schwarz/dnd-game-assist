@@ -52,7 +52,6 @@ const App = () => {
     }
 
     function nextTurn() {
-        console.log("nextTurn")
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/turn/next')
             .then(() => update())
             .catch(() => {
@@ -200,7 +199,7 @@ const App = () => {
                 <Accordion allowToggle width='80%'>
                     {
                         player.map((m, i) => (
-                            <InitiaveEntry player={m} index={i} first={i === 0} last={i === player.length - 1} isTurn={i === turn} update={update} key={i}/>
+                            <InitiaveEntry player={m} statusEffects={m.statusEffects} index={i} first={i === 0} last={i === player.length - 1} isMaster={isMaster} isTurn={i === turn} update={update} key={i}/>
                         ))
                     }
                 </Accordion>

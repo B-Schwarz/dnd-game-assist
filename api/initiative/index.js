@@ -60,7 +60,7 @@ const updateMaster = (req, res) => {
         if (p) {
             try {
                 for (let i = 0; i < master.length; i++) {
-                    if (master[i].turn === p.turnId) {
+                    if (master[i].turnId === p.turnId) {
                         master[i] = p
                         master[i].isMaster = true
                         break
