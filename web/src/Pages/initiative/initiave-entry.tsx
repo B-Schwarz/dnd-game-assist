@@ -525,18 +525,27 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, props.isMaster])
 
     useEffect(() => {
+        setHp(props.player.character.hp || '0')
+        setMaxHp(props.player.character.maxHp || '0')
+        setTempHp(props.player.character.tempHp || '0')
+        setAc(props.player.character.ac || '0')
+
         if (Number(hp) === 0) {
             setDead(true)
         } else {
             setDead(false)
         }
-    }, [hp])
+    }, [hp, maxHp, tempHp, ac, props.player.character.hp, props.player.character.maxHp, props.player.character.tempHp, props.player.character.ac])
 
     useEffect(() => {
         props.player.hidden = hide
         if (props.isMaster)
             savePlayer()
     }, [hide])
+
+    useEffect(() => {
+        setColorMarker(props.player.colorMarker || ColorMarkerEnum.NONE)
+    }, [props.player.colorMarker]);
 
     if (!props.isMaster && hidden) {
         return (
