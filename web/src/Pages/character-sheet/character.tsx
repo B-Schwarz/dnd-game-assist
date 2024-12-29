@@ -15,12 +15,13 @@ import TitleService from "../../Service/titleService";
 import {LanguageType} from "../settings/language.type";
 
 const App = () => {
+    const id = useParams().id
+
+    const [isMaster, setIsMaster] = useState(true)
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
     const [change, setChange] = useState(false)
-    const [isMaster, setIsMaster] = useState(true)
-    const [german, setGerman] = useState<boolean>(loadDefaultLanguage())
+    const [german] = useState<boolean>(loadDefaultLanguage())
 
-    const id = useParams().id
 
     const statsSheet = (
         <DnDCharacterStatsSheet
@@ -48,7 +49,6 @@ const App = () => {
 
     function loadDefaultCharacter() {
         let character: DnDCharacter = {}
-        recv()
         return character
     }
 
@@ -67,7 +67,12 @@ const App = () => {
         return lang === LanguageType.de
     }
 
+    function dummy(char: DnDCharacter) {
+        console.log('dummy')
+    }
+
     function updateCharacter(char: DnDCharacter) {
+        console.log('char')
         setCharacter(char)
         setChange(true)
     }
@@ -75,6 +80,7 @@ const App = () => {
     async function send() {
         const data = {character: character, charID: id}
 
+        console.log("send data")
         if (isMaster) {
             axios.post(process.env.REACT_APP_API_PREFIX + '/api/char', data, {
                 headers: {
@@ -94,7 +100,7 @@ const App = () => {
     }
 
     function initUpdate(char: DnDCharacter) {
-        updateCharacter(char)
+        setCharacter(char)
     }
 
     async function recv() {
