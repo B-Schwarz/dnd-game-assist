@@ -93,7 +93,7 @@ const App = () => {
                 </HStack>
                 <Accordion allowToggle w='100%' h='80vh' overflowY='scroll'>
                     {value.map((m: EncounterType) => {
-                        return (<EncounterEntry m={m} u={update} e={isAdminOrMaster} key={m._id}/>)
+                        return (<EncounterEntry m={m} u={update} e={isAdminOrMaster} key={m.id}/>)
                         }
                     )}
                 </Accordion>

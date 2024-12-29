@@ -74,7 +74,6 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
                .then(res => res.data)
                .then(mon => {
                    monster.name = mon.monster.name
-                   console.log(mon.monster.name)
                })
                .catch(() => {})
         }
@@ -91,7 +90,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
 
     const save = () => {
         axios.put(process.env.REACT_APP_API_PREFIX + '/api/encounter', {
-            encounterID: encounter._id,
+            encounterID: encounter.id,
             encounter: encounter,
             name: name
         })
@@ -111,7 +110,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }
 
     const deleteEncounter = () => {
-        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/encounter/${encounter._id}`)
+        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/encounter/${encounter.id}`)
             .then(() => props.u())
             .catch(() => {
             })

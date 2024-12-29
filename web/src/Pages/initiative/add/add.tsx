@@ -3,6 +3,7 @@ import {ModalBody, ModalCloseButton, ModalHeader, Tab, TabList, TabPanel, TabPan
 import AddPlayer from "./add-player";
 import AddMonster from "./add-monster";
 import AddNpc from "./add-npc";
+import AddEncounter from "./add-encounter";
 
 const App = (props: {u: () => void}) => {
 
@@ -18,6 +19,7 @@ const App = (props: {u: () => void}) => {
                         <Tab>Spieler</Tab>
                         <Tab>Monster</Tab>
                         <Tab>NPC</Tab>
+                        <Tab>Encounter</Tab>
                     </TabList>
 
                     <TabPanels>
@@ -29,6 +31,9 @@ const App = (props: {u: () => void}) => {
                         </TabPanel>
                         <TabPanel>
                             <AddNpc u={props.u}/>
+                        </TabPanel>
+                        <TabPanel>
+                            <AddEncounter u={props.u} />
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
