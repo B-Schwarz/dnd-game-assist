@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from "./App";
 import {ChakraProvider} from '@chakra-ui/react';
@@ -8,7 +8,9 @@ import {Helmet, HelmetProvider} from "react-helmet-async";
 
 axios.defaults.withCredentials = true
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!)
+
+root.render(
     <React.StrictMode>
 
         <HelmetProvider>
@@ -40,6 +42,4 @@ ReactDOM.render(
             <App/>
         </ChakraProvider>
     </React.StrictMode>
-    ,
-    document.getElementById('root')
 );

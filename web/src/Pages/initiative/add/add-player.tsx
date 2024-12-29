@@ -34,25 +34,26 @@ const App = (props: {u: () => void}) => {
     const getPlayer = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist')
             .then((d) => {
+                setValue([])
+                let players: Player[] = []
                 d.data.forEach((c: {
                     character: DnDCharacter;
                     _id: string;
                     npc: boolean;
                 }) => {
                     if (!c.npc) {
-                        data.push({
+                        players.push({
                             character: c.character,
                             id: c._id,
                             initiative: 0,
                             isMaster: false,
-                            isTurn: false,
                             isTurnSet: false,
                             statusEffects: [],
-                            turn: 0
+                            turnId: 0
                         })
                     }
                 })
-                setValue(data)
+                setValue(players)
             })
             .catch(() => {
             })

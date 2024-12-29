@@ -34,6 +34,7 @@ const App = () => {
     const [isMaster, setIsMaster] = useState(false)
     const [round, setRound] = useState<number>(1)
     const [turnBtnActive, setTurnBtnActive] = useState<boolean>(false)
+    const [turn, setTurn] = useState(0)
 
     const [updatePing, setUpdatePing] = useState(0)
     const updateTimer = useRef(null)
@@ -51,46 +52,17 @@ const App = () => {
     }
 
     function nextTurn() {
-        const temp = _.cloneDeep(player)
-        let done = false
-        for (let i = 0; i < temp.length; i++) {
-            if (temp[i].isTurn) {
-                temp[i].isTurn = false
-                const next = (i + 1) % temp.length
-                temp[next].isTurn = true
-                if (next < i) {
-                    axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: round + 1})
-                        .catch(() => {
-                        })
-                    setRound(round + 1)
-                }
-                done = true
-                break
-            }
-        }
-        if (!done && temp.length > 0) {
-            temp[0].isTurn = true
-        }
-        save(temp)
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/turn/next')
+            .then(() => update())
+            .catch(() => {
+            })
     }
 
     function prevTurn() {
-        const temp = _.cloneDeep(player)
-        for (let i = 0; i < temp.length; i++) {
-            if (temp[i].isTurn) {
-                temp[i].isTurn = false
-                const next = (i + temp.length - 1) % temp.length
-                temp[next].isTurn = true
-                if (next > i) {
-                    axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/round', {round: round - 1})
-                        .catch(() => {
-                        })
-                    setRound(round - 1)
-                }
-                break
-            }
-        }
-        save(temp)
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/turn/prev')
+            .then(() => update())
+            .catch(() => {
+            })
     }
 
     const updatePlayer = (newPlayer: Player[]) => {
@@ -117,7 +89,8 @@ const App = () => {
             try {
                 axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/master')
                     .then((r) => {
-                        updatePlayer(r.data)
+                        updatePlayer(r.data.player)
+                        setTurn(r.data.turn)
                     }).catch(() => {
                     setIsMaster(false)
                 })
@@ -127,11 +100,19 @@ const App = () => {
         } else {
             axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative')
                 .then((r) => {
-                    updatePlayer(r.data)
+                    updatePlayer(r.data.player)
+                    setTurn(r.data.turn)
                 })
                 .catch(() => {
                 })
         }
+
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
+            .then((r) => {
+                setRound(r.data.round)
+            })
+            .catch(() => {
+            })
     }
 
     function sort() {
@@ -161,13 +142,14 @@ const App = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => {
                 setIsMaster(true)
-                axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
-                    .then((r) => {
-                        setRound(r.data.round)
-                    })
-                    .catch(() => {
-                    })
                 get(true)
+            })
+            .catch(() => {
+            })
+
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/round')
+            .then((r) => {
+                setRound(r.data.round)
             })
             .catch(() => {
             })
@@ -217,7 +199,7 @@ const App = () => {
                 <Accordion allowToggle width='80%'>
                     {
                         player.map((m, i) => (
-                            <InitiaveEntry p={m} i={i} f={i === 0} l={i === player.length - 1} u={update} key={i}/>
+                            <InitiaveEntry player={m} statusEffects={m.statusEffects} index={i} first={i === 0} last={i === player.length - 1} isMaster={isMaster} isTurn={i === turn} update={update} key={i}/>
                         ))
                     }
                 </Accordion>

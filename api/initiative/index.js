@@ -3,6 +3,10 @@ const _ = require('lodash')
 let master = []
 let player = []
 let round = 1
+let turn = 0
+let playerTurn = 0
+
+let colorMarker = 1
 
 // set master
 // REQUIRES MASTER
@@ -15,20 +19,23 @@ const setPlayer = (req, res) => {
 
 // get master spieler
 const getPlayerPlayer = (req, res) => {
-    res.send(player)
+    res.send({player: player, turn: playerTurn})
 }
 
 // get master master
 // REQUIRES MASTER
 const getPlayerMaster = (req, res) => {
-    res.send(master)
+    res.send({player: master, turn: turn})
 }
 
 // clear master
 // REQUIRES MASTER
 const deleteAllMaster = (req, res) => {
     master = []
-    updatePlayerData()
+    turn = 0
+    player = []
+    playerTurn = 0
+    colorMarker = 1
     res.sendStatus(200)
 }
 
@@ -36,9 +43,12 @@ const deleteAllMaster = (req, res) => {
 // REQUIRES MASTER
 const deleteMaster = (req, res) => {
     if (master.length > 0) {
-        const p = req.params.id
-        if (p) {
-            master = master.filter(m => Number(m.turn) !== Number(p))
+        const turnId = req.params.id
+        if (turnId) {
+            master = master.filter(m => Number(m.turn) !== Number(turnId))
+        }
+        if (turnId < turn) {
+            turn -= 1
         }
     }
     updatePlayerData()
@@ -53,7 +63,7 @@ const updateMaster = (req, res) => {
         if (p) {
             try {
                 for (let i = 0; i < master.length; i++) {
-                    if (master[i].turn === p.turn) {
+                    if (master[i].turnId === p.turnId) {
                         master[i] = p
                         master[i].isMaster = true
                         break
@@ -75,23 +85,9 @@ const addMaster = (req, res) => {
         try {
             p.isMaster = true
 
-            if (master.length > 0) {
-                let i = 1
-                let a = false
-                for (const m of master) {
-                    if (m.character.name.startsWith(p.character.name) && m.character.name.endsWith(')')) {
-                        i++
-                        a = true
-                    } else if (m.character.name === p.character.name) {
-                        m.character.name += ' (' + i + ')'
-                        i++
-                        a = true
-                    }
-                }
-
-                if (a) {
-                    p.character.name += ' (' + i + ')'
-                }
+            if (p.npc && !p.colorMarker) {
+                p.colorMarker = colorMarker
+                colorMarker = Math.max((colorMarker + 1) % 11, 1)
             }
 
             master.push(p)
@@ -100,7 +96,6 @@ const addMaster = (req, res) => {
         } catch (_) {
         }
     }
-
     res.sendStatus(200)
 }
 
@@ -158,7 +153,6 @@ const setRound = (req, res) => {
     }
 }
 
-// REQUIRES MASTER
 const getRound = (req, res) => {
     res.send({round: round})
 }
@@ -166,32 +160,54 @@ const getRound = (req, res) => {
 const setTurn = () => {
     let maxTurn = 0
     master.forEach(p => {
-        if (Boolean(p.isTurnSet) && Number(p.turn) > maxTurn) {
-            maxTurn = p.turn
+        if (Boolean(p.isTurnSet) && Number(p.turnId) > maxTurn) {
+            maxTurn = p.turnId
         }
     })
 
     master.forEach((p, i) => {
         if (!Boolean(p.isTurnSet)) {
             p.isTurnSet = true
-            p.turn = maxTurn + i
+            p.turnId = maxTurn + i
         }
     })
 }
 
+const nextTurn = (req, res) => {
+    if (master.length > 0) {
+        turn += 1
+        if (turn + 1 > master.length) {
+            turn = 0
+            round += 1
+        }
+        updatePlayerData()
+    }
+    res.sendStatus(200)
+}
+
+const prevTurn = (req, res) => {
+    if (turn > 0) {
+        turn -= 1
+    } else {
+        turn = Math.max(0, master.length - 1)
+        round = Math.max(0, round - 1)
+    }
+    updatePlayerData()
+    res.sendStatus(200)
+}
+
 const updatePlayerData = () => {
     const temp = _.cloneDeep(master)
-
+    playerTurn = turn
     // Set whos turn it is + master to false
     for (let i = 0; i < temp.length; i++) {
         const p = temp[i]
         p.isMaster = false
-        if (Boolean(p.isTurn) && Boolean(p.hidden)) {
-            p.isTurn = false
+        if (i === turn && Boolean(p.hidden)) {
             for (let j = 0; j < temp.length; j++) {
                 const p2 = temp[(j+i) % temp.length]
                 if (!Boolean(p2.hidden)) {
-                    p2.isTurn = true
+                    playerTurn = (turn + j) % temp.length
                     break
                 }
             }
@@ -211,5 +227,7 @@ module.exports = {
     deleteAllMaster,
     movePlayer,
     getRound,
-    setRound
+    setRound,
+    nextTurn,
+    prevTurn
 }

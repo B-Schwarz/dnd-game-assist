@@ -37,18 +37,17 @@ import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
 import {Mutex} from "async-mutex"
 
-const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => void }) => {
+const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index: number, first: boolean, last: boolean, isMaster: boolean, isTurn: boolean, update: () => void }) => {
 
-    const [hp, setHp] = useState(props.p.character.hp || '0')
-    const [tempHp, setTempHp] = useState(props.p.character.tempHp || '0')
-    const [maxHp, setMaxHp] = useState(props.p.character.maxHp || '0')
+    const [hp, setHp] = useState(props.player.character.hp || '0')
+    const [tempHp, setTempHp] = useState(props.player.character.tempHp || '0')
+    const [maxHp, setMaxHp] = useState(props.player.character.maxHp || '0')
 
-    const geschwindigkeit = props.p.character.speed || 'UNBEKANNT'
-    const [ac, setAc] = useState(props.p.character.ac || '0')
-    const statusEffects = props.p.statusEffects || []
+    const geschwindigkeit = props.player.character.speed || 'UNBEKANNT'
+    const [ac, setAc] = useState(props.player.character.ac || '0')
 
-    const npc = props.p.npc || false
-    const hidden = props.p.hidden || false
+    const npc = props.player.npc || false
+    const hidden = props.player.hidden || false
 
     const [blind, setBlind] = useState(false)
     const [poison, setPoison] = useState(false)
@@ -74,44 +73,43 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     const [effects, setEffects] = useState([])
 
     const [hide, setHide] = useState(hidden)
-    const [isMaster, setIsMaster] = useState(props.p.isMaster)
 
     const [schaden, setSchaden] = useState(0)
     const [dead, setDead] = useState(Number(hp) === 0)
 
-    const [colorMarker, setColorMarker] = useState<ColorMarkerEnum>(props.p.colorMarker ?? ColorMarkerEnum.NONE)
+    const [colorMarker, setColorMarker] = useState<ColorMarkerEnum>(props.player.colorMarker ?? ColorMarkerEnum.NONE)
 
     const saveTimer = useRef(null)
 
     const effectMutex = useRef(new Mutex())
 
     const onHpEdit = (val: string) => {
-        props.p.character.hp = val
+        props.player.character.hp = val
         setHp(val)
         updatePlayer()
     }
 
     const onTempHpEdit = (val: string) => {
-        props.p.character.tempHp = val
+        props.player.character.tempHp = val
         setTempHp(val)
         updatePlayer()
     }
 
     const onMaxHpEdit = (val: string) => {
-        props.p.character.maxHp = val
+        props.player.character.maxHp = val
         setMaxHp(val)
         updatePlayer()
     }
 
     const onAcEdit = (val: string) => {
-        props.p.character.ac = val
+        props.player.character.ac = val
         setAc(val)
         savePlayer()
     }
 
     const onDelete = () => {
-        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/initiative/player/${props.p.turn}`)
-            .then(() => props.u())
+        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/initiative/player/${props.player.turnId}`)
+            .then(() => props.update())
             .catch(() => {
             })
     }
@@ -131,7 +129,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const strSave = () => {
         try {
-            let save = Number(props.p.character.strSave)
+            let save = Number(props.player.character.strSave)
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -149,7 +147,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const dexSave = () => {
         try {
-            let save = Number(props.p.character.dexSave)
+            let save = Number(props.player.character.dexSave)
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -165,7 +163,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const conSave = () => {
         try {
-            let save = Number(props.p.character.conSave)
+            let save = Number(props.player.character.conSave)
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -181,7 +179,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const intSave = () => {
         try {
-            let save = Number(props.p.character.intSave)
+            let save = Number(props.player.character.intSave)
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -197,7 +195,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const wisSave = () => {
         try {
-            let save = Number(props.p.character.wisSave)
+            let save = Number(props.player.character.wisSave)
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -213,7 +211,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     const chaSave = () => {
         try {
-            let save = Number(props.p.character.chaSave)
+            let save = Number(props.player.character.chaSave)
             if (!Number.isNaN(save)) {
                 return (
                     <Text>{save > 0 && '+'}{save}</Text>
@@ -360,8 +358,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                 e.push(StatusEffectsEnum.CONCENTRATION)
             }
 
-            if (isMaster) {
-                props.p.statusEffects = e
+            if (props.isMaster) {
+                props.player.statusEffects = e
                 savePlayer()
             }
         })
@@ -377,8 +375,8 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
         // @ts-ignore
         saveTimer.current = setTimeout(() =>
-            axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: props.p})
-                .then(() => props.u())
+            axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: props.player})
+                .then(() => props.update())
                 .catch(() => {
                 }), 650)
     }
@@ -386,61 +384,61 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     function toggleEffects(s: StatusEffectsEnum) {
         switch (s) {
             case StatusEffectsEnum.BLIND:
-                setBlind(!blind)
+                setBlind(true)
                 break
             case StatusEffectsEnum.POISONED:
-                setPoison(!poison)
+                setPoison(true)
                 break
             case StatusEffectsEnum.PRONE:
-                setDown(!down)
+                setDown(true)
                 break
             case StatusEffectsEnum.CHARMED:
-                setCharmed(!charmed)
+                setCharmed(true)
                 break
             case StatusEffectsEnum.DEAFENED:
-                setDeafened(!deafened)
+                setDeafened(true)
                 break
             case StatusEffectsEnum.FRIGHTENED:
-                setFrightened(!frightened)
+                setFrightened(true)
                 break
             case StatusEffectsEnum.GRAPPLED:
-                setGrappled(!grappled)
+                setGrappled(true)
                 break
             case StatusEffectsEnum.INCAPACITATED:
-                setIncapacitated(!incapacitated)
+                setIncapacitated(true)
                 break
             case StatusEffectsEnum.INVISIBLE:
-                setInvisible(!invisible)
+                setInvisible(true)
                 break
             case StatusEffectsEnum.PARALYZED:
-                setParalyzed(!paralyzed)
+                setParalyzed(true)
                 break
             case StatusEffectsEnum.PETRIFIED:
-                setPetrified(!petrified)
+                setPetrified(true)
                 break
             case StatusEffectsEnum.RESTRAINED:
-                setRestrained(!restrained)
+                setRestrained(true)
                 break
             case StatusEffectsEnum.STUNNED:
-                setStunned(!stunned)
+                setStunned(true)
                 break
             case StatusEffectsEnum.UNCONSCIOUS:
-                setUnconscious(!unconscious)
+                setUnconscious(true)
                 break
             case StatusEffectsEnum.HEX:
-                setHex(!hex)
+                setHex(true)
                 break
             case StatusEffectsEnum.HEXBLADE:
-                setHexblade(!hexblade)
+                setHexblade(true)
                 break
             case StatusEffectsEnum.UNARMED:
-                setUnarmed(!unarmed)
+                setUnarmed(true)
                 break
             case StatusEffectsEnum.RAGE:
-                setRage(!rage)
+                setRage(true)
                 break
             case StatusEffectsEnum.CONCENTRATION:
-                setConcentration(!concentration)
+                setConcentration(true)
                 break
             default:
                 break
@@ -498,37 +496,65 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }, [])
 
     useEffect(() => {
-        for (let e of statusEffects) {
+        setBlind(false)
+        setPoison(false)
+        setDown(false)
+        setCharmed(false)
+        setDeafened(false)
+        setFrightened(false)
+        setGrappled(false)
+        setIncapacitated(false)
+        setInvisible(false)
+        setParalyzed(false)
+        setPetrified(false)
+        setRestrained(false)
+        setStunned(false)
+        setUnconscious(false)
+        setHex(false)
+        setHexblade(false)
+        setUnarmed(false)
+        setRage(false)
+        setConcentration(false)
+        for (let e of props.statusEffects) {
             toggleEffects(e)
         }
-    }, [isMaster])
+    }, [props.statusEffects])
 
     useEffect(() => {
         createStatusIcons()
-    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, isMaster])
+    }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, props.isMaster])
 
     useEffect(() => {
+        setHp(props.player.character.hp || '0')
+        setMaxHp(props.player.character.maxHp || '0')
+        setTempHp(props.player.character.tempHp || '0')
+        setAc(props.player.character.ac || '0')
+
         if (Number(hp) === 0) {
             setDead(true)
         } else {
             setDead(false)
         }
-    }, [hp])
+    }, [hp, maxHp, tempHp, ac, props.player.character.hp, props.player.character.maxHp, props.player.character.tempHp, props.player.character.ac])
 
     useEffect(() => {
-        props.p.hidden = hide
-        if (props.p.isMaster)
+        props.player.hidden = hide
+        if (props.isMaster)
             savePlayer()
     }, [hide])
 
-    if (!props.p.isMaster && hidden) {
+    useEffect(() => {
+        setColorMarker(props.player.colorMarker || ColorMarkerEnum.NONE)
+    }, [props.player.colorMarker]);
+
+    if (!props.isMaster && hidden) {
         return (
             <></>
         )
     }
 
     function writePlayerHP() {
-        if (!npc || props.p.isMaster) {
+        if (!npc || props.isMaster) {
             return (
                 <React.Fragment>
                     {divider()}
@@ -541,7 +567,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     }
 
     function createHPBar() {
-        if (!npc || props.p.isMaster) {
+        if (!npc || props.isMaster) {
             return (
                 <React.Fragment>
                     <Progress size='sm' colorScheme='yellow'
@@ -574,11 +600,11 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
 
     function move(direction: string) {
         axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/move', {
-            index: props.i,
+            index: props.index,
             direction: direction
         })
             .then(() => {
-                props.u()
+                props.update()
             })
             .catch(() => {
             })
@@ -615,13 +641,13 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
     return (
         <>
             <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
-                           padding='0.4rem 0.75rem' background={(props.p.isTurn) ? '#fff9e1' : '#fafafa'}
-                           borderColor={(props.p.isTurn) ? 'black' : 'blackAlpha.200'}>
+                           padding='0.4rem 0.75rem' background={(props.isTurn) ? '#fff9e1' : '#fafafa'}
+                           borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
                 <ButtonGroup isAttached w='100%'>
-                    {props.p.isMaster && createHideButton()}
-                    <AccordionButton _expanded={props.p.isMaster ? {bg: '#ebebeb'} : undefined}
+                    {props.isMaster && createHideButton()}
+                    <AccordionButton _expanded={props.isMaster ? {bg: '#ebebeb'} : undefined}
                                      style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
-                        {write('', props.p.character.name!)}
+                        {write('', props.player.character.name!)}
                         {writePlayerHP()}
                         {hide &&
                             <>
@@ -645,17 +671,17 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                         {dead && getDeadIcon()}
                         {effects}
                         <Spacer/>
-                        {(!npc || props.p.isMaster) && write('AC:', String(ac))}
-                        {(!npc || props.p.isMaster) && divider()}
-                        {write('Initiative:', String(props.p.initiative))}
+                        {(!npc || props.isMaster) && write('AC:', String(ac))}
+                        {(!npc || props.isMaster) && divider()}
+                        {write('Initiative:', String(props.player.initiative))}
                     </AccordionButton>
-                    {props.p.isMaster && <React.Fragment><ButtonGroup isAttached>
-                        <Button size='sm' isDisabled={props.f} onClick={() => move('up')}><ArrowUpIcon/></Button>
-                        <Button size='sm' isDisabled={props.l} onClick={() => move('down')}><ArrowDownIcon/></Button>
+                    {props.isMaster && <React.Fragment><ButtonGroup isAttached>
+                        <Button size='sm' isDisabled={props.first} onClick={() => move('up')}><ArrowUpIcon/></Button>
+                        <Button size='sm' isDisabled={props.last} onClick={() => move('down')}><ArrowDownIcon/></Button>
                     </ButtonGroup></React.Fragment>}
                 </ButtonGroup>
                 {createHPBar()}
-                {props.p.isMaster &&
+                {props.isMaster &&
                     <AccordionPanel>
                         <Grid templateColumns='repeat(5, 1fr)' gap={0}>
                             <GridItem>
@@ -791,7 +817,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                         onChange={(evt) => {
                                             const color = Number(evt.currentTarget.value)
                                             setColorMarker(color)
-                                            props.p.colorMarker = color
+                                            props.player.colorMarker = color
                                             savePlayer()
                                         }}
                                         placeholder='Markierung' value={colorMarker}
@@ -813,9 +839,9 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                 <VStack>
                                     <HStack>
                                         <Text width='120px'>HP:</Text>
-                                        <NumberInput defaultValue={props.p.character.hp || 0} min={0}
+                                        <NumberInput defaultValue={props.player.character.hp || 0} min={0}
                                                      onChange={onHpEdit} value={hp}
-                                                     max={Number(props.p.character.maxHp)}>
+                                                     max={Number(props.player.character.maxHp)}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
                                                 <NumberIncrementStepper/>
@@ -825,7 +851,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </HStack>
                                     <HStack>
                                         <Text width='120px'>Temp HP:</Text>
-                                        <NumberInput defaultValue={props.p.character.tempHp || 0} min={0}
+                                        <NumberInput defaultValue={props.player.character.tempHp || 0} min={0}
                                                      onChange={onTempHpEdit} value={tempHp}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
@@ -836,7 +862,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </HStack>
                                     <HStack>
                                         <Text width='120px'>Max HP:</Text>
-                                        <NumberInput defaultValue={props.p.character.maxHp || 0} min={0}
+                                        <NumberInput defaultValue={props.player.character.maxHp || 0} min={0}
                                                      onChange={onMaxHpEdit}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
@@ -847,7 +873,7 @@ const App = (props: { p: Player, i: number, f: boolean, l: boolean, u: () => voi
                                     </HStack>
                                     <HStack>
                                         <Text width='120px'>AC:</Text>
-                                        <NumberInput defaultValue={props.p.character.ac || 0} min={0}
+                                        <NumberInput defaultValue={props.player.character.ac || 0} min={0}
                                                      onChange={onAcEdit}>
                                             <NumberInputField/>
                                             <NumberInputStepper>

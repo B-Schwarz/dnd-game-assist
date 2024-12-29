@@ -64,10 +64,9 @@ const App = () => {
                         id: char['_id'],
                         initiative: 0,
                         isMaster: false,
-                        isTurn: false,
                         isTurnSet: false,
                         statusEffects: [],
-                        turn: 0,
+                        turnId: 0,
                         npc: char['npc']
                     }
                     // @ts-ignore
@@ -88,10 +87,9 @@ const App = () => {
                         id: char['_id'],
                         initiative: 0,
                         isMaster: false,
-                        isTurn: false,
                         isTurnSet: false,
                         statusEffects: [],
-                        turn: 0,
+                        turnId: 0,
                         npc: char['npc']
                     }
                     // @ts-ignore
