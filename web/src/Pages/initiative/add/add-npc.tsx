@@ -51,7 +51,9 @@ const App = (props: {u: () => void}) => {
         const roll = Math.floor(Math.random() * 20)
         const dexMod = Math.floor((Number(p.character.dex) - 10) / 2) || 0
         p.initiative = dexMod + roll
-
+        if (p.character.color) {
+            p.colorMarker = Number(p.character.color)
+        }
         axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: p})
             .then(() => props.u())
             .catch(() => {
