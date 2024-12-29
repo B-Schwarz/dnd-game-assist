@@ -7,9 +7,7 @@ function Image(props: {
   name: any
 }) {
   function importImage(event: any) {
-    console.log(event)
     if (event.target.files.length > 0) {
-      console.log(event.target.files)
       if (event.target.files[0].size > 2000000) {
         window.alert(
           'Image is too large. Max size is 2 Mb. Please reduce the size and upload again.'
