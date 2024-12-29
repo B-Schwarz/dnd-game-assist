@@ -5,5 +5,6 @@ export enum SelectedEnum {
     SETTINGS,
     ADMIN,
     MONSTER,
-    BOOKS
+    BOOKS,
+    ENCOUNTER
 }

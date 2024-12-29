@@ -17,7 +17,8 @@ const {
     setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster,
     nextTurn, prevTurn
 } = require("./initiative");
-const {createMonster, getMonsterList, saveMonster, deleteMonster} = require("./monster");
+const {createMonster, getMonsterList, saveMonster, deleteMonster, getMonster} = require("./monster");
+const {createEncounter, getEncounterList, saveEncounter, deleteEncounter} = require("./encounter");
 const {getUserList, setAdmin, setMaster} = require("./admin");
 const {getBookList, getBook} = require("./books");
 const path = require("path");
@@ -151,6 +152,15 @@ app.get('/api/monster/new', isAuth, isMasterOrAdmin, createMonster)
 app.get('/api/monster/list', isAuth, getMonsterList)
 app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
 app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
+app.get('/api/monster/:id', isAuth, isMasterOrAdmin, getMonster)
+
+//
+//  ENCOUNTER
+//
+app.get('/api/encounter/new', isAuth, isMaster, createEncounter)
+app.get('/api/encounter/list', isAuth, isMaster, getEncounterList)
+app.put('/api/encounter', isAuth, isMaster, saveEncounter)
+app.delete('/api/encounter/:id', isAuth, isMaster, deleteEncounter)
 
 //
 //  BOOKS
