@@ -19,16 +19,14 @@ const saveEncounter = async (req, res) => {
     const encounterID = req.body.encounterID
     const name = req.body.name
 
-    try {
-        await Encounter.findOneAndUpdate({
-            _id: encounterID,
-            user: req.user._id,
-        }, {encounter: encounter.encounter, name: name})
-    } catch (_) {
-        res.sendStatus(404)
-        return
-    }
-    res.sendStatus(200)
+    Encounter.findOneAndUpdate({
+        _id: encounterID
+    }, {
+        "encounter": encounter.encounter,
+        "name": name
+    })
+        .then((encounter) => {res.sendStatus(200)})
+        .catch((_) => {res.sendStatus(400)});
 }
 
 const getEncounterList = async (req, res) => {

@@ -63,9 +63,11 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
             amount: amount
         }
 
-        encounter.encounter.push(newEncounter)
-
-        save()
+        if (monster !== "") {
+            let temp: EncounterType = _.cloneDeep(encounter)
+            temp.encounter.push(newEncounter)
+            setEncounter(temp)
+        }
     }
 
     const resolveMonsterName = () => {
@@ -88,9 +90,13 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
         resolveMonsterName()
     }, []);
 
+    useEffect(() => {
+        save()
+    }, [encounter]);
+
     const save = () => {
         axios.put(process.env.REACT_APP_API_PREFIX + '/api/encounter', {
-            encounterID: encounter.id,
+            encounterID: encounter._id,
             encounter: encounter,
             name: name
         })
@@ -110,7 +116,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }
 
     const deleteEncounter = () => {
-        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/encounter/${encounter.id}`)
+        axios.delete(process.env.REACT_APP_API_PREFIX + `/api/encounter/${encounter._id}`)
             .then(() => props.u())
             .catch(() => {
             })
@@ -126,11 +132,9 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
         return (
             <Stack direction={edit ? 'column' : 'row'} w='100%'><Text fontWeight='bold'>{encounter.name}:</Text>
                 {edit && <StackItem><Input defaultValue={name} onChange={(evt) => setName(evt.currentTarget.value)}/></StackItem> }
-                {!edit && <StackItem><React.Fragment>
-                    <Text maxWidth="65vw" wordBreak="break-word">
+                {!edit && <Text maxWidth="65vw" wordBreak="break-word">
                         {name}
-                    </Text>
-                </React.Fragment></StackItem> }
+                    </Text>}
             </Stack>
 
         )
@@ -169,7 +173,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
                                         <Th width={"70%"} >Monster</Th>
                                     </Tr>
                                     {encounter.encounter.map((enc, index) => {
-                                        return (<Tr id={"monster-"+index} key={index}>
+                                        return (<Tr id={"monster-"+index} key={"t-"+index}>
                                             <Th>
                                                 {!edit && enc.amount}
                                                 {edit && <Input type={"number"} defaultValue={enc.amount} onChange={(evt) => changeAmount(evt.currentTarget.value, index)}/>}

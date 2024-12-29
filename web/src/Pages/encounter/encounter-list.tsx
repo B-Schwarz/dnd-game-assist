@@ -88,12 +88,11 @@ const App = () => {
                     <Input placeholder='Suchen...' onChange={async (evt) => {
                         await search(evt.currentTarget.value)
                     }}/>
-                    {isAdminOrMaster && <IconButton aria-label={'add new encounter'} colorScheme='green' icon={<AddIcon/>}
-                                                    onClick={createEncounter}/>}
+                    {isAdminOrMaster && <IconButton aria-label={'add new encounter'} colorScheme='green' icon={<AddIcon/>} onClick={createEncounter}/>}
                 </HStack>
                 <Accordion allowToggle w='100%' h='80vh' overflowY='scroll'>
                     {value.map((m: EncounterType) => {
-                        return (<EncounterEntry m={m} u={update} e={isAdminOrMaster} key={m.id}/>)
+                        return (<EncounterEntry m={m} u={update} e={isAdminOrMaster} key={m._id}/>)
                         }
                     )}
                 </Accordion>

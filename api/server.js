@@ -60,7 +60,7 @@ const sess = session({
         httpOnly: true,
         maxAge: 99999999999999,
         sameSite: 'lax',
-        secure: false
+        secure: (process.env.NODE_ENV === 'production'),
     }
 })
 

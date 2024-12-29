@@ -2,7 +2,7 @@ import {Monster} from "../monster/monster.type";
 import {Player} from "../initiative/player.type";
 
 export interface EncounterType {
-    id: string,
+    _id: string,
     name: string,
     encounter: EncounterMonster[]
 }

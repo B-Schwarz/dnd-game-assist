@@ -67,7 +67,7 @@ const App = (props: {u: () => void}) => {
 
                     encounter.push({
                         encounter: monsters,
-                        id: m.id,
+                        _id: m._id,
                         name: m.name
                     })
                 })

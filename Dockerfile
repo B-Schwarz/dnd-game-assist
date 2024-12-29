@@ -8,6 +8,7 @@ COPY api/character app/character
 COPY api/db app/db
 COPY api/initiative app/initiative
 COPY api/monster app/monster
+COPY api/encounter app/encounter
 COPY api/settings app/settings
 COPY api/package.json app/
 COPY api/yarn.lock app/
