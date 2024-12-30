@@ -20,6 +20,7 @@ const saveMonster = async (req, res) => {
         }, {monster: monster})
     } catch (_) {
         res.sendStatus(404)
+        return
     }
     res.sendStatus(200)
 }
@@ -37,6 +38,13 @@ const deleteMonster = async (req, res) => {
     })
 
     res.sendStatus(200)
+}
+
+const getMonster = async (req, res) => {
+    const charID = req.params.id
+
+    const monster = await Monster.findOne({_id: charID})
+    res.send(monster)
 }
 
 //
@@ -57,5 +65,6 @@ module.exports = {
     createMonster,
     getMonsterList,
     deleteMonster,
-    saveMonster
+    saveMonster,
+    getMonster
 }

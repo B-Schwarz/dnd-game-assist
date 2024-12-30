@@ -38,15 +38,15 @@ everytime they're changed.
 [X] Button to remove player from list  
 [X] Master is able to edit HP/Temp HP/Max HP and AC  
 [X] Master is able to add players with initiative  
-[ ] ~~Master is able to add encounter (auto initiative)~~ (won't do)  
+[X] Master is able to add encounter (auto initiative)
 [X] Master is able to add custom monster/npc (auto initiative)  
 [X] Master is able to see saving throw modifiers  
 
 ---
 
-## ~~Encounter editor~~ (won't do)
+## Encounter editor
 
-[ ] ~~Create custom encounters with saved enemies for quickly loading them~~
+[X] Create custom encounters with saved enemies for quickly loading them
 
 ---
 

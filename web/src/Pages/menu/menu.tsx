@@ -19,7 +19,10 @@ const Menu = (props: { selected: SelectedEnum; }) => {
             selected: SelectedEnum.INITIATIVE
         }, {
             name: 'Monster',
-            selected: SelectedEnum.MONSTER,
+            selected: SelectedEnum.MONSTER
+        }, {
+            name: 'Encounter',
+            selected: SelectedEnum.ENCOUNTER,
             beta: true
         }, {
             name: 'Einstellungen',

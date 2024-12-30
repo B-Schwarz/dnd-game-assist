@@ -67,12 +67,7 @@ const App = () => {
         return lang === LanguageType.de
     }
 
-    function dummy(char: DnDCharacter) {
-        console.log('dummy')
-    }
-
     function updateCharacter(char: DnDCharacter) {
-        console.log('char')
         setCharacter(char)
         setChange(true)
     }
@@ -80,7 +75,6 @@ const App = () => {
     async function send() {
         const data = {character: character, charID: id}
 
-        console.log("send data")
         if (isMaster) {
             axios.post(process.env.REACT_APP_API_PREFIX + '/api/char', data, {
                 headers: {
