@@ -47,7 +47,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     const [ac, setAc] = useState(props.player.character.ac || '0')
 
     const npc = props.player.npc || false
-    const hidden = props.player.hidden || false
+    const [hidden, setHidden] = useState(props.player.hidden || false)
 
     const [blind, setBlind] = useState(false)
     const [poison, setPoison] = useState(false)
@@ -71,8 +71,6 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     const [concentration, setConcentration] = useState(false)
 
     const [effects, setEffects] = useState([])
-
-    const [hide, setHide] = useState(hidden)
 
     const [schaden, setSchaden] = useState(0)
     const [dead, setDead] = useState(Number(hp) === 0)
@@ -538,10 +536,10 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     }, [hp, maxHp, tempHp, ac, props.player.character.hp, props.player.character.maxHp, props.player.character.tempHp, props.player.character.ac])
 
     useEffect(() => {
-        props.player.hidden = hide
+        props.player.hidden = hidden
         if (props.isMaster)
             savePlayer()
-    }, [hide])
+    }, [hidden])
 
     useEffect(() => {
         setColorMarker(props.player.colorMarker || ColorMarkerEnum.NONE)
@@ -583,15 +581,15 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     }
 
     function createHideButton() {
-        if (!hide) {
+        if (!hidden) {
             return (<Button bg="blue.100" borderRadius="0px" onClick={() => {
-                setHide(true)
+                setHidden(true)
                 createHideButton()
             }}><IoEyeSharp/></Button>)
         } else {
             return (
                 <Button bg="purple.100" borderRadius="0px" onClick={() => {
-                    setHide(false)
+                    setHidden(false)
                     createHideButton()
                 }}><IoEyeOffSharp/></Button>
             )
@@ -649,7 +647,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                      style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
                         {write('', props.player.character.name!)}
                         {writePlayerHP()}
-                        {hide &&
+                        {hidden &&
                             <>
                                 <Box marginLeft='0.5rem'/><Badge colorScheme='teal'>VERSTECKT</Badge><Box
                                 marginRight='0.5rem'/>

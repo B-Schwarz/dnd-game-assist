@@ -17,6 +17,7 @@ import {
     useDisclosure,
     VStack
 } from "@chakra-ui/react";
+import { flushSync } from "react-dom";
 import {Player} from "./player.type";
 import axios from "axios";
 import _ from "lodash";
@@ -70,13 +71,13 @@ const App = () => {
             setPlayer(newPlayer)
         } else {
             if (newPlayer.length !== player.length) {
-                setPlayer([])
-                setPlayer(newPlayer)
+                flushSync(() => setPlayer([]))
+                flushSync(() => setPlayer(newPlayer))
             } else {
                 for (let i = 0; i < player.length; i++) {
                     if (!_.isEqual(player[i], newPlayer[i])) {
-                        setPlayer([])
-                        setPlayer(newPlayer)
+                        flushSync(() => setPlayer([]))
+                        flushSync(() => setPlayer(newPlayer))
                         break
                     }
                 }
