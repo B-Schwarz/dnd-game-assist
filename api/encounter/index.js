@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const {Monster} = require("../db/models/monster.model");
 const {Encounter} = require("../db/models/encounter.model");
+const mongoose = require("mongoose");
 
 // REQUIRES MASTER OR ADMIN
 const createEncounter = async (req, res) => {
@@ -38,7 +39,8 @@ const getEncounterList = async (req, res) => {
 const deleteEncounter = async (req, res) => {
     const charID = req.params.id
 
-    Monster.deleteOne({_id: charID}, () => {
+    console.log(charID)
+    Encounter.deleteOne({_id: charID}, () => {
     })
 
     res.sendStatus(200)

@@ -12,9 +12,8 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        const temp = _.cloneDeep(data)
         // @ts-ignore
-        setValue(_.cloneDeep(temp.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
     }
 
     const getMonster = () => {
@@ -50,6 +49,7 @@ const App = (props: {u: () => void}) => {
                     })
                 })
                 setValue(monsters)
+                setData(monsters)
             })
             .catch(() => {
             })
