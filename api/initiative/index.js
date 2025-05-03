@@ -89,7 +89,7 @@ const addMaster = (req, res) => {
 
             if (p.npc && !p.colorMarker) {
                 p.colorMarker = colorMarkers[colorMarkerIndex]
-                colorMarkerIndex += 1
+                colorMarkerIndex = (colorMarkerIndex + 1) % colorMarkers.length
             }
 
             master.push(p)
