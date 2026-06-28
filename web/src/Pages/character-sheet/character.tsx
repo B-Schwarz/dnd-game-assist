@@ -1,18 +1,12 @@
 import React, {useEffect, useState} from 'react'
 
-import {
-    DnDCharacter,
-    DnDCharacterProfileSheet,
-    DnDCharacterSpellSheet,
-    DnDCharacterStatsSheet
-} from 'dnd-character-sheets'
-import 'dnd-character-sheets/index.css'
+import {DnDCharacter} from "./sheet/dnd-character";
+import CharacterSheet from "./sheet/CharacterSheet";
 
 import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
 import TitleService from "../../Service/titleService";
-import {LanguageType} from "../settings/language.type";
 
 const App = () => {
     const id = useParams().id
@@ -20,51 +14,10 @@ const App = () => {
     const [isMaster, setIsMaster] = useState(true)
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
     const [change, setChange] = useState(false)
-    const [german] = useState<boolean>(loadDefaultLanguage())
-
-
-    const statsSheet = (
-        <DnDCharacterStatsSheet
-            character={character}
-            onCharacterChanged={updateCharacter}
-            german={german}
-            />
-    )
-
-    const profileSheet = (
-        <DnDCharacterProfileSheet
-            character={character}
-            onCharacterChanged={updateCharacter}
-            german={german}
-        />
-    )
-
-    const spellSheet = (
-        <DnDCharacterSpellSheet
-            character={character}
-            onCharacterChanged={updateCharacter}
-            german={german}
-        />
-    )
 
     function loadDefaultCharacter() {
         let character: DnDCharacter = {}
         return character
-    }
-
-    function loadDefaultLanguage() {
-        let lang: LanguageType = LanguageType.en
-        const lsData = localStorage.getItem('dnd-character-language')
-        if (lsData) {
-            if (lsData in LanguageType) {
-                lang = LanguageType[lsData as keyof typeof LanguageType]
-            } else {
-                localStorage.setItem('dnd-character-language', lang.toString())
-            }
-        } else {
-            localStorage.setItem('dnd-character-language', lang.toString())
-        }
-        return lang === LanguageType.de
     }
 
     function updateCharacter(char: DnDCharacter) {
@@ -123,6 +76,7 @@ const App = () => {
 
     useEffect(() => {
         recv()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -131,6 +85,7 @@ const App = () => {
                 setChange(false)
             })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [change, isMaster])
 
 
@@ -138,9 +93,7 @@ const App = () => {
         <>
             <TitleService title={character.name || ''}/>
             <div style={{"marginLeft": "auto", "marginRight": "auto", maxWidth: "1200px"}}>
-                {statsSheet}
-                {profileSheet}
-                {spellSheet}
+                <CharacterSheet character={character} onCharacterChanged={updateCharacter}/>
             </div>
         </>
     )

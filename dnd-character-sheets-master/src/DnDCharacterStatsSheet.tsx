@@ -8,7 +8,6 @@ import Skill from './Components/Skill'
 import StatBox2 from './Components/StatBox2'
 import DeathSave from './Components/DeathSave'
 import AttackTable from './Components/AttackTable'
-import Currency from './Components/Currency'
 import {Color} from './Components/color.enum'
 
 import './dndstyles.css'
@@ -225,7 +224,7 @@ class DnDCharacterStatsSheet extends React.Component<
 
         char.skillNature = tempInt
         if (char.skillNatureChecked === 'expert') {
-          char.skillMedicine = String(
+          char.skillNature = String(
             Number(tempInt) +
             Number(char.proficiencyBonus) +
             Number(char.proficiencyBonus)
@@ -405,7 +404,7 @@ class DnDCharacterStatsSheet extends React.Component<
                   fontSize: '11px'
                 }}
               >
-                Character Name
+                {this.props.german ? 'Charaktername' : 'Character Name'}
               </label>
             </div>
             <div className='col-md-9 pr-2 pl-2'>
@@ -419,9 +418,27 @@ class DnDCharacterStatsSheet extends React.Component<
                         this.updateCharacter('classLevel', e.target.value)
                       }
                     />
-                    <label>
-                      {this.props.german ? 'Klasse & Stufe' : 'Class & Level'}
-                    </label>
+                    <label>{this.props.german ? 'Klasse' : 'Class'}</label>
+                  </div>
+                  <div className='col-md-3 col-6 pl-0 pr-0'>
+                    <input
+                      type='text'
+                      value={character.subclass ? character.subclass : ''}
+                      onChange={(e) =>
+                        this.updateCharacter('subclass', e.target.value)
+                      }
+                    />
+                    <label>{this.props.german ? 'Unterklasse' : 'Subclass'}</label>
+                  </div>
+                  <div className='col-md-3 col-6 pl-0 pr-0'>
+                    <input
+                      type='text'
+                      value={character.level ? character.level : ''}
+                      onChange={(e) =>
+                        this.updateCharacter('level', e.target.value)
+                      }
+                    />
+                    <label>{this.props.german ? 'Stufe' : 'Level'}</label>
                   </div>
                   <div className='col-md-3 col-6 pl-0 pr-0'>
                     <input
@@ -435,31 +452,9 @@ class DnDCharacterStatsSheet extends React.Component<
                       {this.props.german ? 'Hintergrund' : 'Background'}
                     </label>
                   </div>
-                  <div className='col-md-3 col-6 pl-0 pr-0'>
-                    <input
-                      type='text'
-                      value={character.playerName ? character.playerName : ''}
-                      onChange={(e) =>
-                        this.updateCharacter('playerName', e.target.value)
-                      }
-                    />
-                    <label>
-                      {this.props.german ? 'Name des Spielers' : 'Player Name'}
-                    </label>
-                  </div>
-                  <div className='col-md-3 col-6 pl-0 pr-0'>
-                    <input
-                      type='text'
-                      value={character.faction ? character.faction : ''}
-                      onChange={(e) =>
-                        this.updateCharacter('faction', e.target.value)
-                      }
-                    />
-                    <label>Faction</label>
-                  </div>
                 </div>
                 <div className='row pl-3 pr-3'>
-                  <div className='col-md-3 col-6 pl-0 pr-0'>
+                  <div className='col-md-4 col-6 pl-0 pr-0'>
                     <input
                       type='text'
                       value={character.race ? character.race : ''}
@@ -467,21 +462,9 @@ class DnDCharacterStatsSheet extends React.Component<
                         this.updateCharacter('race', e.target.value)
                       }
                     />
-                    <label>{this.props.german ? 'Volk' : 'Ancestry'}</label>
+                    <label>{this.props.german ? 'Spezies' : 'Species'}</label>
                   </div>
-                  <div className='col-md-3 col-6 pl-0 pr-0'>
-                    <input
-                      type='text'
-                      value={character.alignment ? character.alignment : ''}
-                      onChange={(e) =>
-                        this.updateCharacter('alignment', e.target.value)
-                      }
-                    />
-                    <label>
-                      {this.props.german ? 'Gesinnung' : 'Alignment'}
-                    </label>
-                  </div>
-                  <div className='col-md-3 col-6 pl-0 pr-0'>
+                  <div className='col-md-4 col-6 pl-0 pr-0'>
                     <input
                       type='text'
                       value={character.xp ? character.xp : ''}
@@ -495,7 +478,7 @@ class DnDCharacterStatsSheet extends React.Component<
                         : 'Experience Points'}
                     </label>
                   </div>
-                  <div className='col-md-3 col-6 pl-0 pr-0'>
+                  <div className='col-md-4 col-6 pl-0 pr-0'>
                     <label className='color-select'>
                       <select value={this.state.color} onChange={evt => changeColor(Color[evt.target.value as keyof typeof Color])}>
                         <option value={Color.NONE}>Keine</option>
@@ -584,7 +567,7 @@ class DnDCharacterStatsSheet extends React.Component<
                 </div>
                 <div className='col-8'>
                   <StatRow
-                    label='Inspiration'
+                    label={this.props.german ? 'Heroische Inspiration' : 'Heroic Inspiration'}
                     name='inspiration'
                     value={character.inspiration}
                     onChange={(name: string, value: any) => {
@@ -896,21 +879,71 @@ class DnDCharacterStatsSheet extends React.Component<
                 />
               </div>
               <div className='d-and-d-box mt-4'>
+                <div style={{textAlign: 'left', marginBottom: '8px'}}>
+                  <label style={{textTransform: 'uppercase', fontSize: '11px', width: '100%'}}>
+                    {this.props.german ? 'Rüstungstraining' : 'Armor Training'}
+                  </label>
+                  <label style={{marginRight: '10px'}}>
+                    <input
+                      type='checkbox'
+                      checked={!!character.armorTrainingLight}
+                      onChange={(e) =>
+                        this.updateCharacter('armorTrainingLight', e.target.checked)
+                      }
+                    />{' '}
+                    {this.props.german ? 'Leicht' : 'Light'}
+                  </label>
+                  <label style={{marginRight: '10px'}}>
+                    <input
+                      type='checkbox'
+                      checked={!!character.armorTrainingMedium}
+                      onChange={(e) =>
+                        this.updateCharacter('armorTrainingMedium', e.target.checked)
+                      }
+                    />{' '}
+                    {this.props.german ? 'Mittel' : 'Medium'}
+                  </label>
+                  <label style={{marginRight: '10px'}}>
+                    <input
+                      type='checkbox'
+                      checked={!!character.armorTrainingHeavy}
+                      onChange={(e) =>
+                        this.updateCharacter('armorTrainingHeavy', e.target.checked)
+                      }
+                    />{' '}
+                    {this.props.german ? 'Schwer' : 'Heavy'}
+                  </label>
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={!!character.armorTrainingShields}
+                      onChange={(e) =>
+                        this.updateCharacter('armorTrainingShields', e.target.checked)
+                      }
+                    />{' '}
+                    {this.props.german ? 'Schilde' : 'Shields'}
+                  </label>
+                </div>
                 <textarea
-                  value={
-                    character.otherProficiencies
-                      ? character.otherProficiencies
-                      : ''
-                  }
+                  placeholder={this.props.german ? 'Waffen' : 'Weapons'}
+                  value={character.weaponProficiencies ? character.weaponProficiencies : ''}
                   onChange={(e) =>
-                    this.updateCharacter('otherProficiencies', e.target.value)
+                    this.updateCharacter('weaponProficiencies', e.target.value)
                   }
-                  rows={12}
+                  rows={4}
+                />
+                <textarea
+                  placeholder={this.props.german ? 'Werkzeuge' : 'Tools'}
+                  value={character.toolProficiencies ? character.toolProficiencies : ''}
+                  onChange={(e) =>
+                    this.updateCharacter('toolProficiencies', e.target.value)
+                  }
+                  rows={4}
                 />
                 <label className='d-and-d-title' style={{marginTop: '10px'}}>
                   {this.props.german
-                    ? 'Weitere Übung und Sprachen'
-                    : 'Other Proficiencies & Languages'}
+                    ? 'Ausrüstungstraining & Übungen'
+                    : 'Equipment Training & Proficiencies'}
                 </label>
               </div>
             </div>
@@ -918,7 +951,7 @@ class DnDCharacterStatsSheet extends React.Component<
             <div className='col-md-4'>
               <div className='d-and-d-box gray'>
                 <div className='row'>
-                  <div className='col-4 pr-2'>
+                  <div className='col-3 pr-1'>
                     <StatBox2
                       classes='shield'
                       labelTop={this.props.german ? 'Rüstungs-' : 'Armour'}
@@ -929,8 +962,18 @@ class DnDCharacterStatsSheet extends React.Component<
                         this.updateCharacter(name, value)
                       }}
                     />
+                    <label style={{fontSize: '10px', display: 'block', textAlign: 'center'}}>
+                      <input
+                        type='checkbox'
+                        checked={!!character.shield}
+                        onChange={(e) =>
+                          this.updateCharacter('shield', e.target.checked)
+                        }
+                      />{' '}
+                      {this.props.german ? 'Schild' : 'Shield'}
+                    </label>
                   </div>
-                  <div className='col-4 pr-2 pl-2'>
+                  <div className='col-3 pr-1 pl-1'>
                     <StatBox2
                       label='Initiative'
                       name='init'
@@ -940,12 +983,22 @@ class DnDCharacterStatsSheet extends React.Component<
                       }}
                     />
                   </div>
-                  <div className='col-4 pl-2'>
+                  <div className='col-3 pr-1 pl-1'>
                     <StatBox2
                       labelTop={this.props.german ? 'Bewegungs-' : ''}
                       label={this.props.german ? 'rate' : 'Speed'}
                       name='speed'
                       value={character.speed}
+                      onChange={(name: string, value: any) => {
+                        this.updateCharacter(name, value)
+                      }}
+                    />
+                  </div>
+                  <div className='col-3 pl-1'>
+                    <StatBox2
+                      label={this.props.german ? 'Größe' : 'Size'}
+                      name='size'
+                      value={character.size}
                       onChange={(name: string, value: any) => {
                         this.updateCharacter(name, value)
                       }}
@@ -1015,12 +1068,12 @@ class DnDCharacterStatsSheet extends React.Component<
                       style={{paddingBottom: '5px'}}
                     >
                       <div className='d-and-d-gray-text'>
-                        <label style={{width: '25px'}}>
-                          {this.props.german ? 'Gesamt' : 'Total'}
+                        <label style={{width: '40px'}}>
+                          {this.props.german ? 'Max' : 'Max'}
                         </label>
                         <input
                           type='text'
-                          style={{width: 'calc(100% - 25px)'}}
+                          style={{width: 'calc(100% - 40px)'}}
                           className='d-and-d-linput'
                           value={
                             character.hitDiceMax ? character.hitDiceMax : ''
@@ -1042,7 +1095,9 @@ class DnDCharacterStatsSheet extends React.Component<
                         className='d-and-d-title'
                         style={{marginTop: '5px'}}
                       >
-                        {this.props.german ? 'Trefferwürfel' : 'Hit Dice'}
+                        {this.props.german
+                          ? 'Trefferwürfel (Verbraucht)'
+                          : 'Hit Dice (Spent)'}
                       </label>
                     </div>
                   </div>
@@ -1082,7 +1137,7 @@ class DnDCharacterStatsSheet extends React.Component<
 
               <div className='d-and-d-box mt-3'>
                 <AttackTable
-                  rows={3}
+                  rows={6}
                   name='attacks'
                   value={character.attacks}
                   onChange={(name: string, value: any) => {
@@ -1090,195 +1145,56 @@ class DnDCharacterStatsSheet extends React.Component<
                   }}
                   german={this.props.german}
                 />
-                <textarea
-                  value={character.attacksText ? character.attacksText : ''}
-                  onChange={(e) =>
-                    this.updateCharacter('attacksText', e.target.value)
-                  }
-                  rows={6}
-                />
                 <label className='d-and-d-title' style={{marginTop: '10px'}}>
                   {this.props.german
-                    ? 'Angriffe & Zauber'
-                    : 'Attacks & Spellcasting'}
-                </label>
-              </div>
-
-              <div className='d-and-d-box mt-4'>
-                <div className='row'>
-                  <div className='' style={{width: '100px'}}>
-                    <Currency
-                      label={this.props.german ? 'KM' : 'CP'}
-                      name='cp'
-                      value={character.cp}
-                      onChange={(name: string, value: any) => {
-                        this.updateCharacter(name, value)
-                      }}
-                    />
-                    <Currency
-                      label={this.props.german ? 'SM' : 'SP'}
-                      name='sp'
-                      value={character.sp}
-                      onChange={(name: string, value: any) => {
-                        this.updateCharacter(name, value)
-                      }}
-                    />
-                    <Currency
-                      label={this.props.german ? 'EM' : 'EP'}
-                      name='ep'
-                      value={character.ep}
-                      onChange={(name: string, value: any) => {
-                        this.updateCharacter(name, value)
-                      }}
-                    />
-                    <Currency
-                      label={this.props.german ? 'GM' : 'GP'}
-                      name='gp'
-                      value={character.gp}
-                      onChange={(name: string, value: any) => {
-                        this.updateCharacter(name, value)
-                      }}
-                    />
-                    <Currency
-                      label={this.props.german ? 'PM' : 'PP'}
-                      name='pp'
-                      value={character.pp}
-                      onChange={(name: string, value: any) => {
-                        this.updateCharacter(name, value)
-                      }}
-                    />
-                  </div>
-                  <div className='col'>
-                    <textarea
-                      className='d-and-d-equipment-indent'
-                      value={character.equipment ? character.equipment : ''}
-                      onChange={(e) =>
-                        this.updateCharacter('equipment', e.target.value)
-                      }
-                      rows={10}
-                    />
-                  </div>
-                  <div className='col-md-12'>
-                    <textarea
-                      value={character.equipment2 ? character.equipment2 : ''}
-                      onChange={(e) =>
-                        this.updateCharacter('equipment2', e.target.value)
-                      }
-                      rows={4}
-                    />
-                  </div>
-                </div>
-                <label className='d-and-d-title' style={{marginTop: '10px'}}>
-                  {this.props.german ? 'Ausrüstung' : 'Equipment'}
+                    ? 'Waffen & Schadenszauber'
+                    : 'Weapons & Damage Cantrips'}
                 </label>
               </div>
             </div>
 
             <div className='col-md-4'>
-              <div
-                className='d-and-d-box gray'
-                style={{marginBottom: '17px'}}
-              >
-                <div
-                  className='d-and-d-box white'
-                  style={{
-                    borderRadius: '8px 8px 0 0',
-                    marginBottom: '5px',
-                    paddingTop: '1px',
-                    paddingBottom: '5px'
-                  }}
-                >
-                  <textarea
-                    value={
-                      character.personalityTraits
-                        ? character.personalityTraits
-                        : ''
-                    }
-                    onChange={(e) =>
-                      this.updateCharacter('personalityTraits', e.target.value)
-                    }
-                    rows={3}
-                  />
-                  <label className='d-and-d-title'>
-                    {this.props.german
-                      ? 'Persönlichkeitsmerkmale'
-                      : 'Personality Traits'}
-                  </label>
-                </div>
-                <div
-                  className='d-and-d-box white'
-                  style={{
-                    borderRadius: '0 0 0 0',
-                    marginBottom: '5px',
-                    paddingTop: '1px',
-                    paddingBottom: '5px'
-                  }}
-                >
-                  <textarea
-                    value={character.ideals ? character.ideals : ''}
-                    onChange={(e) =>
-                      this.updateCharacter('ideals', e.target.value)
-                    }
-                    rows={3}
-                  />
-                  <label className='d-and-d-title'>
-                    {this.props.german ? 'Ideale' : 'Ideals'}
-                  </label>
-                </div>
-                <div
-                  className='d-and-d-box white'
-                  style={{
-                    borderRadius: '0 0 0 0',
-                    marginBottom: '5px',
-                    paddingTop: '1px',
-                    paddingBottom: '5px'
-                  }}
-                >
-                  <textarea
-                    value={character.bonds ? character.bonds : ''}
-                    onChange={(e) =>
-                      this.updateCharacter('bonds', e.target.value)
-                    }
-                    rows={2}
-                  />
-                  <label className='d-and-d-title'>
-                    {this.props.german ? 'Bindungen' : 'Bonds'}
-                  </label>
-                </div>
-                <div
-                  className='d-and-d-box white'
-                  style={{
-                    borderRadius: '0 0 8px 8px',
-                    marginBottom: '0px',
-                    paddingTop: '1px',
-                    paddingBottom: '4px'
-                  }}
-                >
-                  <textarea
-                    value={character.flaws ? character.flaws : ''}
-                    onChange={(e) =>
-                      this.updateCharacter('flaws', e.target.value)
-                    }
-                    rows={2}
-                  />
-                  <label className='d-and-d-title'>
-                    {this.props.german ? 'Makel' : 'Flaws'}
-                  </label>
-                </div>
+              <div className='d-and-d-box'>
+                <textarea
+                  style={{paddingBottom: '5px'}}
+                  value={
+                    character.classFeatures ? character.classFeatures : ''
+                  }
+                  onChange={(e) =>
+                    this.updateCharacter('classFeatures', e.target.value)
+                  }
+                  rows={18}
+                />
+                <label className='d-and-d-title' style={{marginTop: '10px'}}>
+                  {this.props.german ? 'Klassenmerkmale' : 'Class Features'}
+                </label>
               </div>
               <div className='d-and-d-box mt-3'>
                 <textarea
                   style={{paddingBottom: '5px'}}
                   value={
-                    character.featuresTraits ? character.featuresTraits : ''
+                    character.speciesTraits ? character.speciesTraits : ''
                   }
                   onChange={(e) =>
-                    this.updateCharacter('featuresTraits', e.target.value)
+                    this.updateCharacter('speciesTraits', e.target.value)
                   }
-                  rows={27}
+                  rows={9}
                 />
                 <label className='d-and-d-title' style={{marginTop: '10px'}}>
-                  {this.props.german ? 'Merkmale' : 'Features & Traits'}
+                  {this.props.german ? 'Speziesmerkmale' : 'Species Traits'}
+                </label>
+              </div>
+              <div className='d-and-d-box mt-3'>
+                <textarea
+                  style={{paddingBottom: '5px'}}
+                  value={character.feats ? character.feats : ''}
+                  onChange={(e) =>
+                    this.updateCharacter('feats', e.target.value)
+                  }
+                  rows={9}
+                />
+                <label className='d-and-d-title' style={{marginTop: '10px'}}>
+                  {this.props.german ? 'Talente' : 'Feats'}
                 </label>
               </div>
             </div>

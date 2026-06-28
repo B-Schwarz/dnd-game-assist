@@ -51,6 +51,7 @@ const Menu = (props: { selected: SelectedEnum; }) => {
             .then(() => {
                 setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
             }).catch(() => {})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const navigate = useNavigate()

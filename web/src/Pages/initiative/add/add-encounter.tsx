@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Button, Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
+import {Button, Center, Input, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
-import {Player} from "../player.type";
 import _ from "lodash";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
-import {Monster} from "../../monster/monster.type";
 
 const App = (props: {u: () => void}) => {
 

@@ -78,12 +78,12 @@ class DnDCharacterSpellsSheet extends React.Component<
                 <input
                   type='text'
                   value={
-                    character.spellcastingClass
-                      ? character.spellcastingClass
+                    character.spellcastingAbility
+                      ? character.spellcastingAbility
                       : ''
                   }
                   onChange={(e) =>
-                    this.updateCharacter('spellcastingClass', e.target.value)
+                    this.updateCharacter('spellcastingAbility', e.target.value)
                   }
                 />
               </div>
@@ -95,7 +95,7 @@ class DnDCharacterSpellsSheet extends React.Component<
                   fontSize: '11px'
                 }}
               >
-                {this.props.german ? 'Zauberwirkende Klasse' : 'Spellcasting Class'}
+                {this.props.german ? 'Zauberwirkendes Attribut' : 'Spellcasting Ability'}
               </label>
             </div>
             <div className='col-md-9 pr-2 pl-2' style={{ marginTop: '18px' }}>
@@ -103,8 +103,8 @@ class DnDCharacterSpellsSheet extends React.Component<
                 <div className='row pl-3 pr-3'>
                   <div className='col-4 pr-4 pl-4'>
                     <StatBox2
-                      name='spellcastingAbility'
-                      value={character.spellcastingAbility}
+                      name='spellcastingModifier'
+                      value={character.spellcastingModifier}
                       onChange={(name: string, value: any) => {
                         this.updateCharacter(name, value)
                       }}
@@ -117,7 +117,7 @@ class DnDCharacterSpellsSheet extends React.Component<
                         marginBottom: '0'
                       }}
                     >
-                      {this.props.german ? 'Max. Vorbereitete' : 'Prepared Spells'}
+                      {this.props.german ? 'Zauber-' : 'Spellcasting'}
                     </label>
                     <label
                       style={{
@@ -127,7 +127,7 @@ class DnDCharacterSpellsSheet extends React.Component<
                         marginBottom: '0'
                       }}
                     >
-                      {this.props.german ? 'Zauber' : 'Total'}
+                      {this.props.german ? 'modifikator' : 'Modifier'}
                     </label>
                   </div>
                   <div className='col-4 pr-4 pl-4'>

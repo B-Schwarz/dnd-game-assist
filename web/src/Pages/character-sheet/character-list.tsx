@@ -111,6 +111,7 @@ const App = () => {
                 updateOwnCharList()
                 updateOtherCharList()
             })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function openCharacter(id: string) {
@@ -154,10 +155,10 @@ const App = () => {
                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
                                     <Text color='gray'>Klasse:</Text>
                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                                    <Text color='gray'>Rasse:</Text>
+                                    <Text color='gray'>Spezies:</Text>
                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                                    <Text color='gray'>Player:</Text>
-                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                    <Text color='gray'>Stufe:</Text>
+                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'}</Text>
                                     <Text>{item.npc}</Text>
                                 </HStack>
                             </Button>
@@ -207,10 +208,10 @@ const App = () => {
                                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
                                                     <Text color='gray'>Klasse:</Text>
                                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                                                    <Text color='gray'>Rasse:</Text>
+                                                    <Text color='gray'>Spezies:</Text>
                                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                                                    <Text color='gray'>Player:</Text>
-                                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
+                                                    <Text color='gray'>Stufe:</Text>
+                                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'}</Text>
                                                 </HStack>
                                             </Button>
                                             <Button borderWidth='1px' borderRadius='lg'

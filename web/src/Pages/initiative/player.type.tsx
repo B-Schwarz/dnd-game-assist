@@ -1,4 +1,4 @@
-import {DnDCharacter} from "dnd-character-sheets";
+import {DnDCharacter} from "../character-sheet/sheet/dnd-character";
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {ColorMarkerEnum} from "./color-marker.enum";
 

@@ -520,6 +520,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
 
     useEffect(() => {
         createStatusIcons()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [blind, down, poison, charmed, deafened, frightened, grappled, incapacitated, invisible, paralyzed, petrified, restrained, stunned, unconscious, hex, hexblade, unarmed, rage, concentration, props.isMaster])
 
     useEffect(() => {
@@ -539,6 +540,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
         props.player.hidden = hidden
         if (props.isMaster)
             savePlayer()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hidden])
 
     useEffect(() => {

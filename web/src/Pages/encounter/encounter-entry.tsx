@@ -15,7 +15,7 @@ import {
     GridItem,
     IconButton,
     Input,
-    Select, Spacer,
+    Select,
     Stack,
     StackItem,
     Switch,
@@ -43,7 +43,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const [encounter, setEncounter] = useState<EncounterType>(props.m)
     const [edit, setEdit] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
-    const [watched, setWatched] = useState(false)
+    const [, setWatched] = useState(false)
 
     const [name, setName] = useState(props.m.name)
     const [amount, setAmount] = useState<number>(1)
@@ -88,10 +88,12 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
             })
 
         resolveMonsterName()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         save()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [encounter]);
 
     const save = () => {

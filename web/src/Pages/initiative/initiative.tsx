@@ -34,7 +34,7 @@ const App = () => {
     const [player, setPlayer] = useState<Player[]>([])
     const [isMaster, setIsMaster] = useState(false)
     const [round, setRound] = useState<number>(1)
-    const [turnBtnActive, setTurnBtnActive] = useState<boolean>(false)
+    const [turnBtnActive] = useState<boolean>(false)
     const [turn, setTurn] = useState(0)
 
     const [updatePing, setUpdatePing] = useState(0)
@@ -44,13 +44,6 @@ const App = () => {
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose} = useDisclosure()
-
-    function save(p: Player[]) {
-        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative', {player: p})
-            .then(() => update())
-            .catch(() => {
-            })
-    }
 
     function nextTurn() {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/turn/next')
@@ -157,6 +150,7 @@ const App = () => {
 
         // @ts-ignore
         return () => clearTimeout(updateTimer.current)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -168,6 +162,7 @@ const App = () => {
         }, 350)
 
         update()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMaster, updatePing])
 
     return (

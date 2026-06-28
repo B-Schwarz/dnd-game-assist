@@ -2,14 +2,13 @@ import {Color} from './Components/color.enum'
 
 export default class DnDCharacter {
   name?: string
-  classLevel?: string
+  classLevel?: string // 2024: "Class" (level tracked separately in `level`)
+  subclass?: string
+  level?: string
   background?: string
-  playerName?: string
-  faction?: string
-  race?: string
+  race?: string // 2024: "Species"
   alignment?: string
   xp?: string
-  dciNo?: string
   color?: Color
 
   str?: string
@@ -19,7 +18,7 @@ export default class DnDCharacter {
   wis?: string
   cha?: string
 
-  inspiration?: string
+  inspiration?: string // 2024: "Heroic Inspiration"
   proficiencyBonus?: string
 
   strSave?: string
@@ -72,24 +71,32 @@ export default class DnDCharacter {
   skillSurvivalChecked?: string
 
   passivePerception?: string
-  otherProficiencies?: string
+
+  // 2024: Equipment Training & Proficiencies
+  armorTrainingLight?: boolean
+  armorTrainingMedium?: boolean
+  armorTrainingHeavy?: boolean
+  armorTrainingShields?: boolean
+  weaponProficiencies?: string
+  toolProficiencies?: string
 
   ac?: string
+  shield?: boolean
   init?: string
   speed?: string
+  size?: string
 
   maxHp?: string
   hp?: string
   tempHp?: string
 
   hitDiceMax?: string
-  hitDice?: string
+  hitDice?: string // 2024: hit dice "Spent" (was "remaining")
 
   deathsaveSuccesses?: number
   deathsaveFailures?: number
 
-  attacks?: any[]
-  attacksText?: string
+  attacks?: any[] // 2024: "Weapons & Damage Cantrips"
 
   cp?: string
   sp?: string
@@ -97,39 +104,24 @@ export default class DnDCharacter {
   gp?: string
   pp?: string
   equipment?: string
-  equipment2?: string
 
-  personalityTraits?: string
-  ideals?: string
-  bonds?: string
-  flaws?: string
+  // 2024: Magic Item Attunement slots
+  attunement1?: string
+  attunement2?: string
+  attunement3?: string
 
-  featuresTraits?: string
+  // 2024: split feature boxes
+  classFeatures?: string
+  speciesTraits?: string
+  feats?: string
 
-  age?: string
-  height?: string
-  weight?: string
-  eyes?: string
-  skin?: string
-  hair?: string
+  languages?: string
 
   appearance?: string
-  backstory?: string
+  backstory?: string // 2024: "Backstory & Personality"
 
-  factionImg?: string
-  factionRank?: string
-  allies?: string
-  allies2?: string
-
-  additionalFeatures?: string
-  additionalFeatures2?: string
-
-  totalNonConsumableMagicItems?: string
-  treasure?: string
-  treasure2?: string
-
-  spellcastingClass?: string
   spellcastingAbility?: string
+  spellcastingModifier?: string
   spellSaveDC?: string
   spellAttackBonus?: string
 

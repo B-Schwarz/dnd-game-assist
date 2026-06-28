@@ -55,6 +55,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
 
     useEffect(() => {
         calcEntries()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [monster])
 
     const closePopup = () => setIsOpen(false)

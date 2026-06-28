@@ -8,7 +8,6 @@ import {Text} from "@chakra-ui/layout";
 import {AiOutlineArrowLeft} from "@react-icons/all-files/ai/AiOutlineArrowLeft";
 import {AiOutlineArrowRight} from "@react-icons/all-files/ai/AiOutlineArrowRight";
 import {EncounterType} from "./encounter.type";
-import MonsterEntry from "../monster/monster-entry";
 import EncounterEntry from "./encounter-entry";
 
 const App = () => {
@@ -78,6 +77,7 @@ const App = () => {
 
     useEffect(() => {
         update()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
