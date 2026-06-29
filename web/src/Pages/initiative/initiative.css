@@ -101,14 +101,25 @@
     min-width: 38px;
 }
 
-/* drag-to-reorder grip */
-.init-drag-handle {
+/* drag-to-reorder grip — just the dots, no button chrome */
+.init-drag-handle,
+.init-drag-handle:hover {
     cursor: grab;
     touch-action: none;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #9a9a9a;
+    padding: 8px 6px;
+}
+
+.init-drag-handle:hover {
+    color: #5d5d5d;
 }
 
 .init-drag-handle:active {
     cursor: grabbing;
+    transform: none;
 }
 
 /* prev / next grouped as a single segmented control */

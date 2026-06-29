@@ -3,7 +3,6 @@ import {
     Badge,
     Box,
     Button,
-    Collapse,
     HStack,
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -88,7 +87,8 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
     // onto the grip button so only that grip starts a drag, not the whole row.
     const {attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging} = useSortable({
         id: props.player.turnId,
-        disabled: !props.isMaster
+        disabled: !props.isMaster,
+        animateLayoutChanges: () => false
     })
     const sortableStyle: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -749,8 +749,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
                     }
                 </HStack>
                 {createHPBar()}
-                {props.isMaster &&
-                    <Collapse in={props.isOpen} animateOpacity>
+                {props.isMaster && props.isOpen &&
                         <Box paddingTop='3'>
                         <div className='init-panel'>
                             <div className='init-panel-card'>
@@ -944,7 +943,6 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
                             </div>
                         </div>
                         </Box>
-                    </Collapse>
                 }
             </Box>
         </div>
