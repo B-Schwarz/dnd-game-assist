@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {Button, Center, Input, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
+import {Center, Input, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
+import "../initiative.css";
 import _ from "lodash";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
@@ -116,8 +117,8 @@ const App = (props: {u: () => void}) => {
                                 <Td><Text isTruncated maxW='11rem'>{item.name}</Text></Td>
                                 <Td>
                                     <Center>
-                                        <Button colorScheme='green'
-                                                onClick={() => onAdd(item)}><AddIcon/></Button>
+                                        <button className='init-btn init-btn--primary init-btn--icon'
+                                                onClick={() => onAdd(item)} aria-label='Hinzufügen'><AddIcon/></button>
                                     </Center>
                                 </Td>
                             </Tr>

@@ -15,6 +15,7 @@ import {
     useToast,
     VStack
 } from "@chakra-ui/react";
+import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import "./initiative.css";
 import { flushSync } from "react-dom";
 import {Player} from "./player.type";
@@ -198,6 +199,38 @@ const App = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMaster, updatePing])
 
+    // Master hotkeys: J steps to the previous turn, K to the next. Ignored while
+    // typing in a field or when a modifier is held.
+    useEffect(() => {
+        if (!isMaster) {
+            return
+        }
+
+        const onKey = (e: KeyboardEvent) => {
+            if (e.metaKey || e.ctrlKey || e.altKey) {
+                return
+            }
+            const target = e.target as HTMLElement | null
+            const tag = target?.tagName
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable) {
+                return
+            }
+
+            const key = e.key.toLowerCase()
+            if (key === 'j') {
+                e.preventDefault()
+                prevTurn()
+            } else if (key === 'k') {
+                e.preventDefault()
+                nextTurn()
+            }
+        }
+
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isMaster])
+
     return (
         <>
             <TitleService title={'Initiative'}/>
@@ -206,6 +239,7 @@ const App = () => {
                     { isMaster &&
                         <StackItem>
                             <div className='init-controls'>
+                                <button className='init-btn init-btn--success' onClick={saveHealthToSheets}>Leben speichern</button>
                                 <button className='init-btn init-btn--danger' onClick={() => {
                                     setConfirm(confirmType.RESET)
                                     onConfirmOpen()
@@ -215,11 +249,10 @@ const App = () => {
                                     onConfirmOpen()
                                 }}>Sortieren</button>
                                 <div className='init-segmented'>
-                                    <button className='init-btn' onClick={prevTurn} disabled={turnBtnActive}>Vorheriger</button>
-                                    <button className='init-btn' onClick={nextTurn} disabled={turnBtnActive}>Nächster</button>
+                                    <button className='init-btn init-btn--icon' onClick={prevTurn} disabled={turnBtnActive} aria-label='Vorheriger'><ChevronLeftIcon boxSize={5}/></button>
+                                    <button className='init-btn init-btn--icon' onClick={nextTurn} disabled={turnBtnActive} aria-label='Nächster'><ChevronRightIcon boxSize={5}/></button>
                                 </div>
                                 <button className='init-btn init-btn--primary' onClick={onOpen}>Hinzufügen</button>
-                                <button className='init-btn' onClick={saveHealthToSheets}>Leben speichern</button>
                             </div>
                         </StackItem>
                     }

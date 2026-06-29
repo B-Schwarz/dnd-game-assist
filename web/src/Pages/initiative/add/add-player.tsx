@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button,
     Center,
     Input,
     NumberInput,
@@ -14,6 +13,7 @@ import {
     Tr
 } from "@chakra-ui/react"
 import {AddIcon} from "@chakra-ui/icons";
+import "../initiative.css";
 import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
@@ -100,8 +100,8 @@ const App = (props: {u: () => void}) => {
                                 </NumberInput></Td>
                                 <Td>
                                     <Center>
-                                        <Button colorScheme='green'
-                                                onClick={() => onAdd(item)}><AddIcon/></Button>
+                                        <button className='init-btn init-btn--primary init-btn--icon'
+                                                onClick={() => onAdd(item)} aria-label='Hinzufügen'><AddIcon/></button>
                                     </Center>
                                 </Td>
                             </Tr>

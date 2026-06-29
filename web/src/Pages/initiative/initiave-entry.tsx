@@ -7,8 +7,6 @@ import {
     Box,
     Button,
     ButtonGroup,
-    Grid,
-    GridItem,
     HStack,
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -36,6 +34,7 @@ import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
 import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
 import {Mutex} from "async-mutex"
+import "./initiative.css";
 
 const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index: number, first: boolean, last: boolean, isMaster: boolean, isTurn: boolean, update: () => void }) => {
 
@@ -683,85 +682,34 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                 {createHPBar()}
                 {props.isMaster &&
                     <AccordionPanel>
-                        <Grid templateColumns='repeat(5, 1fr)' gap={0}>
-                            <GridItem>
-                                <Switch onChange={() => setBlind(!blind)}
-                                        isChecked={blind}>
-                                    Blind
-                                </Switch><br/>
-                                <Switch onChange={() => setPoison(!poison)}
-                                        isChecked={poison}>
-                                    Vergifted
-                                </Switch><br/>
-                                <Switch onChange={() => setDown(!down)} isChecked={down}>
-                                    Liegend
-                                </Switch><br/>
-                                <Switch onChange={() => setCharmed(!charmed)} isChecked={charmed}>
-                                    Bezaubert
-                                </Switch><br/>
-                                <Switch onChange={() => setDeafened(!deafened)} isChecked={deafened}>
-                                    Taub
-                                </Switch><br/>
-                                <Switch onChange={() => setFrightened(!frightened)}
-                                        isChecked={frightened}>
-                                    Verängstigt
-                                </Switch><br/>
-                                <Switch onChange={() => setGrappled(!grappled)} isChecked={grappled}>
-                                    Gepackt
-                                </Switch><br/>
-                                <Switch onChange={() => setHex(!hex)} isChecked={hex}>
-                                    Hex
-                                </Switch><br/>
-                                <Switch onChange={() => setUnarmed(!unarmed)} isChecked={unarmed}>
-                                    Unbewaffnet
-                                </Switch>
-                                <br/>
-                                <br/>
-                                <Switch onChange={() => setRage(!rage)} isChecked={rage}>
-                                    Rage
-                                </Switch>
-                            </GridItem>
-                            <GridItem>
-                                <Switch onChange={() => setIncapacitated(!incapacitated)}
-                                        isChecked={incapacitated}>
-                                    Kampfunfähig
-                                </Switch><br/>
-                                <Switch onChange={() => setInvisible(!invisible)}
-                                        isChecked={invisible}>
-                                    Unsichtbar
-                                </Switch><br/>
-                                <Switch onChange={() => setParalyzed(!paralyzed)}
-                                        isChecked={paralyzed}>
-                                    Gelähmt
-                                </Switch><br/>
-                                <Switch onChange={() => setPetrified(!petrified)}
-                                        isChecked={petrified}>
-                                    Versteinert
-                                </Switch><br/>
-                                <Switch onChange={() => setRestrained(!restrained)}
-                                        isChecked={restrained}>
-                                    Festgesetzt
-                                </Switch><br/>
-                                <Switch onChange={() => setStunned(!stunned)}
-                                        isChecked={stunned}>
-                                    Betäubt
-                                </Switch><br/>
-                                <Switch onChange={() => setUnconscious(!unconscious)}
-                                        isChecked={unconscious}>
-                                    Bewusstlos
-                                </Switch><br/>
-                                <Switch onChange={() => setHexblade(!hexblade)}
-                                        isChecked={hexblade}>
-                                    Hexblade
-                                </Switch>
-                                <br/><br/>
-                                <br/>
-                                <Switch onChange={() => setConcentration(!concentration)}
-                                        isChecked={concentration}>
-                                    Konzentration
-                                </Switch>
-                            </GridItem>
-                            <GridItem>
+                        <div className='init-panel'>
+                            <div className='init-panel-card'>
+                                <span className='init-panel-title'>Zustände</span>
+                                <div className='init-states'>
+                                    <Switch size='sm' onChange={() => setBlind(!blind)} isChecked={blind}>Blind</Switch>
+                                    <Switch size='sm' onChange={() => setIncapacitated(!incapacitated)} isChecked={incapacitated}>Kampfunfähig</Switch>
+                                    <Switch size='sm' onChange={() => setPoison(!poison)} isChecked={poison}>Vergifted</Switch>
+                                    <Switch size='sm' onChange={() => setInvisible(!invisible)} isChecked={invisible}>Unsichtbar</Switch>
+                                    <Switch size='sm' onChange={() => setDown(!down)} isChecked={down}>Liegend</Switch>
+                                    <Switch size='sm' onChange={() => setParalyzed(!paralyzed)} isChecked={paralyzed}>Gelähmt</Switch>
+                                    <Switch size='sm' onChange={() => setCharmed(!charmed)} isChecked={charmed}>Bezaubert</Switch>
+                                    <Switch size='sm' onChange={() => setPetrified(!petrified)} isChecked={petrified}>Versteinert</Switch>
+                                    <Switch size='sm' onChange={() => setDeafened(!deafened)} isChecked={deafened}>Taub</Switch>
+                                    <Switch size='sm' onChange={() => setRestrained(!restrained)} isChecked={restrained}>Festgesetzt</Switch>
+                                    <Switch size='sm' onChange={() => setFrightened(!frightened)} isChecked={frightened}>Verängstigt</Switch>
+                                    <Switch size='sm' onChange={() => setStunned(!stunned)} isChecked={stunned}>Betäubt</Switch>
+                                    <Switch size='sm' onChange={() => setGrappled(!grappled)} isChecked={grappled}>Gepackt</Switch>
+                                    <Switch size='sm' onChange={() => setUnconscious(!unconscious)} isChecked={unconscious}>Bewusstlos</Switch>
+                                    <Switch size='sm' onChange={() => setHex(!hex)} isChecked={hex}>Hex</Switch>
+                                    <Switch size='sm' onChange={() => setHexblade(!hexblade)} isChecked={hexblade}>Hexblade</Switch>
+                                    <Switch size='sm' onChange={() => setUnarmed(!unarmed)} isChecked={unarmed}>Unbewaffnet</Switch>
+                                    <Switch size='sm' onChange={() => setConcentration(!concentration)} isChecked={concentration}>Konzentration</Switch>
+                                    <Switch size='sm' onChange={() => setRage(!rage)} isChecked={rage}>Rage</Switch>
+                                </div>
+                            </div>
+
+                            <div className='init-panel-card'>
+                                <span className='init-panel-title'>Rettungswürfe</span>
                                 <Table size='sm'>
                                     <Thead>
                                         <Tr>
@@ -796,11 +744,13 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                         </Tr>
                                     </Tbody>
                                 </Table>
-                            </GridItem>
-                            <GridItem>
-                                Geschwindigkeit: {geschwindigkeit}<br/>
-                                <HStack w='88%'>
-                                    <Text width='120px'>Schaden:</Text>
+                            </div>
+
+                            <div className='init-panel-card'>
+                                <span className='init-panel-title'>Aktionen</span>
+                                <Text fontSize='sm' marginBottom='2'>Geschwindigkeit: {geschwindigkeit}</Text>
+                                <HStack>
+                                    <Text width='90px'>Schaden:</Text>
                                     <NumberInput defaultValue={0} min={0}
                                                  onChange={(_, val) => setSchaden(val)}
                                                  value={schaden}>
@@ -811,8 +761,10 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                         </NumberInputStepper>
                                     </NumberInput>
                                 </HStack>
-                                <Button colorScheme='red' onClick={doSchaden} w='88%'>Schaden</Button>
-                                <Button colorScheme='green' onClick={doHeal} w='88%'>Heilen</Button>
+                                <div className='init-actions'>
+                                    <button className='init-btn init-btn--danger init-btn--block' onClick={doSchaden}>Schaden</button>
+                                    <button className='init-btn init-btn--success init-btn--block' onClick={doHeal}>Heilen</button>
+                                </div>
                                 <Select variant='flushed' marginTop='1rem'
                                         onChange={(evt) => {
                                             const color = Number(evt.currentTarget.value)
@@ -834,11 +786,13 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                     <option value={ColorMarkerEnum.BLUE}>Blau</option>
                                     <option value={ColorMarkerEnum.WHITE}>Weiß</option>
                                 </Select>
-                            </GridItem>
-                            <GridItem>
-                                <VStack>
+                            </div>
+
+                            <div className='init-panel-card'>
+                                <span className='init-panel-title'>Werte</span>
+                                <VStack align='stretch' spacing='2'>
                                     <HStack>
-                                        <Text width='120px'>HP:</Text>
+                                        <Text width='90px'>HP:</Text>
                                         <NumberInput defaultValue={props.player.character.hp || 0} min={0}
                                                      onChange={onHpEdit} value={hp}
                                                      max={Number(props.player.character.maxHp)}>
@@ -850,7 +804,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                         </NumberInput>
                                     </HStack>
                                     <HStack>
-                                        <Text width='120px'>Temp HP:</Text>
+                                        <Text width='90px'>Temp HP:</Text>
                                         <NumberInput defaultValue={props.player.character.tempHp || 0} min={0}
                                                      onChange={onTempHpEdit} value={tempHp}>
                                             <NumberInputField/>
@@ -861,7 +815,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                         </NumberInput>
                                     </HStack>
                                     <HStack>
-                                        <Text width='120px'>Max HP:</Text>
+                                        <Text width='90px'>Max HP:</Text>
                                         <NumberInput defaultValue={props.player.character.maxHp || 0} min={0}
                                                      onChange={onMaxHpEdit}>
                                             <NumberInputField/>
@@ -872,7 +826,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                         </NumberInput>
                                     </HStack>
                                     <HStack>
-                                        <Text width='120px'>AC:</Text>
+                                        <Text width='90px'>AC:</Text>
                                         <NumberInput defaultValue={props.player.character.ac || 0} min={0}
                                                      onChange={onAcEdit}>
                                             <NumberInputField/>
@@ -882,13 +836,12 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                             </NumberInputStepper>
                                         </NumberInput>
                                     </HStack>
-                                    <Button borderWidth='1px' borderRadius='lg' colorScheme='red' w='100%'
-                                            onClick={onDelete}>
-                                        <DeleteIcon/>LÖSCHEN
-                                    </Button>
+                                    <button className='init-btn init-btn--danger init-btn--block' onClick={onDelete}>
+                                        <DeleteIcon/> Löschen
+                                    </button>
                                 </VStack>
-                            </GridItem>
-                        </Grid>
+                            </div>
+                        </div>
                     </AccordionPanel>
                 }
             </AccordionItem>

@@ -9,6 +9,7 @@
     --card: #ffffff;
     --card-soft: #f4f4f4;
     --danger: #8a2b2b;
+    --success: #2f6f3e;
 
     display: flex;
     flex-wrap: wrap;
@@ -83,6 +84,23 @@
     color: #fff;
 }
 
+/* restrained green — positive (save health to sheets) */
+.init-btn--success {
+    color: var(--success, #2f6f3e);
+    border-color: var(--success, #2f6f3e);
+}
+
+.init-btn--success:hover {
+    background: var(--success, #2f6f3e);
+    color: #fff;
+}
+
+/* square icon-only button (arrows, add-row "+") */
+.init-btn--icon {
+    padding: 8px 10px;
+    min-width: 38px;
+}
+
 /* prev / next grouped as a single segmented control */
 .init-segmented {
     display: inline-flex;
@@ -101,8 +119,53 @@
     border-left: none;
 }
 
+.init-btn--block {
+    width: 100%;
+}
+
 /* footer button rows inside the modals reuse the same buttons */
 .init-modal-actions {
     display: flex;
     gap: 10px;
+}
+
+/* ---- expanded entry "additional info" panel ---- */
+.init-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.init-panel-card {
+    background: #fff;
+    border: 1px solid #8d8d8d;
+    border-radius: 6px;
+    padding: 12px 14px;
+}
+
+.init-panel-title {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5d5d5d;
+    border-bottom: 1px solid #cfcfcf;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+/* status toggles laid out in two compact columns */
+.init-states {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px 16px;
+}
+
+.init-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
 }
