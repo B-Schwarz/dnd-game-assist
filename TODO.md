@@ -83,3 +83,4 @@
 1. [ ] Unit tests
 2. [ ] Acceptance tests
 3. [ ] Update dependencies
+4. [ ] Update displayed version

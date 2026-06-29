@@ -56,13 +56,6 @@ everytime they're changed.
 
 ---
 
-## Spell List
-
-[ ] Create spells  
-[ ] Search for spells with different filter  
-
----
-
 ## Settings
 
 [X] A user should be able to change their password  
