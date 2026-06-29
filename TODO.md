@@ -63,7 +63,7 @@
 
 # Admin
 
-1. [ ] Add capability to set a users password (as admin)
+1. [x] Add capability to set a users password (as admin)
 2. [ ] Add a new menu called characters
 
 ## Characters

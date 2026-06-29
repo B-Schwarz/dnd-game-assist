@@ -57,6 +57,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/user        | `GET`  |                 `none`                 | `admin` | Returns a list with all users and their roles | `[user:User]` |
 | /api/user/admin  | `PUT`  | `userID:ObjectID`<br/>`admin:boolean`  | `admin` | Sets the role status                          | `none`        |
 | /api/user/master | `PUT`  | `userID:ObjectID`<br/>`master:boolean` | `admin` | Sets the role status                          | `none`        |
+| /api/user/password | `PUT` | `userID:ObjectID`<br/>`password:string` | `admin` | Sets another user's password (min 8 chars)   | `none`        |
 
 ## Initiative Board
 

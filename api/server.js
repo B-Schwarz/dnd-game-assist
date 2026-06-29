@@ -20,7 +20,7 @@ const {
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster, getMonster} = require("./monster");
 const {createEncounter, getEncounterList, saveEncounter, deleteEncounter} = require("./encounter");
-const {getUserList, setAdmin, setMaster} = require("./admin");
+const {getUserList, setAdmin, setMaster, setPassword} = require("./admin");
 const {getBookList, getBook} = require("./books");
 const path = require("path");
 
@@ -133,6 +133,7 @@ app.get('/api/me/admin/master', isAuth, isMasterOrAdmin, (req, res) => {
 app.get('/api/user', isAuth, isAdmin, getUserList)
 app.put('/api/user/admin', isAuth, isAdmin, setAdmin)
 app.put('/api/user/master', isAuth, isAdmin, setMaster)
+app.put('/api/user/password', isAuth, isAdmin, setPassword)
 
 //
 //  INITIATIVE
