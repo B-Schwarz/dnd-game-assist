@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {Color, DnDCharacter} from './dnd-character'
 import './character-sheet.css'
 
@@ -240,7 +240,37 @@ const CharacterSheet = (props: Props) => {
     )
 
     const attackRows = Math.max(6, (character.attacks?.length || 0) + 1)
-    const spellRows = Math.max(24, (character.spells?.length || 0) + 1)
+
+    // The prepared-spells table keeps natural row height and is filled with as
+    // many blank rows as fit its (page-height-driven) card, recomputed on resize.
+    const spellCardRef = useRef<HTMLDivElement>(null)
+    const [spellFillRows, setSpellFillRows] = useState(24)
+
+    useEffect(() => {
+        const card = spellCardRef.current
+        if (!card || typeof ResizeObserver === 'undefined') return
+
+        const compute = () => {
+            const table = card.querySelector('table')
+            const tbody = table?.querySelector('tbody')
+            const row = tbody?.querySelector('tr')
+            if (!table || !tbody || !row) return
+            const rowH = row.getBoundingClientRect().height
+            if (!rowH) return
+            const cardStyle = getComputedStyle(card)
+            const contentBottom = card.getBoundingClientRect().bottom - parseFloat(cardStyle.paddingBottom)
+            const avail = contentBottom - tbody.getBoundingClientRect().top
+            const fit = Math.max(1, Math.floor(avail / rowH))
+            setSpellFillRows((prev) => (prev === fit ? prev : fit))
+        }
+
+        compute()
+        const ro = new ResizeObserver(compute)
+        ro.observe(card)
+        return () => ro.disconnect()
+    }, [])
+
+    const spellRows = Math.max(spellFillRows, (character.spells?.length || 0) + 1)
 
     // current-HP percentage for the vitals HP bar
     const hpPct = (() => {
@@ -529,7 +559,7 @@ const CharacterSheet = (props: Props) => {
                             </div>
                         </div>
 
-                        <div className='dnd-card dnd-spellcard'>
+                        <div className='dnd-card dnd-spellcard' ref={spellCardRef}>
                             <div className='dnd-title'>{t('Cantrips & Prepared Spells', 'Zaubertricks & vorbereitete Zauber')}</div>
                             <table className='dnd-table dnd-table--ruled'>
                                 <thead>
@@ -598,7 +628,7 @@ const CharacterSheet = (props: Props) => {
                                       onChange={(e) => set('languages', e.target.value)}/>
                         </div>
 
-                        <div className='dnd-card'>
+                        <div className='dnd-card dnd-equipcard'>
                             <div className='dnd-title'>{t('Equipment', 'Ausrüstung')}</div>
                             <textarea rows={8} value={character.equipment || ''}
                                       onChange={(e) => set('equipment', e.target.value)}/>

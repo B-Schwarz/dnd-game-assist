@@ -816,7 +816,15 @@
     flex-direction: column;
 }
 
-.dnd-spellcard .dnd-table {
+/* equipment card grows so the right column reaches the bottom of the page,
+   pushing the coins card to the very bottom */
+.dnd-equipcard {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.dnd-equipcard > textarea {
     flex: 1 1 auto;
 }
 

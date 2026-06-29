@@ -32,8 +32,8 @@
 9. [x] Remove the tick from the C/R/M checkboxes
 10. [x] Increase the page height to match the first page
 11. [x] All checkboxes should be the same shape
-12. [ ] Extend the equipment box, so that the column reaches the end of the page
-13. [ ] Restore the old height of the Spell entries and make up the remaining space with new lines
+12. [x] Extend the equipment box, so that the column reaches the end of the page
+13. [x] Restore the old height of the Spell entries and make up the remaining space with new lines
 
 # Character List
 
