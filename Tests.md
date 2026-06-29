@@ -59,7 +59,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [ ] `updatePlayerData` deep-clones master, forces `isMaster:false` on every player entry, and advances `playerTurn` past hidden entries (cyclic `(j+i) % len` search).
 - [ ] `updatePlayerData` when **all** entries are hidden → `playerTurn` stays at the current index.
 - [ ] `updateMaster` replaces the matching entry by `turnId`, keeps `isMaster:true`, then runs `reorderDeadMonsters`.
-- [ ] `deleteMaster` removes by `turnId` and decrements `turn` when the removed `turnId < turn`. ⚠️ `turn` has no lower bound and can go negative.
+- [ ] `deleteMaster` removes the entry matching `turnId` and decrements `turn` (floored at 0) when the removed `turnId < turn`.
 - [ ] `deleteAllMaster` clears master/player, resets `round` and `turn`/`playerTurn`, resets `colorMarkerIndex`, and **shuffles** `colorMarkers` for the next session.
 - [ ] `sortPlayer` runs `setTurn` first, orders by initiative **desc**, ties broken by `turnId` **asc**, then runs `reorderDeadMonsters`.
 - [ ] `sortPlayer` coerces initiative via `Number(...)`; document behaviour for non-numeric/NaN values. ⚠️
@@ -89,7 +89,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [ ] `getCharacterList` excludes the requester's own characters (`$nin`) and returns only `_id`/`character`/`npc`; returns `[]` when the user owns everything.
 - [ ] `getOwnCharacterList` returns only the caller's characters (iterates `user.character`, includes NPCs).
 - [ ] `getNPCList` returns only the caller's `npc:true` characters.
-- [ ] `setNPC` toggles the `npc` flag; missing `charID` → 400. ⚠️ invalid id throws → 500 (inconsistent with 400/404 elsewhere).
+- [ ] `setNPC` toggles the `npc` flag; missing `charID` → 400; invalid/unknown id → 404.
 - [ ] `deleteCharacter` removes the doc and pulls it from **every** owning user; ⚠️ an invalid id still returns 200.
 - [ ] `deleteOwnCharacter` only affects the caller's char; a char not in the caller's array is a silent 200 no-op.
 - [ ] `getCharacter` (privileged) vs `getOwnCharacter` (ownership-checked via `isOwnedByUser`, exact `_id.toString()` match).
@@ -106,9 +106,9 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 
 ## API — Settings (`api/settings`)
 - [ ] `changeOwnPassword` requires both `currPass` and `newPass` (400 if either missing); rejects a wrong current password (401, via `findByCredentials`, case-insensitive lookup).
-- [ ] `changeOwnPassword` accepts **any** non-empty `newPass` (no length check — contrast with admin `setPassword`'s 8-char minimum). ⚠️
+- [ ] `changeOwnPassword` rejects a `newPass` shorter than 8 chars (400), matching admin `setPassword`.
 - [ ] `deleteOwnAccount` deletes the user and all of their characters, then destroys the session; works with zero characters; a `deleteMany` error is swallowed and the user is still deleted.
-- [ ] `deleteAccount` (admin) deletes a target user and their characters; missing `userID` → 400. ⚠️ unknown user → 500 (not handled gracefully).
+- [ ] `deleteAccount` (admin) deletes a target user and their characters; missing `userID` → 400; unknown user → 404.
 
 ## API — Books (`api/books`)
 - [ ] `getBookList` returns the file names in `books/pdf`; the directory is auto-created (recursive) if missing; empty dir → `[]`.
@@ -126,7 +126,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [ ] Monster `delete`/`save` with an invalid id → ⚠️ delete returns 200 anyway; save → 404.
 - [ ] Encounter: create / list / update / delete gated to master.
 - [ ] `createEncounter` is owned by `req.user._id`, defaults `name:'New Encounter'`, `encounter:[]`; `getEncounterList` is scoped to the caller; `saveEncounter` missing id → 400.
-- [ ] ⚠️ **`deleteEncounter` performs no ownership check — any master can delete any user's encounter** (also leaves a debug `console.log`). Pin current behaviour and flag for a fix.
+- [ ] `deleteEncounter` is scoped to the requester (`{_id, user}`): deleting an own encounter → 200; deleting another user's or an unknown encounter → 404.
 
 ## API — CORS / app wiring (`api/server.js`)
 - [ ] An `OPTIONS` preflight returns **204** before auth/static can reject it, with `Access-Control-Allow-Credentials: true`, `Allow-Methods: GET, POST, PUT, DELETE`, and `Allow-Origin` from `CORS_URL` (not `*`).

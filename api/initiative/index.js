@@ -75,10 +75,11 @@ const deleteMaster = (req, res) => {
     if (master.length > 0) {
         const turnId = req.params.id
         if (turnId) {
-            master = master.filter(m => Number(m.turn) !== Number(turnId))
+            // Entries are keyed by turnId (assigned in setTurn); filter on that.
+            master = master.filter(m => Number(m.turnId) !== Number(turnId))
         }
-        if (turnId < turn) {
-            turn -= 1
+        if (Number(turnId) < turn) {
+            turn = Math.max(0, turn - 1)
         }
     }
     updatePlayerData()

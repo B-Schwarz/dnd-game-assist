@@ -147,19 +147,20 @@ const createCharacter = async (req, res) => {
 const setNPC = async (req, res) => {
     const charID = req.body.charID
 
-    if (charID) {
-        await Character.findOne({
-            _id: mongoose.Types.ObjectId(charID)
-        })
-            .then((char) => {
-                char.npc = !char.npc
-                char.save()
-            })
-            .catch(() => res.sendStatus(500))
+    if (!charID) {
+        return res.sendStatus(400)
+    }
 
+    try {
+        const char = await Character.findById(charID)
+        if (!char) {
+            return res.sendStatus(404)
+        }
+        char.npc = !char.npc
+        await char.save()
         res.sendStatus(200)
-    } else {
-        res.sendStatus(400)
+    } catch (_) {
+        res.sendStatus(404)
     }
 }
 
