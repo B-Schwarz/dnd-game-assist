@@ -92,6 +92,9 @@ describe('encounter', () => {
         expect(after.encounter).toHaveLength(1)
         // An un-castable id rejects in findOneAndUpdate → 400.
         expect((await gm.put('/api/encounter').send({encounterID: 'bad-id', encounter: {encounter: []}})).statusCode).toBe(400)
+        // A missing id or a missing body → 400 (no 500 throw).
+        expect((await gm.put('/api/encounter').send({encounter: {encounter: []}})).statusCode).toBe(400)
+        expect((await gm.put('/api/encounter').send({encounterID: enc._id.toString()})).statusCode).toBe(400)
     })
 
     test('deleteEncounter is scoped to the owner: own → 200, another user’s → 404', async () => {

@@ -151,12 +151,10 @@ describe('deleteAllMaster', () => {
         expect(playerView().turn).toBe(0)
     })
 
-    // NOTE: current behaviour — deleteAllMaster does NOT reset `round`. Pinned
-    // here so a future "reset round on board clear" change is a conscious one.
-    test('does not reset round (current behaviour)', () => {
+    test('resets round to 1 on board clear', () => {
         init.setRound({body: {round: 5}}, mockRes())
         init.deleteAllMaster({}, mockRes())
-        expect(roundValue()).toBe(5)
+        expect(roundValue()).toBe(1)
     })
 })
 
@@ -169,6 +167,17 @@ describe('sortPlayer', () => {
         ])
         init.sortPlayer({}, mockRes())
         expect(masterView().player.map(p => p.name)).toEqual(['high', 'mid', 'low'])
+    })
+
+    test('breaks initiative ties by turnId ascending (turn order)', () => {
+        // Add in order A, B, C all on initiative 10 → turnIds 0,1,2.
+        setBoard([
+            mkPlayer({name: 'A', initiative: 10}),
+            mkPlayer({name: 'B', initiative: 10}),
+            mkPlayer({name: 'C', initiative: 10}),
+        ])
+        init.sortPlayer({}, mockRes())
+        expect(masterView().player.map(p => p.name)).toEqual(['A', 'B', 'C'])
     })
 
     test('pushes dead monsters to the bottom regardless of initiative', () => {
@@ -344,12 +353,11 @@ describe('round get/set', () => {
         expect(roundValue()).toBe(-3)
     })
 
-    // NOTE: Number('abc') is NaN but does not throw, so the catch never fires —
-    // setRound returns 200 and stores NaN rather than rejecting with 400.
-    test('a non-numeric round is NOT rejected; it stores NaN and returns 200 (current behaviour)', () => {
+    test('a non-numeric round is rejected with 400 and leaves round unchanged', () => {
+        init.setRound({body: {round: 4}}, mockRes())
         const res = mockRes()
         init.setRound({body: {round: 'abc'}}, res)
-        expect(res.statusCode).toBe(200)
-        expect(Number.isNaN(roundValue())).toBe(true)
+        expect(res.statusCode).toBe(400)
+        expect(roundValue()).toBe(4)
     })
 })

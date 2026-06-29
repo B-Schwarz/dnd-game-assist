@@ -18,6 +18,10 @@ const setAdmin = async (req, res) => {
     const userID = req.body.userID
     const admin = req.body.admin
 
+    if (!userID) {
+        return res.sendStatus(400)
+    }
+
     await User.findOneAndUpdate({
         _id: userID
     }, {admin: admin})
@@ -33,6 +37,10 @@ const setAdmin = async (req, res) => {
 const setMaster = async (req, res) => {
     const userID = req.body.userID
     const master = req.body.master
+
+    if (!userID) {
+        return res.sendStatus(400)
+    }
 
     await User.findOneAndUpdate({
         _id: userID

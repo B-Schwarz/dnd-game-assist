@@ -20,6 +20,10 @@ const saveCharacter = async (req, res) => {
     const char = req.body.character
     const charID = req.body.charID
 
+    if (!charID) {
+        return res.sendStatus(400)
+    }
+
     try {
         await preserveHp(char, charID)
         await Character.findOneAndUpdate({
@@ -34,6 +38,10 @@ const saveCharacter = async (req, res) => {
 const saveOwnCharacter = async (req, res) => {
     const char = req.body.character
     const charID = req.body.charID
+
+    if (!charID) {
+        return res.sendStatus(400)
+    }
 
     if (isOwnedByUser(req.user.character, charID)) {
         try {

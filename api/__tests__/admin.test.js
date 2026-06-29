@@ -33,7 +33,7 @@ describe('getUserList', () => {
 })
 
 describe('setAdmin / setMaster', () => {
-    test('flip the respective flag; an invalid userID → 400', async () => {
+    test('flip the respective flag; missing or invalid userID → 400', async () => {
         await seedAdmin()
         const u = await makeUser({name: 'target'})
         expect((await admin.put('/api/user/admin').send({userID: u._id.toString(), admin: true})).statusCode).toBe(200)
@@ -41,6 +41,8 @@ describe('setAdmin / setMaster', () => {
         expect((await admin.put('/api/user/master').send({userID: u._id.toString(), master: true})).statusCode).toBe(200)
         expect((await User.findById(u._id)).master).toBe(true)
         expect((await admin.put('/api/user/admin').send({userID: 'not-an-id', admin: true})).statusCode).toBe(400)
+        expect((await admin.put('/api/user/admin').send({admin: true})).statusCode).toBe(400)
+        expect((await admin.put('/api/user/master').send({master: true})).statusCode).toBe(400)
     })
 })
 

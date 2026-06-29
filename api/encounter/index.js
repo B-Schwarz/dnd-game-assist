@@ -20,6 +20,12 @@ const saveEncounter = async (req, res) => {
     const encounterID = req.body.encounterID
     const name = req.body.name
 
+    // Guard the id and body (reading encounter.encounter on a missing body
+    // would otherwise throw → 500).
+    if (!encounterID || !encounter) {
+        return res.sendStatus(400)
+    }
+
     Encounter.findOneAndUpdate({
         _id: encounterID
     }, {

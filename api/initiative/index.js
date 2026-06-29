@@ -64,6 +64,7 @@ const deleteAllMaster = (req, res) => {
     turn = 0
     player = []
     playerTurn = 0
+    round = 1
     colorMarkerIndex = 0
     colorMarkers = _.shuffle(colorMarkers)
     res.sendStatus(200)
@@ -135,12 +136,13 @@ const addMaster = (req, res) => {
 // REQUIRES MASTER
 const sortPlayer = (req, res) => {
     setTurn()
+    // Initiative descending; ties broken by turnId ascending (turn order).
     master = master.sort((f, s) => {
-        if (Number(s.initiative) < Number(f.initiative) || (Number(s.initiative) === Number(f.initiative) && Number(s.turn) < Number(f.turn))) {
-            return -1
-        } else {
-            return 1
+        const byInitiative = Number(s.initiative) - Number(f.initiative)
+        if (byInitiative !== 0) {
+            return byInitiative
         }
+        return Number(f.turnId) - Number(s.turnId)
     })
 
     reorderDeadMonsters()
@@ -202,15 +204,14 @@ const reorderPlayer = (req, res) => {
 
 // REQUIES MASTER
 const setRound = (req, res) => {
-    let r = req.body.round
+    const r = Number(req.body.round)
 
-    try {
-        r = Number(r)
-        round = r
-        res.sendStatus(200)
-    } catch (_) {
-        res.sendStatus(400)
+    // Number(...) never throws, so reject NaN explicitly instead of storing it.
+    if (Number.isNaN(r)) {
+        return res.sendStatus(400)
     }
+    round = r
+    res.sendStatus(200)
 }
 
 const getRound = (req, res) => {

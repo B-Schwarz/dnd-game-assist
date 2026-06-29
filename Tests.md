@@ -60,8 +60,8 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `updatePlayerData` when **all** entries are hidden → `playerTurn` stays at the current index.
 - [x] `updateMaster` replaces the matching entry by `turnId`, keeps `isMaster:true`, then runs `reorderDeadMonsters`.
 - [x] `deleteMaster` removes the entry matching `turnId` and decrements `turn` (floored at 0) when the removed `turnId < turn`.
-- [x] `deleteAllMaster` clears master/player, resets `turn`/`playerTurn` and `colorMarkerIndex`, and **shuffles** `colorMarkers`. ⚠️ it does **not** reset `round` (board-clear keeps the round counter).
-- [x] `sortPlayer` runs `setTurn` first, orders by initiative **desc**, then runs `reorderDeadMonsters`. ⚠️ the tie-break reads a non-existent `.turn` field (should be `turnId`), so equal-initiative ties are not reliably ordered.
+- [x] `deleteAllMaster` clears master/player, resets `turn`/`playerTurn`, `round` (to 1) and `colorMarkerIndex`, and **shuffles** `colorMarkers`.
+- [x] `sortPlayer` runs `setTurn` first, orders by initiative **desc**, ties broken by `turnId` **asc**, then runs `reorderDeadMonsters`.
 - [ ] `sortPlayer` coerces initiative via `Number(...)`; document behaviour for non-numeric/NaN values. ⚠️
 - [x] `nextTurn` advances, wraps to 0 and increments `round` at the end; no-op on an empty board.
 - [x] `prevTurn` steps back, wraps to last (`max(0, len-1)`) and decrements `round` (floored at 0); no-op on an empty board.
@@ -73,12 +73,12 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `movePlayer` rejects moving index 0 up, the last index down, out-of-range index, or an invalid direction (400), and does not update on rejection.
 - [x] `reorderPlayer` moves `from`→`to`; turn pointer follows the acting creature; runs `reorderDeadMonsters` then `updatePlayerData`; `from === to` is an accepted no-op.
 - [x] `reorderPlayer` requires integer indices in `[0, master.length)` — otherwise 400.
-- [x] `setRound` stores `Number(r)`; negatives are accepted. ⚠️ a non-numeric value is **not** rejected — `Number('abc')` is `NaN` but does not throw, so it returns 200 and stores `NaN` (the 400 catch is dead code).
+- [x] `setRound` stores `Number(r)` (negatives accepted) and rejects a non-numeric value with 400, leaving `round` unchanged.
 - [x] `getRound` returns `{round}` (no master gate).
 
 ## API — Character (`api/character`)
 - [x] `createCharacter` creates a Character doc, returns its `_id`, links it to `req.user.character`, with default `name:''` and `npc:false`.
-- [x] `saveCharacter` / `saveOwnCharacter` persist the opaque `character` object; an **invalid** `charID` → 404, while a **missing** `charID` matches nothing and returns 200. ⚠️ missing id is not validated.
+- [x] `saveCharacter` / `saveOwnCharacter` persist the opaque `character` object; a **missing** `charID` → 400, an **invalid** `charID` → 404.
 - [x] **HP decoupling:** `preserveHp` keeps the stored current HP when saving the rest of the sheet; safe when no existing doc and when the existing doc has no `hp`.
 - [x] `saveOwnCharacter` rejects a character the caller doesn't own → 401 (ownership via `isOwnedByUser`).
 - [x] `saveCharacterHp` / `saveOwnCharacterHp` update only HP; missing `charID` → 400, invalid → 404; `saveOwnCharacterHp` on an unowned char → 401.
@@ -100,7 +100,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 
 ## API — Admin (`api/admin`)
 - [x] `getUserList` returns `_id`/`name`/`master`/`admin`/`character` only (no password/session).
-- [x] `setAdmin` / `setMaster` flip the respective flag; an **invalid** `userID` → 400. ⚠️ a missing `userID` matches nothing and returns 200.
+- [x] `setAdmin` / `setMaster` flip the respective flag; a missing or invalid `userID` → 400.
 - [x] **`setPassword`** sets another user's password (hashed via the save hook); afterwards login works with the new password and fails with the old one.
 - [x] `setPassword` rejects passwords shorter than 8 chars or empty/missing (400) and a missing/unknown target user (404).
 
@@ -125,7 +125,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `getMonsterList` is sorted by `monster.name` ascending and omits `__v`.
 - [x] Monster `delete`/`save` with an invalid id → ⚠️ delete returns 200 anyway; save → 404.
 - [x] Encounter: create / list / update / delete gated to master.
-- [x] `createEncounter` is owned by `req.user._id`, defaults `name:'New Encounter'`, `encounter:[]`; `getEncounterList` is scoped to the caller; `saveEncounter` with an **invalid** id → 400. ⚠️ a missing `encounter` body throws → 500, and a missing id matches nothing → 200.
+- [x] `createEncounter` is owned by `req.user._id`, defaults `name:'New Encounter'`, `encounter:[]`; `getEncounterList` is scoped to the caller; `saveEncounter` with a missing id, missing body, or invalid id → 400.
 - [x] `deleteEncounter` is scoped to the requester (`{_id, user}`): deleting an own encounter → 200; deleting another user's or an unknown encounter → 404.
 
 ## API — CORS / app wiring (`api/server.js`)

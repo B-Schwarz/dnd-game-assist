@@ -52,12 +52,11 @@ describe('saveCharacter + preserveHp', () => {
         expect(after.character.hp).toBe(7) // HP preserved, not 999
     })
 
-    test('invalid charID → 404; a missing charID matches nothing and returns 200 (current behaviour)', async () => {
+    test('missing charID → 400; invalid charID → 404', async () => {
         await seedActors()
+        expect((await gm.post('/api/char').send({character: {}})).statusCode).toBe(400)
         // An un-castable id throws in preserveHp → 404.
         expect((await gm.post('/api/char').send({charID: 'not-an-id', character: {}})).statusCode).toBe(404)
-        // A missing charID casts to nothing, updates no document, and returns 200.
-        expect((await gm.post('/api/char').send({character: {}})).statusCode).toBe(200)
     })
 
     test('a plain user cannot use the privileged save (401)', async () => {
