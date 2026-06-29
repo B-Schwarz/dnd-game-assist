@@ -43,3 +43,41 @@
 # Initiative
 
 1. [x] Add a button to save the current health of the players to their character sheet. The current health should update for the character sheet automatically by polling for a change every 10 seconds
+2. [x] Redesign the buttons to match the vibe of the character sheet (modern, sleek)
+3. [x] Change the vorheriger/nächster buttons to arrows
+4. [x] Change the chromatic of the leben speicher to green and put it left of board löschen
+5. [x] Modernize the additional info of selected entities
+6. [x] Add hotkeys, so that by pressing J the previous character is selected and with k the next one
+7. [x] The conditions Rage and Konzentraion should be on their own line at the bottom, as they are the most common
+8. [x] When the additional infos of one character is open, it should close when the turn is changed and the characters wohs turn it is should have its additional info opened
+9. [x] Put the NPC Tag at the beginning of the line
+10. [x] ~~A player should be able to click on their own character and toggle shield (with an input field to set a number) and~~ add the number behind the AC in paranthesis in this style: AC: 14 (+2). ~~Also they should be able to toggle concentraion and rage.~~ A DM should also be able to set the shield
+    - Implemented variation: the **DM** sets the shield (toggle + value), concentration and rage from the entry's detail panel. The shield bonus is shown behind the AC everywhere as `AC: 14 (+2)` (visible to players too). Player self-service editing of their own character (clicking their own row to toggle shield/concentration/rage) was **deferred** — it needs a new ownership-checked self endpoint, since the initiative board is currently master-write only.
+11. [x] The additional info should also be able to modify the initiative value
+12. [x] in the additional info the dm should be able to share the HP of an npc with the players (default is hidden)
+13. [x] a dead monster should be greyed out and at the bottom of the initiative and its turn should be skipped automatically. a dead player character should stay at the position and the background should be red. a dead npc should also be greyed out, but stay at its current position in the order.
+14. [x] a hidden npcs background should be the same colour as the button
+15. [x] swap out the arrows that change the order to an area that can be dragged to change the area that way.
+16. [x] the color of the character should be the first item in the row.
+17. [x] the tooltips for the conditions should contain a brief description to what the effect is
+
+# Admin
+
+1. [ ] Add capability to set a users password (as admin)
+2. [ ] Add a new menu called characters
+
+## Characters
+
+1. [ ] Button to export all characters
+2. [ ] Import characters
+3. [ ] Reassign character sheets
+
+## Books
+
+1. [ ] Add/remove books
+
+# Generic
+
+1. [ ] Unit tests
+2. [ ] Acceptance tests
+3. [ ] Update dependencies
