@@ -704,7 +704,7 @@
     border-bottom: 1px solid var(--line);
 }
 
-.dnd-table input {
+.dnd-table input:not([type="checkbox"]) {
     border-bottom: none !important;
 }
 
