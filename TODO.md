@@ -72,10 +72,11 @@
 2. [x] Import characters
 3. [x] Reassign character sheets
 4. [x] NPC should not be reassignable
+5. [x] Export singular characters
 
 ## Books
 
-1. [ ] Add/remove books
+1. [x] Add/remove books
 
 # Generic
 

@@ -11,6 +11,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.2",
     "mongoose": "^6.11.3",
+    "multer": "^2.2.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

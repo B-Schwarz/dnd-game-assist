@@ -22,7 +22,7 @@ const {
 const {createMonster, getMonsterList, saveMonster, deleteMonster, getMonster} = require("./monster");
 const {createEncounter, getEncounterList, saveEncounter, deleteEncounter} = require("./encounter");
 const {getUserList, setAdmin, setMaster, setPassword} = require("./admin");
-const {getBookList, getBook} = require("./books");
+const {getBookList, uploadBook, deleteBook, bookUpload} = require("./books");
 const path = require("path");
 
 const port = 4000;
@@ -38,6 +38,12 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Credentials", "true")
+
+    // Answer CORS preflight requests here, before auth/static middleware can
+    // reject them (a preflight carries no credentials).
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204)
+    }
 
     next();
 });
@@ -178,6 +184,8 @@ app.delete('/api/encounter/:id', isAuth, isMaster, deleteEncounter)
 //  BOOKS
 //
 app.get('/api/books', isAuth, getBookList)
+app.post('/api/books', isAuth, isAdmin, bookUpload.single('book'), uploadBook)
+app.delete('/api/books/:name', isAuth, isAdmin, deleteBook)
 app.use('/api/books/', isAuth, express.static('books/pdf'))
 
 const start = async () => {

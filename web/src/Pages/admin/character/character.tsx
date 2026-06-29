@@ -58,20 +58,29 @@ const App = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const download = (data: unknown, filename: string) => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'})
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
     const exportAll = () => {
         axios.get(prefix + '/api/char/export')
-            .then((r) => {
-                const blob = new Blob([JSON.stringify(r.data, null, 2)], {type: 'application/json'})
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `characters-${new Date().toISOString().slice(0, 10)}.json`
-                a.click()
-                URL.revokeObjectURL(url)
-            })
+            .then((r) => download(r.data, `characters-${new Date().toISOString().slice(0, 10)}.json`))
             .catch(() => {
                 toast({title: 'Export fehlgeschlagen', status: 'error', duration: 3000, isClosable: true})
             })
+    }
+
+    // Export a single character in the same shape as the bulk export, so it can
+    // be re-imported with the same Import button.
+    const exportSingle = (c: ExportedCharacter) => {
+        const safe = (c.character?.name || 'character').replace(/[^a-z0-9-_]+/gi, '_')
+        download([c], `character-${safe}.json`)
     }
 
     const onImportFile = (file: File) => {
@@ -167,10 +176,14 @@ const App = () => {
                                             )}
                                         </Td>
                                         <Td>
-                                            {!c.npc &&
-                                                <Button size='sm' isDisabled={!assignSel[c._id]}
-                                                        onClick={() => reassign(c._id)}>Zuweisen</Button>
-                                            }
+                                            <HStack spacing='0.5rem'>
+                                                {!c.npc &&
+                                                    <Button size='sm' isDisabled={!assignSel[c._id]}
+                                                            onClick={() => reassign(c._id)}>Zuweisen</Button>
+                                                }
+                                                <Button size='sm' variant='outline'
+                                                        onClick={() => exportSingle(c)}>Export</Button>
+                                            </HStack>
                                         </Td>
                                     </Tr>
                                 ))
