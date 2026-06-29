@@ -36,6 +36,7 @@ const App = () => {
     const [round, setRound] = useState<number>(1)
     const [turnBtnActive] = useState<boolean>(false)
     const [turn, setTurn] = useState(0)
+    const [accordionIndex, setAccordionIndex] = useState<number>(-1)
 
     const [updatePing, setUpdatePing] = useState(0)
     const updateTimer = useRef(null)
@@ -199,6 +200,12 @@ const App = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMaster, updatePing])
 
+    // When the turn changes, collapse whatever entry was open and expand the
+    // entry whose turn it now is, so its additional info is shown automatically.
+    useEffect(() => {
+        setAccordionIndex(turn)
+    }, [turn])
+
     // Master hotkeys: J steps to the previous turn, K to the next. Ignored while
     // typing in a field or when a modifier is held.
     useEffect(() => {
@@ -259,7 +266,8 @@ const App = () => {
                     <Divider marginTop='1rem'/>
                 </VStack>
             <Center marginTop='2rem'>
-                <Accordion allowToggle width='80%'>
+                <Accordion allowToggle width='80%' index={accordionIndex}
+                           onChange={(i) => setAccordionIndex(i as number)}>
                     {
                         player.map((m, i) => (
                             <InitiaveEntry player={m} statusEffects={m.statusEffects} index={i} first={i === 0} last={i === player.length - 1} isMaster={isMaster} isTurn={i === turn} update={update} key={i}/>

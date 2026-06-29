@@ -47,6 +47,8 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
 
     const npc = props.player.npc || false
     const [hidden, setHidden] = useState(props.player.hidden || false)
+    const [shareHp, setShareHp] = useState(props.player.shareHp || false)
+    const [initiative, setInitiative] = useState(props.player.initiative ?? 0)
 
     const [blind, setBlind] = useState(false)
     const [poison, setPoison] = useState(false)
@@ -101,6 +103,18 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     const onAcEdit = (val: string) => {
         props.player.character.ac = val
         setAc(val)
+        savePlayer()
+    }
+
+    const onInitiativeEdit = (val: string) => {
+        props.player.initiative = Number(val)
+        setInitiative(Number(val))
+        savePlayer()
+    }
+
+    const onShareHpToggle = (val: boolean) => {
+        props.player.shareHp = val
+        setShareHp(val)
         savePlayer()
     }
 
@@ -546,6 +560,14 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
         setColorMarker(props.player.colorMarker || ColorMarkerEnum.NONE)
     }, [props.player.colorMarker]);
 
+    useEffect(() => {
+        setShareHp(props.player.shareHp || false)
+    }, [props.player.shareHp]);
+
+    useEffect(() => {
+        setInitiative(props.player.initiative ?? 0)
+    }, [props.player.initiative]);
+
     if (!props.isMaster && hidden) {
         return (
             <></>
@@ -553,7 +575,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     }
 
     function writePlayerHP() {
-        if (!npc || props.isMaster) {
+        if (!npc || props.isMaster || shareHp) {
             return (
                 <React.Fragment>
                     {divider()}
@@ -566,7 +588,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     }
 
     function createHPBar() {
-        if (!npc || props.isMaster) {
+        if (!npc || props.isMaster || shareHp) {
             return (
                 <React.Fragment>
                     <Progress size='sm' colorScheme='yellow'
@@ -640,12 +662,26 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     return (
         <>
             <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
-                           padding='0.4rem 0.75rem' background={(props.isTurn) ? '#fff9e1' : '#fafafa'}
+                           padding='0.4rem 0.75rem'
+                           background={(props.isTurn) ? '#fff9e1' : (hidden ? 'purple.100' : '#fafafa')}
                            borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
                 <ButtonGroup isAttached w='100%'>
                     {props.isMaster && createHideButton()}
                     <AccordionButton _expanded={props.isMaster ? {bg: '#ebebeb'} : undefined}
                                      style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
+                        {
+                            colorMarker !== ColorMarkerEnum.NONE &&
+                            <><Badge variant='solid' bg={getColor(colorMarker)}
+                                     textColor={getColor(colorMarker)}
+                                     borderColor='black' borderWidth='1px'
+                                     marginRight='0.5rem'
+                                     width='2rem'>_</Badge></>
+                        }
+                        {npc &&
+                            <>
+                                <Badge colorScheme='green'>NPC</Badge><Box marginRight='0.5rem'/>
+                            </>
+                        }
                         {write('', props.player.character.name!)}
                         {writePlayerHP()}
                         {hidden &&
@@ -653,19 +689,6 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                 <Box marginLeft='0.5rem'/><Badge colorScheme='teal'>VERSTECKT</Badge><Box
                                 marginRight='0.5rem'/>
                             </>
-                        }
-                        {npc &&
-                            <>
-                                <Box marginLeft='0.5rem'/><Badge colorScheme='green'>NPC</Badge><Box
-                                marginRight='0.5rem'/>
-                            </>
-                        }
-                        {
-                            colorMarker !== ColorMarkerEnum.NONE ? <Badge variant='solid' bg={getColor(colorMarker)}
-                                                                          textColor={getColor(colorMarker)}
-                                                                          borderColor='black' borderWidth='1px'
-                                                                          marginLeft='0.5rem' marginRight='0.5rem'
-                                                                          width='2rem'>_</Badge> : <></>
                         }
                         {dead && getDeadIcon()}
                         {effects}
@@ -703,8 +726,10 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                     <Switch size='sm' onChange={() => setHex(!hex)} isChecked={hex}>Hex</Switch>
                                     <Switch size='sm' onChange={() => setHexblade(!hexblade)} isChecked={hexblade}>Hexblade</Switch>
                                     <Switch size='sm' onChange={() => setUnarmed(!unarmed)} isChecked={unarmed}>Unbewaffnet</Switch>
-                                    <Switch size='sm' onChange={() => setConcentration(!concentration)} isChecked={concentration}>Konzentration</Switch>
+                                </div>
+                                <div className='init-states-primary'>
                                     <Switch size='sm' onChange={() => setRage(!rage)} isChecked={rage}>Rage</Switch>
+                                    <Switch size='sm' onChange={() => setConcentration(!concentration)} isChecked={concentration}>Konzentration</Switch>
                                 </div>
                             </div>
 
@@ -836,6 +861,23 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                             </NumberInputStepper>
                                         </NumberInput>
                                     </HStack>
+                                    <HStack>
+                                        <Text width='90px'>Initiative:</Text>
+                                        <NumberInput min={0} onChange={onInitiativeEdit} value={initiative}>
+                                            <NumberInputField/>
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper/>
+                                                <NumberDecrementStepper/>
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HStack>
+                                    {npc &&
+                                        <HStack justifyContent='space-between'>
+                                            <Text width='90px'>HP teilen:</Text>
+                                            <Switch isChecked={shareHp}
+                                                    onChange={(evt) => onShareHpToggle(evt.currentTarget.checked)}/>
+                                        </HStack>
+                                    }
                                     <button className='init-btn init-btn--danger init-btn--block' onClick={onDelete}>
                                         <DeleteIcon/> Löschen
                                     </button>

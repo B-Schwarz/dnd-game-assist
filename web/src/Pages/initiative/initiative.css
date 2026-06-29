@@ -163,6 +163,16 @@
     gap: 9px 16px;
 }
 
+/* the two most common conditions sit on their own row at the bottom */
+.init-states-primary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #cfcfcf;
+}
+
 .init-actions {
     display: flex;
     flex-direction: column;

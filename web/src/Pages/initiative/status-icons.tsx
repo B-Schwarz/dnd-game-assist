@@ -1,5 +1,5 @@
 import {StatusEffectsEnum} from "./status-effects.enum";
-import {Box, Icon, Tooltip} from "@chakra-ui/react";
+import {Box, Icon, Text, Tooltip} from "@chakra-ui/react";
 import {IoArrowDownSharp, IoEarOutline, IoEyeOffSharp, IoWaterSharp} from "react-icons/io5";
 import React from "react";
 import {
@@ -21,225 +21,61 @@ import {
     GiBrain
 } from "react-icons/gi";
 
-const prone = (
-    <React.Fragment key='prone'>
+// A condition icon with a tooltip that shows the name plus a brief description
+// of what the effect does (German, matching the rest of the board UI).
+const makeIcon = (key: string, IconComp: any, color: string, name: string, description: string) => (
+    <React.Fragment key={key}>
         <Box marginLeft='0.5rem'/>
-        <Tooltip label='Liegend' hasArrow size='md' placement='top'>
+        <Tooltip
+            label={<><Text fontWeight='bold'>{name}</Text><Text fontSize='sm'>{description}</Text></>}
+            hasArrow size='md' placement='top'>
             <span>
-                <Icon as={GiBootStomp} color='red'/>
+                <Icon as={IconComp} color={color}/>
             </span>
         </Tooltip>
     </React.Fragment>
 )
 
-const blind = (
-    <React.Fragment key='blind'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Blind' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={IoEyeOffSharp} color='purple'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const poison = (
-    <React.Fragment key='poison'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Vergifted' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={IoWaterSharp} color='green'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const charmed = (
-    <React.Fragment key='charmed'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Bezaubert' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiCharm} color="#ff3dda"/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const deafened = (
-    <React.Fragment key='deafened'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Taub' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={IoEarOutline} color='purple'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const frightened = (
-    <React.Fragment key='frightened'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Verängstigt' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiChicken} color='brown'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const grappled = (
-    <React.Fragment key='grappled'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Gepackt' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiHook} color='purple'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const incapacitated = (
-    <React.Fragment key='incapacitated'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Kampfunfähig' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={IoArrowDownSharp} color='purple'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const invisible = (
-    <React.Fragment key='invisible'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Unsichtbar' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiInvisible} color='blue'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const paralyzed = (
-    <React.Fragment key='paralyzed'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Gelähmt' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiThunderStruck} color='orange'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const petrified = (
-    <React.Fragment key='petrified'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Versteinert' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiStoneBlock} color='gray'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const restrained = (
-    <React.Fragment key='restrained'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Festgesetzt' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiSpiderWeb} color='purple'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const stunned = (
-    <React.Fragment key='stunned'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Betäubt' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiKnockedOutStars} color='orange'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const unconscious = (
-    <React.Fragment key='unconscious'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Bewusstlos' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiKnockout} color='darkred'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const hex = (
-    <React.Fragment key='hex'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label='Hex' hasArrow size='md' placement='top'>
-            <span>
-                <Icon as={GiPentagramRose} color='darkred'/>
-            </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const hexblade = (
-    <React.Fragment key='unconscious'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label="Hexblade's Curse" hasArrow size='md' placement='top'>
-        <span>
-            <Icon as={GiPentacle} color='purple'/>
-        </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const unarmed = (
-    <React.Fragment key='unarmed'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label="Unbewaffnet" hasArrow size='md' placement='top'>
-        <span>
-            <Icon as={GiDropWeapon} color='red'/>
-        </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const dead = (
-    <React.Fragment key='unarmed'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label="Tot" hasArrow size='md' placement='top'>
-        <span>
-            <Icon as={GiChewedSkull} color='red'/>
-        </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const rage = (
-    <React.Fragment key='unarmed'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label="Rage" hasArrow size='md' placement='top'>
-        <span>
-            <Icon as={GiEnrage} color='red'/>
-        </span>
-        </Tooltip>
-    </React.Fragment>
-)
-
-const concentration = (
-    <React.Fragment key='unarmed'>
-        <Box marginLeft='0.5rem'/>
-        <Tooltip label="Konzentration" hasArrow size='md' placement='top'>
-        <span>
-            <Icon as={GiBrain} color='green'/>
-        </span>
-        </Tooltip>
-    </React.Fragment>
-)
+const prone = makeIcon('prone', GiBootStomp, 'red', 'Liegend',
+    'Angriffe aus der Nähe gegen die Kreatur haben Vorteil, Fernangriffe Nachteil; eigene Angriffe mit Nachteil.')
+const blind = makeIcon('blind', IoEyeOffSharp, 'purple', 'Blind',
+    'Kann nicht sehen. Angriffe gegen sie mit Vorteil, eigene Angriffe mit Nachteil.')
+const poison = makeIcon('poison', IoWaterSharp, 'green', 'Vergiftet',
+    'Nachteil auf Angriffswürfe und Fähigkeitsproben.')
+const charmed = makeIcon('charmed', GiCharm, '#ff3dda', 'Bezaubert',
+    'Kann den Bezaubernden nicht angreifen; dieser hat Vorteil bei sozialen Proben.')
+const deafened = makeIcon('deafened', IoEarOutline, 'purple', 'Taub',
+    'Kann nicht hören und verfehlt jede Probe, die Hören erfordert.')
+const frightened = makeIcon('frightened', GiChicken, 'brown', 'Verängstigt',
+    'Nachteil auf Proben und Angriffe, solange die Quelle der Furcht sichtbar ist; kann sich ihr nicht nähern.')
+const grappled = makeIcon('grappled', GiHook, 'purple', 'Gepackt',
+    'Bewegungsrate ist 0. Endet, wenn der Packende handlungsunfähig wird.')
+const incapacitated = makeIcon('incapacitated', IoArrowDownSharp, 'purple', 'Kampfunfähig',
+    'Kann keine Aktionen oder Reaktionen ausführen.')
+const invisible = makeIcon('invisible', GiInvisible, 'blue', 'Unsichtbar',
+    'Nicht zu sehen. Angriffe gegen sie mit Nachteil, eigene Angriffe mit Vorteil.')
+const paralyzed = makeIcon('paralyzed', GiThunderStruck, 'orange', 'Gelähmt',
+    'Handlungsunfähig, kann sich nicht bewegen oder sprechen. Treffer aus der Nähe sind kritische Treffer.')
+const petrified = makeIcon('petrified', GiStoneBlock, 'gray', 'Versteinert',
+    'In Stein verwandelt: handlungsunfähig, resistent gegen jeden Schaden, immun gegen Gift und Krankheit.')
+const restrained = makeIcon('restrained', GiSpiderWeb, 'purple', 'Festgesetzt',
+    'Bewegungsrate 0. Angriffe gegen sie mit Vorteil, eigene mit Nachteil; Nachteil auf GES-Rettungswürfe.')
+const stunned = makeIcon('stunned', GiKnockedOutStars, 'orange', 'Betäubt',
+    'Handlungsunfähig, kann sich nicht bewegen. Angriffe gegen sie haben Vorteil.')
+const unconscious = makeIcon('unconscious', GiKnockout, 'darkred', 'Bewusstlos',
+    'Handlungsunfähig und liegend. Treffer aus der Nähe sind kritische Treffer.')
+const hex = makeIcon('hex', GiPentagramRose, 'darkred', 'Hex',
+    'Zauber Hex: zusätzlicher Schaden und Nachteil auf Proben eines gewählten Attributs.')
+const hexblade = makeIcon('hexblade', GiPentacle, 'purple', "Hexblade's Curse",
+    'Verflucht: Bonus-Schaden gegen das Ziel und erweiterter kritischer Trefferbereich.')
+const unarmed = makeIcon('unarmed', GiDropWeapon, 'red', 'Unbewaffnet',
+    'Keine Waffe ausgerüstet.')
+const dead = makeIcon('dead', GiChewedSkull, 'red', 'Tot',
+    'Die Kreatur ist tot.')
+const rage = makeIcon('rage', GiEnrage, 'red', 'Rage',
+    'Wut des Barbaren: Bonus-Nahkampfschaden und Resistenz gegen physischen Schaden.')
+const concentration = makeIcon('concentration', GiBrain, 'green', 'Konzentration',
+    'Hält einen Konzentrationszauber aufrecht; bei Schaden ist eine Konstitutions-Rettung nötig.')
 
 export const getIcon = (effect: StatusEffectsEnum) => {
 
