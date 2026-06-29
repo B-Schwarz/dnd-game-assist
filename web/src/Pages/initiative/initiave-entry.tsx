@@ -49,6 +49,8 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     const [hidden, setHidden] = useState(props.player.hidden || false)
     const [shareHp, setShareHp] = useState(props.player.shareHp || false)
     const [initiative, setInitiative] = useState(props.player.initiative ?? 0)
+    const [shield, setShield] = useState(props.player.shield ?? 0)
+    const [shieldActive, setShieldActive] = useState(props.player.shieldActive || false)
 
     const [blind, setBlind] = useState(false)
     const [poison, setPoison] = useState(false)
@@ -116,6 +118,27 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
         props.player.shareHp = val
         setShareHp(val)
         savePlayer()
+    }
+
+    const onShieldToggle = (val: boolean) => {
+        props.player.shieldActive = val
+        setShieldActive(val)
+        savePlayer()
+    }
+
+    const onShieldEdit = (val: string) => {
+        props.player.shield = Number(val)
+        setShield(Number(val))
+        savePlayer()
+    }
+
+    // AC, with the active shield bonus shown in parentheses, e.g. "14 (+2)"
+    const acDisplay = () => {
+        if (shieldActive && Number(shield) !== 0) {
+            const s = Number(shield)
+            return `${ac} (${s > 0 ? '+' : ''}${s})`
+        }
+        return String(ac)
     }
 
     const onDelete = () => {
@@ -568,6 +591,14 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
         setInitiative(props.player.initiative ?? 0)
     }, [props.player.initiative]);
 
+    useEffect(() => {
+        setShield(props.player.shield ?? 0)
+    }, [props.player.shield]);
+
+    useEffect(() => {
+        setShieldActive(props.player.shieldActive || false)
+    }, [props.player.shieldActive]);
+
     if (!props.isMaster && hidden) {
         return (
             <></>
@@ -700,7 +731,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                         {dead && getDeadIcon()}
                         {effects}
                         <Spacer/>
-                        {(!npc || props.isMaster) && write('AC:', String(ac))}
+                        {(!npc || props.isMaster) && write('AC:', acDisplay())}
                         {(!npc || props.isMaster) && divider()}
                         {write('Initiative:', String(props.player.initiative))}
                     </AccordionButton>
@@ -871,6 +902,18 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                     <HStack>
                                         <Text width='90px'>Initiative:</Text>
                                         <NumberInput min={0} onChange={onInitiativeEdit} value={initiative}>
+                                            <NumberInputField/>
+                                            <NumberInputStepper>
+                                                <NumberIncrementStepper/>
+                                                <NumberDecrementStepper/>
+                                            </NumberInputStepper>
+                                        </NumberInput>
+                                    </HStack>
+                                    <HStack>
+                                        <Text width='90px'>Schild:</Text>
+                                        <Switch isChecked={shieldActive}
+                                                onChange={(evt) => onShieldToggle(evt.currentTarget.checked)}/>
+                                        <NumberInput onChange={onShieldEdit} value={shield} isDisabled={!shieldActive}>
                                             <NumberInputField/>
                                             <NumberInputStepper>
                                                 <NumberIncrementStepper/>

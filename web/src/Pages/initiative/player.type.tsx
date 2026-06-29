@@ -14,5 +14,7 @@ export interface Player {
     npc?: boolean,
     monster?: boolean,
     colorMarker?: ColorMarkerEnum,
-    shareHp?: boolean
+    shareHp?: boolean,
+    shield?: number,
+    shieldActive?: boolean
 }
