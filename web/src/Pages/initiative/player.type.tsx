@@ -12,6 +12,7 @@ export interface Player {
     id: string,
     hidden?: boolean,
     npc?: boolean,
+    monster?: boolean,
     colorMarker?: ColorMarkerEnum,
     shareHp?: boolean
 }

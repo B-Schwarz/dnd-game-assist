@@ -9,6 +9,34 @@ let playerTurn = 0
 let colorMarkerIndex = 0
 let colorMarkers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
+// A monster (not a player character or plain NPC) counts as dead once its HP
+// hits 0. Dead monsters are pushed to the bottom of the order and skipped.
+const isDeadMonster = (p) => {
+    try {
+        return Boolean(p && p.monster) && Number(p.character.hp) <= 0
+    } catch (_) {
+        return false
+    }
+}
+
+// Stably move every dead monster to the bottom of the order while keeping the
+// turn pointer on whichever creature is currently acting.
+const reorderDeadMonsters = () => {
+    if (master.length === 0) {
+        return
+    }
+    const currentId = master[turn] ? master[turn].turnId : null
+    const alive = master.filter(p => !isDeadMonster(p))
+    const deadMonsters = master.filter(p => isDeadMonster(p))
+    master = [...alive, ...deadMonsters]
+    if (currentId !== null) {
+        const idx = master.findIndex(p => p.turnId === currentId)
+        if (idx >= 0) {
+            turn = idx
+        }
+    }
+}
+
 // set master
 // REQUIRES MASTER
 const setPlayer = (req, res) => {
@@ -75,6 +103,7 @@ const updateMaster = (req, res) => {
             }
         }
     }
+    reorderDeadMonsters()
     updatePlayerData()
     res.sendStatus(200)
 }
@@ -113,6 +142,8 @@ const sortPlayer = (req, res) => {
         }
     })
 
+    reorderDeadMonsters()
+    updatePlayerData()
     res.sendStatus(200)
 }
 
@@ -177,24 +208,36 @@ const setTurn = () => {
 
 const nextTurn = (req, res) => {
     if (master.length > 0) {
-        turn += 1
-        if (turn + 1 > master.length) {
-            turn = 0
-            round += 1
-        }
+        // Step forward, skipping dead monsters. The guard stops us looping
+        // forever if every remaining creature is a dead monster.
+        let guard = 0
+        do {
+            turn += 1
+            if (turn + 1 > master.length) {
+                turn = 0
+                round += 1
+            }
+            guard += 1
+        } while (isDeadMonster(master[turn]) && guard <= master.length)
         updatePlayerData()
     }
     res.sendStatus(200)
 }
 
 const prevTurn = (req, res) => {
-    if (turn > 0) {
-        turn -= 1
-    } else {
-        turn = Math.max(0, master.length - 1)
-        round = Math.max(0, round - 1)
+    if (master.length > 0) {
+        let guard = 0
+        do {
+            if (turn > 0) {
+                turn -= 1
+            } else {
+                turn = Math.max(0, master.length - 1)
+                round = Math.max(0, round - 1)
+            }
+            guard += 1
+        } while (isDeadMonster(master[turn]) && guard <= master.length)
+        updatePlayerData()
     }
-    updatePlayerData()
     res.sendStatus(200)
 }
 

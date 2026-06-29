@@ -663,7 +663,14 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
         <>
             <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
                            padding='0.4rem 0.75rem'
-                           background={(props.isTurn) ? '#fff9e1' : (hidden ? 'purple.100' : '#fafafa')}
+                           background={
+                               (dead && !npc) ? 'red.100'
+                                   : (dead && npc) ? '#e2e2e2'
+                                       : (props.isTurn) ? '#fff9e1'
+                                           : hidden ? 'purple.100'
+                                               : '#fafafa'
+                           }
+                           opacity={(dead && npc) ? 0.55 : 1}
                            borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
                 <ButtonGroup isAttached w='100%'>
                     {props.isMaster && createHideButton()}

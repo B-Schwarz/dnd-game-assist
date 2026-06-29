@@ -46,7 +46,8 @@ const App = (props: {u: () => void}) => {
                         statusEffects: [],
                         turnId: 0,
                         hidden: false,
-                        npc: true
+                        npc: true,
+                        monster: true
                     })
                 })
                 setValue(monsters)
