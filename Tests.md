@@ -99,41 +99,41 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] **`reassignCharacter`** rejects missing `charID`/`toUserID` (400), an NPC (400), and a non-existent target user (404).
 
 ## API — Admin (`api/admin`)
-- [ ] `getUserList` returns `_id`/`name`/`master`/`admin`/`character` only (no password/session).
-- [ ] `setAdmin` / `setMaster` flip the respective flag; missing/invalid `userID` → 400.
-- [ ] **`setPassword`** sets another user's password (hashed via the save hook); afterwards login works with the new password and fails with the old one.
-- [ ] `setPassword` rejects passwords shorter than 8 chars or empty/missing (400) and a missing/unknown target user (404).
+- [x] `getUserList` returns `_id`/`name`/`master`/`admin`/`character` only (no password/session).
+- [x] `setAdmin` / `setMaster` flip the respective flag; an **invalid** `userID` → 400. ⚠️ a missing `userID` matches nothing and returns 200.
+- [x] **`setPassword`** sets another user's password (hashed via the save hook); afterwards login works with the new password and fails with the old one.
+- [x] `setPassword` rejects passwords shorter than 8 chars or empty/missing (400) and a missing/unknown target user (404).
 
 ## API — Settings (`api/settings`)
-- [ ] `changeOwnPassword` requires both `currPass` and `newPass` (400 if either missing); rejects a wrong current password (401, via `findByCredentials`, case-insensitive lookup).
-- [ ] `changeOwnPassword` rejects a `newPass` shorter than 8 chars (400), matching admin `setPassword`.
-- [ ] `deleteOwnAccount` deletes the user and all of their characters, then destroys the session; works with zero characters; a `deleteMany` error is swallowed and the user is still deleted.
-- [ ] `deleteAccount` (admin) deletes a target user and their characters; missing `userID` → 400; unknown user → 404.
+- [x] `changeOwnPassword` requires both `currPass` and `newPass` (400 if either missing); rejects a wrong current password (401, via `findByCredentials`, case-insensitive lookup).
+- [x] `changeOwnPassword` rejects a `newPass` shorter than 8 chars (400), matching admin `setPassword`.
+- [x] `deleteOwnAccount` deletes the user and all of their characters, then destroys the session; works with zero characters; a `deleteMany` error is swallowed and the user is still deleted.
+- [x] `deleteAccount` (admin) deletes a target user and their characters; missing `userID` → 400; unknown user → 404.
 
 ## API — Books (`api/books`)
-- [ ] `getBookList` returns the file names in `books/pdf`; the directory is auto-created (recursive) if missing; empty dir → `[]`.
-- [ ] `uploadBook` accepts a PDF (multer `single('book')`) → 200; the file lands in `books/pdf` named via `path.basename(originalname)`.
-- [ ] The multer `fileFilter` accepts on a `.pdf` extension (case-insensitive) **or** `application/pdf` mimetype; a `.pdf` name with a wrong mimetype still passes (extension check).
-- [ ] Non-PDF upload is rejected by the filter (no `req.file`) → 400.
-- [ ] `deleteBook` removes a named file → 200; missing file → 404; empty name → 400.
-- [ ] `deleteBook` is path-traversal safe (`path.basename` + a `startsWith(BOOK_DIR)` guard refuses names escaping `books/pdf`).
+- [x] `getBookList` returns the file names in `books/pdf`; the directory is auto-created (recursive) if missing; empty dir → `[]`.
+- [x] `uploadBook` accepts a PDF (multer `single('book')`) → 200; the file lands in `books/pdf` named via `path.basename(originalname)`.
+- [x] The multer `fileFilter` accepts on a `.pdf` extension (case-insensitive) **or** `application/pdf` mimetype; a `.pdf` name with a wrong mimetype still passes (extension check).
+- [x] Non-PDF upload is rejected by the filter (no `req.file`) → 400.
+- [x] `deleteBook` removes a named file → 200; missing file → 404; empty name → 400.
+- [x] `deleteBook` is path-traversal safe (`path.basename` + a `startsWith(BOOK_DIR)` guard refuses names escaping `books/pdf`).
 - [ ] The `/api/books/` static mount is behind `isAuth` (unauthenticated cannot fetch PDFs).
 
 ## API — Monster & Encounter (`api/monster`, `api/encounter`)
-- [ ] Monster: create / update / delete / get-by-id gated to master|admin; **list and get-by-id only require `isAuth`** (no role).
-- [ ] `createMonster`/`createEncounter` return 200 **without** the new id (unlike `createCharacter`).
-- [ ] `getMonsterList` is sorted by `monster.name` ascending and omits `__v`.
-- [ ] Monster `delete`/`save` with an invalid id → ⚠️ delete returns 200 anyway; save → 404.
-- [ ] Encounter: create / list / update / delete gated to master.
-- [ ] `createEncounter` is owned by `req.user._id`, defaults `name:'New Encounter'`, `encounter:[]`; `getEncounterList` is scoped to the caller; `saveEncounter` missing id → 400.
-- [ ] `deleteEncounter` is scoped to the requester (`{_id, user}`): deleting an own encounter → 200; deleting another user's or an unknown encounter → 404.
+- [x] Monster: create / update / delete / get-by-id gated to master|admin; **list and get-by-id only require `isAuth`** (no role).
+- [x] `createMonster`/`createEncounter` return 200 **without** the new id (unlike `createCharacter`).
+- [x] `getMonsterList` is sorted by `monster.name` ascending and omits `__v`.
+- [x] Monster `delete`/`save` with an invalid id → ⚠️ delete returns 200 anyway; save → 404.
+- [x] Encounter: create / list / update / delete gated to master.
+- [x] `createEncounter` is owned by `req.user._id`, defaults `name:'New Encounter'`, `encounter:[]`; `getEncounterList` is scoped to the caller; `saveEncounter` with an **invalid** id → 400. ⚠️ a missing `encounter` body throws → 500, and a missing id matches nothing → 200.
+- [x] `deleteEncounter` is scoped to the requester (`{_id, user}`): deleting an own encounter → 200; deleting another user's or an unknown encounter → 404.
 
 ## API — CORS / app wiring (`api/server.js`)
 - [ ] An `OPTIONS` preflight returns **204** before auth/static can reject it, with `Access-Control-Allow-Credentials: true`, `Allow-Methods: GET, POST, PUT, DELETE`, and `Allow-Origin` from `CORS_URL` (not `*`).
 - [ ] Rate limiter is mounted on `/api` (window 60s, max 10000, `standardHeaders` on).
 - [ ] Session cookie is `dnd.sid`, `httpOnly`, `sameSite:'lax'`, `secure` only in production, persisted in Mongo.
 - [ ] `x-powered-by` is disabled and JSON body limit is 20mb.
-- [ ] Mirrored privileged vs `/me` routes enforce ownership (a normal user cannot act on others' data).
+- [x] Mirrored privileged vs `/me` routes enforce ownership (a normal user cannot act on others' data).
 
 ## API — DB bootstrap (`api/db`)
 - [ ] On first connect with an empty users collection, a default admin is seeded (`name:admin`, `password:asdasdasd`, `admin:true`, `master:false`); it is **not** re-seeded when users already exist.
