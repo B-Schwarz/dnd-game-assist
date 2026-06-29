@@ -207,8 +207,14 @@ if (process.env.NODE_ENV === 'production') {
     })
 }
 
-start().then(() => {
-    console.log(`Der Server wurde gestartet!`);
-});
+// Only boot the server when run directly (`node server.js`). When required from
+// a test, we export `app` so supertest can drive it without binding a port.
+if (require.main === module) {
+    start().then(() => {
+        console.log(`Der Server wurde gestartet!`);
+    });
+}
+
+module.exports = {app, start};
 
 

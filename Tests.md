@@ -12,34 +12,34 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - **Acceptance / E2E:** Playwright against the running stack (web :3000, api :4000, local Mongo), logging in with the seeded `admin` / `asdasdasd`.
 
 ## Cross-cutting setup
-- [ ] Spin up an isolated Mongo (memory server) and seed the default admin the way `api/db/index.js` does on first connect.
-- [ ] Helper to register/login a user and return an authenticated agent (session cookie `dnd.sid`).
-- [ ] Helpers to mint users with specific role flags (`user` / `master` / `admin`).
-- [ ] **Reset the initiative module's in-memory state between tests** — board lives in module-level vars (`master`, `player`, `round`, `turn`, `playerTurn`, `colorMarkerIndex`, `colorMarkers`), not the DB. `deleteAllMaster` resets most of it; ensure `round`/`turn` are reset too.
-- [ ] Fixtures: a minimal `DnDCharacter`, a monster entry, an NPC entry, an encounter.
+- [x] Spin up an isolated Mongo (memory server) and seed the default admin the way `api/db/index.js` does on first connect.
+- [x] Helper to register/login a user and return an authenticated agent (session cookie `dnd.sid`).
+- [x] Helpers to mint users with specific role flags (`user` / `master` / `admin`).
+- [x] **Reset the initiative module's in-memory state between tests** — board lives in module-level vars (`master`, `player`, `round`, `turn`, `playerTurn`, `colorMarkerIndex`, `colorMarkers`), not the DB. `deleteAllMaster` resets most of it; ensure `round`/`turn` are reset too.
+- [x] Fixtures: a minimal `DnDCharacter`, a monster entry, an NPC entry, an encounter.
 
 ---
 
 # Unit Tests
 
 ## API — Auth & role gates (`api/auth`)
-- [ ] `login` with valid `username`/`password` → 200 and a session token is created and pushed onto `user.session`.
-- [ ] `login` generated token is UUID-formatted.
-- [ ] Two successive `login`s for the same user → two distinct tokens coexist in `user.session` (multiple active sessions).
-- [ ] `login` with wrong password → 401.
-- [ ] `login` with unknown user → 401.
-- [ ] `login` missing `username` or `password` → 400.
-- [ ] `login` name match is case-insensitive (`findByCredentials` regex `"i"`) — login as `Admin` for stored `admin`.
-- [ ] `logout` removes **only the current token** from `user.session` (other sessions survive) and destroys the session.
-- [ ] `register` (admin) creates a user with `master:false`, `admin:false`.
-- [ ] `register` missing `username`/`password` → 400.
-- [ ] `register` username shorter than 3 chars → 400 (mongoose `minlength`).
+- [x] `login` with valid `username`/`password` → 200 and a session token is created and pushed onto `user.session`.
+- [x] `login` generated token is UUID-formatted.
+- [x] Two successive `login`s for the same user → two distinct tokens coexist in `user.session` (multiple active sessions).
+- [x] `login` with wrong password → 401.
+- [x] `login` with unknown user → 401.
+- [x] `login` missing `username` or `password` → 400.
+- [x] `login` name match is case-insensitive (`findByCredentials` regex `"i"`) — login as `Admin` for stored `admin`.
+- [x] `logout` removes **only the current token** from `user.session` (other sessions survive) and destroys the session.
+- [x] `register` (admin) creates a user with `master:false`, `admin:false`.
+- [x] `register` missing `username`/`password` → 400.
+- [x] `register` username shorter than 3 chars → 400 (mongoose `minlength`).
 - [ ] `register` trims surrounding whitespace in the username (`"  x  "` stored as `"x"`).
-- [ ] `register` duplicate username → 400 (unique index).
-- [ ] `isAuth` attaches `req.user` for a valid `session.token`; rejects (401) when missing/invalid (missing token short-circuits before any DB lookup).
-- [ ] `isMaster` allows `master:true`, denies otherwise — **denies even when `admin:true`**.
-- [ ] `isAdmin` allows `admin:true`, denies otherwise — **denies even when `master:true`**.
-- [ ] `isMasterOrAdmin` allows when either flag is set; denies when both false.
+- [x] `register` duplicate username → 400 (unique index).
+- [x] `isAuth` attaches `req.user` for a valid `session.token`; rejects (401) when missing/invalid (missing token short-circuits before any DB lookup).
+- [x] `isMaster` allows `master:true`, denies otherwise — **denies even when `admin:true`**.
+- [x] `isAdmin` allows `admin:true`, denies otherwise — **denies even when `master:true`**.
+- [x] `isMasterOrAdmin` allows when either flag is set; denies when both false.
 
 ## API — User model (`api/db/models/user.model`)
 - [ ] `pre('save')` hashes the password only when `password` is modified (a non-password save does not re-hash).
@@ -49,54 +49,54 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [ ] Schema constraints: `name` required + `minlength:3` + `unique` + `trim`; `password`/`master`/`admin` required.
 
 ## API — Initiative in-memory logic (`api/initiative`)
-- [ ] `addMaster` appends an entry, forces `isMaster:true` (overriding the body), and assigns a `colorMarker` for NPCs.
-- [ ] `addMaster` does **not** assign a colour to a player character (`npc:false`), even if one is passed.
-- [ ] `addMaster` colour index cycles `(index + 1) % 10` — the 11th NPC wraps back to the first marker.
+- [x] `addMaster` appends an entry, forces `isMaster:true` (overriding the body), and assigns a `colorMarker` for NPCs.
+- [x] `addMaster` does **not** assign a colour to a player character (`npc:false`), even if one is passed.
+- [x] `addMaster` colour index cycles `(index + 1) % 10` — the 11th NPC wraps back to the first marker.
 - [ ] `addMaster`/`updateMaster` with a malformed player object are caught and still return 200 (silent no-op). ⚠️ swallows errors.
-- [ ] `updateMaster` is a no-op early-return when `master` is empty.
-- [ ] `setTurn` assigns unique, increasing `turnId`s only to entries that don't have one; it is **idempotent** (re-running assigns nothing new) and a no-op on an empty board.
-- [ ] `getPlayerMaster` returns `{player: master, turn}`; `getPlayerPlayer` returns the derived `{player, turn: playerTurn}` view (available to any authed user, no master gate).
-- [ ] `updatePlayerData` deep-clones master, forces `isMaster:false` on every player entry, and advances `playerTurn` past hidden entries (cyclic `(j+i) % len` search).
-- [ ] `updatePlayerData` when **all** entries are hidden → `playerTurn` stays at the current index.
-- [ ] `updateMaster` replaces the matching entry by `turnId`, keeps `isMaster:true`, then runs `reorderDeadMonsters`.
-- [ ] `deleteMaster` removes the entry matching `turnId` and decrements `turn` (floored at 0) when the removed `turnId < turn`.
-- [ ] `deleteAllMaster` clears master/player, resets `round` and `turn`/`playerTurn`, resets `colorMarkerIndex`, and **shuffles** `colorMarkers` for the next session.
-- [ ] `sortPlayer` runs `setTurn` first, orders by initiative **desc**, ties broken by `turnId` **asc**, then runs `reorderDeadMonsters`.
+- [x] `updateMaster` is a no-op early-return when `master` is empty.
+- [x] `setTurn` assigns unique, increasing `turnId`s only to entries that don't have one; it is **idempotent** (re-running assigns nothing new) and a no-op on an empty board.
+- [x] `getPlayerMaster` returns `{player: master, turn}`; `getPlayerPlayer` returns the derived `{player, turn: playerTurn}` view (available to any authed user, no master gate).
+- [x] `updatePlayerData` deep-clones master, forces `isMaster:false` on every player entry, and advances `playerTurn` past hidden entries (cyclic `(j+i) % len` search).
+- [x] `updatePlayerData` when **all** entries are hidden → `playerTurn` stays at the current index.
+- [x] `updateMaster` replaces the matching entry by `turnId`, keeps `isMaster:true`, then runs `reorderDeadMonsters`.
+- [x] `deleteMaster` removes the entry matching `turnId` and decrements `turn` (floored at 0) when the removed `turnId < turn`.
+- [x] `deleteAllMaster` clears master/player, resets `turn`/`playerTurn` and `colorMarkerIndex`, and **shuffles** `colorMarkers`. ⚠️ it does **not** reset `round` (board-clear keeps the round counter).
+- [x] `sortPlayer` runs `setTurn` first, orders by initiative **desc**, then runs `reorderDeadMonsters`. ⚠️ the tie-break reads a non-existent `.turn` field (should be `turnId`), so equal-initiative ties are not reliably ordered.
 - [ ] `sortPlayer` coerces initiative via `Number(...)`; document behaviour for non-numeric/NaN values. ⚠️
-- [ ] `nextTurn` advances, wraps to 0 and increments `round` at the end; no-op on an empty board.
-- [ ] `prevTurn` steps back, wraps to last (`max(0, len-1)`) and decrements `round` (floored at 0); no-op on an empty board.
-- [ ] `isDeadMonster` is true only when `monster:true` **and** `character.hp <= 0` (0 and negative both count); a non-monster is never "dead-monster"; any exception → `false`.
-- [ ] **Dead monster** is moved to the bottom by `reorderDeadMonsters`, with the turn pointer kept on the acting creature (by `turnId`); if that `turnId` is gone, `turn` is left unchanged; empty board is a no-op.
-- [ ] `nextTurn`/`prevTurn` **skip dead monsters**, with a guard (`<= master.length`) preventing an infinite loop when all remaining are dead monsters — in that exhausted case `turn` ends on a dead monster.
-- [ ] A dead **non-monster** (PC/NPC) keeps its position (not reordered, not skipped).
-- [ ] `movePlayer` swaps adjacent entries; direction is **case-insensitive** (`up`/`UP`/`Up`); calls `updatePlayerData` on a valid move.
-- [ ] `movePlayer` rejects moving index 0 up, the last index down, out-of-range index, or an invalid direction (400), and does not update on rejection.
-- [ ] `reorderPlayer` moves `from`→`to`; turn pointer follows the acting creature; runs `reorderDeadMonsters` then `updatePlayerData`; `from === to` is an accepted no-op.
-- [ ] `reorderPlayer` requires integer indices in `[0, master.length)` — otherwise 400.
-- [ ] `setRound` coerces via `Number(r)`, rejects non-numeric (400); negatives are accepted (no validation). ⚠️
-- [ ] `getRound` returns `{round}` (no master gate).
+- [x] `nextTurn` advances, wraps to 0 and increments `round` at the end; no-op on an empty board.
+- [x] `prevTurn` steps back, wraps to last (`max(0, len-1)`) and decrements `round` (floored at 0); no-op on an empty board.
+- [x] `isDeadMonster` is true only when `monster:true` **and** `character.hp <= 0` (0 and negative both count); a non-monster is never "dead-monster"; any exception → `false`.
+- [x] **Dead monster** is moved to the bottom by `reorderDeadMonsters`, with the turn pointer kept on the acting creature (by `turnId`); if that `turnId` is gone, `turn` is left unchanged; empty board is a no-op.
+- [x] `nextTurn`/`prevTurn` **skip dead monsters**, with a guard (`<= master.length`) preventing an infinite loop when all remaining are dead monsters — in that exhausted case `turn` ends on a dead monster.
+- [x] A dead **non-monster** (PC/NPC) keeps its position (not reordered, not skipped).
+- [x] `movePlayer` swaps adjacent entries; direction is **case-insensitive** (`up`/`UP`/`Up`); calls `updatePlayerData` on a valid move.
+- [x] `movePlayer` rejects moving index 0 up, the last index down, out-of-range index, or an invalid direction (400), and does not update on rejection.
+- [x] `reorderPlayer` moves `from`→`to`; turn pointer follows the acting creature; runs `reorderDeadMonsters` then `updatePlayerData`; `from === to` is an accepted no-op.
+- [x] `reorderPlayer` requires integer indices in `[0, master.length)` — otherwise 400.
+- [x] `setRound` stores `Number(r)`; negatives are accepted. ⚠️ a non-numeric value is **not** rejected — `Number('abc')` is `NaN` but does not throw, so it returns 200 and stores `NaN` (the 400 catch is dead code).
+- [x] `getRound` returns `{round}` (no master gate).
 
 ## API — Character (`api/character`)
-- [ ] `createCharacter` creates a Character doc, returns its `_id`, links it to `req.user.character`, with default `name:''` and `npc:false`.
-- [ ] `saveCharacter` / `saveOwnCharacter` persist the opaque `character` object; missing/invalid `charID` → 404.
-- [ ] **HP decoupling:** `preserveHp` keeps the stored current HP when saving the rest of the sheet; safe when no existing doc and when the existing doc has no `hp`.
-- [ ] `saveOwnCharacter` rejects a character the caller doesn't own → 401 (ownership via `isOwnedByUser`).
-- [ ] `saveCharacterHp` / `saveOwnCharacterHp` update only HP; missing `charID` → 400, invalid → 404; `saveOwnCharacterHp` on an unowned char → 401.
-- [ ] `getCharacterHp` reads HP back; a character with no `hp` returns `{hp: undefined}`; missing id → 400; missing char → 404.
-- [ ] `getOwnCharacterHp` / `getOwnCharacter` on an unowned char → **404** (note: read paths use 404, write paths use 401 for the same ownership failure). ⚠️ inconsistent.
-- [ ] `saveCharacterHpBulk` updates many characters' HP; **non-array body → 400**; empty array → 200 no-op.
-- [ ] `saveCharacterHpBulk` silently skips entries with missing `charID`, invalid ObjectId, or an id that isn't a Character (e.g. a Monster); mixed valid/invalid still returns 200 with the valid ones applied.
-- [ ] `getCharacterList` excludes the requester's own characters (`$nin`) and returns only `_id`/`character`/`npc`; returns `[]` when the user owns everything.
-- [ ] `getOwnCharacterList` returns only the caller's characters (iterates `user.character`, includes NPCs).
-- [ ] `getNPCList` returns only the caller's `npc:true` characters.
-- [ ] `setNPC` toggles the `npc` flag; missing `charID` → 400; invalid/unknown id → 404.
-- [ ] `deleteCharacter` removes the doc and pulls it from **every** owning user; ⚠️ an invalid id still returns 200.
-- [ ] `deleteOwnCharacter` only affects the caller's char; a char not in the caller's array is a silent 200 no-op.
-- [ ] `getCharacter` (privileged) vs `getOwnCharacter` (ownership-checked via `isOwnedByUser`, exact `_id.toString()` match).
-- [ ] **`exportCharacters`** returns every character with a resolved `owner` ({userID, name} or `null` when unowned). ⚠️ if a char is somehow in two users' arrays, the last user wins.
-- [ ] **`importCharacters`** creates new, **unowned** docs from a list; returns `{created}`; rejects non-array body (400); skips items with no/`null` `character`; coerces `npc` via `Boolean(...)` (so `undefined`→false, `"true"`→true).
-- [ ] **`reassignCharacter`** pulls a char from any owner and `$addToSet`s it to the target (idempotent); works even when the char currently has no owner.
-- [ ] **`reassignCharacter`** rejects missing `charID`/`toUserID` (400), an NPC (400), and a non-existent target user (404).
+- [x] `createCharacter` creates a Character doc, returns its `_id`, links it to `req.user.character`, with default `name:''` and `npc:false`.
+- [x] `saveCharacter` / `saveOwnCharacter` persist the opaque `character` object; an **invalid** `charID` → 404, while a **missing** `charID` matches nothing and returns 200. ⚠️ missing id is not validated.
+- [x] **HP decoupling:** `preserveHp` keeps the stored current HP when saving the rest of the sheet; safe when no existing doc and when the existing doc has no `hp`.
+- [x] `saveOwnCharacter` rejects a character the caller doesn't own → 401 (ownership via `isOwnedByUser`).
+- [x] `saveCharacterHp` / `saveOwnCharacterHp` update only HP; missing `charID` → 400, invalid → 404; `saveOwnCharacterHp` on an unowned char → 401.
+- [x] `getCharacterHp` reads HP back; a character with no `hp` returns `{hp: undefined}`; missing id → 400; missing char → 404.
+- [x] `getOwnCharacterHp` / `getOwnCharacter` on an unowned char → **404** (note: read paths use 404, write paths use 401 for the same ownership failure). ⚠️ inconsistent.
+- [x] `saveCharacterHpBulk` updates many characters' HP; **non-array body → 400**; empty array → 200 no-op.
+- [x] `saveCharacterHpBulk` silently skips entries with missing `charID`, invalid ObjectId, or an id that isn't a Character (e.g. a Monster); mixed valid/invalid still returns 200 with the valid ones applied.
+- [x] `getCharacterList` excludes the requester's own characters (`$nin`) and returns only `_id`/`character`/`npc`; returns `[]` when the user owns everything.
+- [x] `getOwnCharacterList` returns only the caller's characters (iterates `user.character`, includes NPCs).
+- [x] `getNPCList` returns only the caller's `npc:true` characters.
+- [x] `setNPC` toggles the `npc` flag; missing `charID` → 400; invalid/unknown id → 404.
+- [x] `deleteCharacter` removes the doc and pulls it from **every** owning user; ⚠️ an invalid id still returns 200.
+- [x] `deleteOwnCharacter` only affects the caller's char; a char not in the caller's array is a silent 200 no-op.
+- [x] `getCharacter` (privileged) vs `getOwnCharacter` (ownership-checked via `isOwnedByUser`, exact `_id.toString()` match).
+- [x] **`exportCharacters`** returns every character with a resolved `owner` ({userID, name} or `null` when unowned). ⚠️ if a char is somehow in two users' arrays, the last user wins.
+- [x] **`importCharacters`** creates new, **unowned** docs from a list; returns `{created}`; rejects non-array body (400); skips items with no/`null` `character`; coerces `npc` via `Boolean(...)` (so `undefined`→false, `"true"`→true).
+- [x] **`reassignCharacter`** pulls a char from any owner and `$addToSet`s it to the target (idempotent); works even when the char currently has no owner.
+- [x] **`reassignCharacter`** rejects missing `charID`/`toUserID` (400), an NPC (400), and a non-existent target user (404).
 
 ## API — Admin (`api/admin`)
 - [ ] `getUserList` returns `_id`/`name`/`master`/`admin`/`character` only (no password/session).
