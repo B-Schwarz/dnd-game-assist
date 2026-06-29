@@ -31,7 +31,7 @@
 8. [x] Add a tooltip to the C/R/M that explains what it stands for
 9. [x] Remove the tick from the C/R/M checkboxes
 10. [x] Increase the page height to match the first page
-11. [ ] All checkboxes should be the same shape
+11. [x] All checkboxes should be the same shape
 
 # Character List
 

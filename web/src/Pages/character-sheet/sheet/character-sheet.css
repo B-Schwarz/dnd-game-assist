@@ -724,18 +724,20 @@
     margin: 0 1px;
 }
 
-/* spell-attribute checkboxes: solid colored fill when checked, no tick mark
+/* spell-attribute checkboxes: diamond-shaped to match the other pips, solid
+   colored fill when checked, no tick mark
    (concentration = gold, ritual = purple, material = blue) */
 .dnd-table input[type="checkbox"].crm {
     -webkit-appearance: none;
     appearance: none;
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
     border: 1.5px solid var(--line-dark);
-    border-radius: 3px;
     background: #fff;
     cursor: pointer;
     vertical-align: middle;
+    transform: rotate(45deg);
+    margin: 0 4px;
 }
 
 .dnd-table input[type="checkbox"].crm-concentration:checked {
