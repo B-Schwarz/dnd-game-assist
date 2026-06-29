@@ -34,7 +34,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `register` (admin) creates a user with `master:false`, `admin:false`.
 - [x] `register` missing `username`/`password` → 400.
 - [x] `register` username shorter than 3 chars → 400 (mongoose `minlength`).
-- [ ] `register` trims surrounding whitespace in the username (`"  x  "` stored as `"x"`).
+- [x] `register` trims surrounding whitespace in the username (`"  x  "` stored as `"x"`).
 - [x] `register` duplicate username → 400 (unique index).
 - [x] `isAuth` attaches `req.user` for a valid `session.token`; rejects (401) when missing/invalid (missing token short-circuits before any DB lookup).
 - [x] `isMaster` allows `master:true`, denies otherwise — **denies even when `admin:true`**.
@@ -42,11 +42,11 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `isMasterOrAdmin` allows when either flag is set; denies when both false.
 
 ## API — User model (`api/db/models/user.model`)
-- [ ] `pre('save')` hashes the password only when `password` is modified (a non-password save does not re-hash).
-- [ ] Stored hash uses bcrypt (cost 10); plaintext is never persisted.
-- [ ] `findByCredentials` resolves on correct bcrypt match, rejects otherwise; lookup is case-insensitive.
-- [ ] `generateSession` pushes a new token and returns it.
-- [ ] Schema constraints: `name` required + `minlength:3` + `unique` + `trim`; `password`/`master`/`admin` required.
+- [x] `pre('save')` hashes the password only when `password` is modified (a non-password save does not re-hash).
+- [x] Stored hash uses bcrypt (cost 10); plaintext is never persisted.
+- [x] `findByCredentials` resolves on correct bcrypt match, rejects otherwise; lookup is case-insensitive.
+- [x] `generateSession` pushes a new token and returns it.
+- [x] Schema constraints: `name` required + `minlength:3` + `unique` + `trim`; `password`/`master`/`admin` required.
 
 ## API — Initiative in-memory logic (`api/initiative`)
 - [x] `addMaster` appends an entry, forces `isMaster:true` (overriding the body), and assigns a `colorMarker` for NPCs.
@@ -117,7 +117,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] Non-PDF upload is rejected by the filter (no `req.file`) → 400.
 - [x] `deleteBook` removes a named file → 200; missing file → 404; empty name → 400.
 - [x] `deleteBook` is path-traversal safe (`path.basename` + a `startsWith(BOOK_DIR)` guard refuses names escaping `books/pdf`).
-- [ ] The `/api/books/` static mount is behind `isAuth` (unauthenticated cannot fetch PDFs).
+- [x] The `/api/books/` static mount is behind `isAuth` (unauthenticated cannot fetch PDFs).
 
 ## API — Monster & Encounter (`api/monster`, `api/encounter`)
 - [x] Monster: create / update / delete / get-by-id gated to master|admin; **list and get-by-id only require `isAuth`** (no role).
@@ -129,15 +129,15 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `deleteEncounter` is scoped to the requester (`{_id, user}`): deleting an own encounter → 200; deleting another user's or an unknown encounter → 404.
 
 ## API — CORS / app wiring (`api/server.js`)
-- [ ] An `OPTIONS` preflight returns **204** before auth/static can reject it, with `Access-Control-Allow-Credentials: true`, `Allow-Methods: GET, POST, PUT, DELETE`, and `Allow-Origin` from `CORS_URL` (not `*`).
-- [ ] Rate limiter is mounted on `/api` (window 60s, max 10000, `standardHeaders` on).
-- [ ] Session cookie is `dnd.sid`, `httpOnly`, `sameSite:'lax'`, `secure` only in production, persisted in Mongo.
-- [ ] `x-powered-by` is disabled and JSON body limit is 20mb.
+- [x] An `OPTIONS` preflight returns **204** before auth/static can reject it, with `Access-Control-Allow-Credentials: true`, `Allow-Methods: GET, POST, PUT, DELETE`, and `Allow-Origin` from `CORS_URL` (not `*`).
+- [x] Rate limiter is mounted on `/api` (window 60s, max 10000, `standardHeaders` on).
+- [x] Session cookie is `dnd.sid`, `httpOnly`, `sameSite:'lax'`, `secure` only in production, persisted in Mongo.
+- [x] `x-powered-by` is disabled and JSON body limit is 20mb.
 - [x] Mirrored privileged vs `/me` routes enforce ownership (a normal user cannot act on others' data).
 
 ## API — DB bootstrap (`api/db`)
-- [ ] On first connect with an empty users collection, a default admin is seeded (`name:admin`, `password:asdasdasd`, `admin:true`, `master:false`); it is **not** re-seeded when users already exist.
-- [ ] Connection is configured with `strictQuery:false` and uses `DB_URI`.
+- [x] On first connect with an empty users collection, a default admin is seeded (`name:admin`, `password:asdasdasd`, `admin:true`, `master:false`); it is **not** re-seeded when users already exist.
+- [x] Connection is configured with `strictQuery:false` and uses `DB_URI`.
 
 ## Web — character sheet model & math (`web/src/Pages/character-sheet/sheet`)
 - [ ] `DnDCharacter` / `Color` enum shape is stable (snapshot of default object; `Color.NONE === 0`).
