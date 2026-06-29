@@ -173,6 +173,32 @@ const movePlayer = (req, res) => {
 
 }
 
+// Move the entry at index `from` to index `to` (drag-to-reorder). The turn
+// pointer follows the creature that is currently acting.
+// REQUIRES MASTER
+const reorderPlayer = (req, res) => {
+    const from = Number(req.body.from)
+    const to = Number(req.body.to)
+
+    if (Number.isInteger(from) && Number.isInteger(to) &&
+        from >= 0 && to >= 0 && from < master.length && to < master.length) {
+        const currentId = master[turn] ? master[turn].turnId : null
+        const [moved] = master.splice(from, 1)
+        master.splice(to, 0, moved)
+        if (currentId !== null) {
+            const idx = master.findIndex(p => p.turnId === currentId)
+            if (idx >= 0) {
+                turn = idx
+            }
+        }
+        reorderDeadMonsters()
+        updatePlayerData()
+        res.sendStatus(200)
+    } else {
+        res.sendStatus(400)
+    }
+}
+
 // REQUIES MASTER
 const setRound = (req, res) => {
     let r = req.body.round
@@ -271,6 +297,7 @@ module.exports = {
     deleteMaster,
     deleteAllMaster,
     movePlayer,
+    reorderPlayer,
     getRound,
     setRound,
     nextTurn,

@@ -16,6 +16,8 @@ import {
     VStack
 } from "@chakra-ui/react";
 import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
+import {DndContext, DragEndEvent, PointerSensor, closestCenter, useSensor, useSensors} from "@dnd-kit/core";
+import {SortableContext, arrayMove, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import "./initiative.css";
 import { flushSync } from "react-dom";
 import {Player} from "./player.type";
@@ -133,6 +135,26 @@ const App = () => {
 
     const update = () => {
         get(isMaster)
+    }
+
+    const sensors = useSensors(useSensor(PointerSensor, {activationConstraint: {distance: 5}}))
+
+    // Drag-to-reorder: move the dragged entry to the drop position, optimistically
+    // update the local order, then persist it and refetch the authoritative state.
+    const onDragEnd = (event: DragEndEvent) => {
+        const {active, over} = event
+        if (!over || active.id === over.id) {
+            return
+        }
+        const from = player.findIndex((p) => p.turnId === active.id)
+        const to = player.findIndex((p) => p.turnId === over.id)
+        if (from < 0 || to < 0) {
+            return
+        }
+        setPlayer(arrayMove(player, from, to))
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/reorder', {from, to})
+            .then(() => update())
+            .catch(() => update())
     }
 
     // Push every board entry's current HP to its character sheet. Entries that are
@@ -266,14 +288,18 @@ const App = () => {
                     <Divider marginTop='1rem'/>
                 </VStack>
             <Center marginTop='2rem'>
-                <Accordion allowToggle width='80%' index={accordionIndex}
-                           onChange={(i) => setAccordionIndex(i as number)}>
-                    {
-                        player.map((m, i) => (
-                            <InitiaveEntry player={m} statusEffects={m.statusEffects} index={i} first={i === 0} last={i === player.length - 1} isMaster={isMaster} isTurn={i === turn} update={update} key={i}/>
-                        ))
-                    }
-                </Accordion>
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                    <SortableContext items={player.map((p) => p.turnId)} strategy={verticalListSortingStrategy}>
+                        <Accordion allowToggle width='80%' index={accordionIndex}
+                                   onChange={(i) => setAccordionIndex(i as number)}>
+                            {
+                                player.map((m, i) => (
+                                    <InitiaveEntry player={m} statusEffects={m.statusEffects} index={i} first={i === 0} last={i === player.length - 1} isMaster={isMaster} isTurn={i === turn} update={update} key={m.turnId}/>
+                                ))
+                            }
+                        </Accordion>
+                    </SortableContext>
+                </DndContext>
             </Center>
             <Modal isOpen={isOpen} onClose={() => {
                 onClose()

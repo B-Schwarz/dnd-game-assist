@@ -71,6 +71,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/initiative/player/:id | `DELETE` |                    `none`                    | `master` | Deletes the player or npc from the board                                 | `none`                                |
 | /api/initiative/player     | `DELETE` |                    `none`                    | `master` | Resets the curren initiative board                                       | `none`                                |
 | /api/initiative/move       |  `PUT`   | `index:number`<br/>`direction:{'UP','DOWN'}` | `master` | Swaps the position of two players                                        | `none`                                |
+| /api/initiative/reorder    |  `PUT`   |        `from:number`<br/>`to:number`         | `master` | Moves the entry at `from` to index `to` (drag-to-reorder)                | `none`                                |
 | /api/initiative/round      |  `GET`   |                    `none`                    |  `user`  | Gets the current round number                                            | `none`                                |
 | /api/initiative/round      |  `PUT`   |                `round:number`                | `master` | Sets the current round number                                            | `none`                                |
 

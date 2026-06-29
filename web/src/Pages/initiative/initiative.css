@@ -101,6 +101,16 @@
     min-width: 38px;
 }
 
+/* drag-to-reorder grip */
+.init-drag-handle {
+    cursor: grab;
+    touch-action: none;
+}
+
+.init-drag-handle:active {
+    cursor: grabbing;
+}
+
 /* prev / next grouped as a single segmented control */
 .init-segmented {
     display: inline-flex;

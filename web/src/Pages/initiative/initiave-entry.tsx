@@ -31,9 +31,12 @@ import {getDeadIcon, getIcon} from "./status-icons";
 import {Player} from "./player.type";
 import axios from "axios";
 import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
-import {ArrowDownIcon, ArrowUpIcon, DeleteIcon} from "@chakra-ui/icons";
+import {MdDragIndicator} from "react-icons/md";
+import {DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
 import {Mutex} from "async-mutex"
+import {useSortable} from "@dnd-kit/sortable";
+import {CSS} from "@dnd-kit/utilities";
 import "./initiative.css";
 
 const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index: number, first: boolean, last: boolean, isMaster: boolean, isTurn: boolean, update: () => void }) => {
@@ -83,6 +86,19 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     const saveTimer = useRef(null)
 
     const effectMutex = useRef(new Mutex())
+
+    // Drag-to-reorder handle (master only). The handle's listeners are spread
+    // onto the grip button so only that grip starts a drag, not the whole row.
+    const {attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging} = useSortable({
+        id: props.player.turnId,
+        disabled: !props.isMaster
+    })
+    const sortableStyle: React.CSSProperties = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        position: 'relative',
+        zIndex: isDragging ? 2 : undefined
+    }
 
     const onHpEdit = (val: string) => {
         props.player.character.hp = val
@@ -650,18 +666,6 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
         }
     }
 
-    function move(direction: string) {
-        axios.put(process.env.REACT_APP_API_PREFIX + '/api/initiative/move', {
-            index: props.index,
-            direction: direction
-        })
-            .then(() => {
-                props.update()
-            })
-            .catch(() => {
-            })
-    }
-
     const getColor = (color: ColorMarkerEnum) => {
         switch (color) {
             case ColorMarkerEnum.BLACK:
@@ -692,7 +696,8 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
     // @ts-ignore
     return (
         <>
-            <AccordionItem borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
+            <AccordionItem ref={setNodeRef} style={sortableStyle}
+                           borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
                            padding='0.4rem 0.75rem'
                            background={
                                (dead && !npc) ? 'red.100'
@@ -735,10 +740,13 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                         {(!npc || props.isMaster) && divider()}
                         {write('Initiative:', String(props.player.initiative))}
                     </AccordionButton>
-                    {props.isMaster && <React.Fragment><ButtonGroup isAttached>
-                        <Button size='sm' isDisabled={props.first} onClick={() => move('up')}><ArrowUpIcon/></Button>
-                        <Button size='sm' isDisabled={props.last} onClick={() => move('down')}><ArrowDownIcon/></Button>
-                    </ButtonGroup></React.Fragment>}
+                    {props.isMaster &&
+                        <button className='init-btn init-btn--icon init-drag-handle'
+                                ref={setActivatorNodeRef}
+                                {...attributes} {...listeners} aria-label='Verschieben'>
+                            <MdDragIndicator size={18}/>
+                        </button>
+                    }
                 </ButtonGroup>
                 {createHPBar()}
                 {props.isMaster &&
