@@ -153,6 +153,9 @@ export interface DnDCharacter {
     attunement1?: string
     attunement2?: string
     attunement3?: string
+    attunement1Checked?: boolean
+    attunement2Checked?: boolean
+    attunement3Checked?: boolean
 
     cp?: string
     sp?: string

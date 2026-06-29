@@ -153,6 +153,8 @@ const App = () => {
                                 <HStack>
                                     <Text color='gray'>Name:</Text>
                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                                    <Text color='gray'>Spieler:</Text>
+                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'},</Text>
                                     <Text color='gray'>Klasse:</Text>
                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
                                     <Text color='gray'>Spezies:</Text>
@@ -206,6 +208,8 @@ const App = () => {
                                                 <HStack>
                                                     <Text color='gray'>Name:</Text>
                                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
+                                                    <Text color='gray'>Spieler:</Text>
+                                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'},</Text>
                                                     <Text color='gray'>Klasse:</Text>
                                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
                                                     <Text color='gray'>Spezies:</Text>

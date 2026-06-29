@@ -239,10 +239,12 @@
     padding: 12px 8px 0;
     clip-path: path("M0,18 Q0,0 18,0 L100,0 Q118,0 118,18 L118,82 Q118,120 59,150 Q0,120 0,82 Z");
     filter:
-        drop-shadow(1px 0 0 var(--line-dark))
-        drop-shadow(-1px 0 0 var(--line-dark))
-        drop-shadow(0 1px 0 var(--line-dark))
-        drop-shadow(0 -1px 0 var(--line-dark));
+        drop-shadow(2px 0 0 var(--line-dark))
+        drop-shadow(-2px 0 0 var(--line-dark))
+        drop-shadow(0 2px 0 var(--line-dark))
+        drop-shadow(0 -2px 0 var(--line-dark))
+        drop-shadow(1.5px 1.5px 0 var(--line-dark))
+        drop-shadow(-1.5px -1.5px 0 var(--line-dark));
 }
 
 .dnd-shield .dnd-ac {
@@ -325,12 +327,37 @@
     gap: 8px;
 }
 
-/* combined vitals box: hit points | hit dice | death saves side by side */
+/* combined vitals box: hit points | hit dice | death saves side by side,
+   with a current-HP bar across the bottom */
 .dnd-vitals {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dnd-vitals-row {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 0;
+    flex: 1 1 auto;
+}
+
+/* current-HP bar at the bottom of the vitals card */
+.dnd-hpbar {
+    height: 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--card-soft);
+    overflow: hidden;
+}
+
+.dnd-hpbar-fill {
+    height: 100%;
+    background: linear-gradient(#e74c3c, #c0392b);
+    border-radius: 5px 0 0 5px;
+    transition: width 0.2s ease;
 }
 
 .dnd-vital {
@@ -497,8 +524,8 @@
 }
 
 .dnd-prof .pip.expert {
-    background: var(--mark);
-    border-color: var(--mark);
+    background: #27ae60;
+    border-color: #1e8449;
     box-shadow: inset 0 0 0 2.5px #fff;
 }
 
@@ -597,6 +624,18 @@
     font-weight: 600;
     width: 100%;
     color: var(--ink);
+    margin-top: 2px;
+}
+
+/* equipment training card grows to fill the bottom of the left column */
+.dnd-equip {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.dnd-equip textarea:last-of-type {
+    flex: 1 1 auto;
 }
 
 .dnd-recalc:hover {
@@ -654,10 +693,45 @@
     text-align: center;
 }
 
+/* vertical column separators (weapons table) */
+.dnd-table--ruled th:not(:last-child),
+.dnd-table--ruled td:not(:last-child) {
+    border-right: 1px solid var(--line);
+}
+
 .dnd-table input[type="checkbox"] {
     width: auto;
     accent-color: var(--mark);
     margin: 0 1px;
+}
+
+/* spell-attribute checkboxes: solid colored fill when checked, no tick mark
+   (concentration = gold, ritual = purple, material = blue) */
+.dnd-table input[type="checkbox"].crm {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    border: 1.5px solid var(--line-dark);
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.dnd-table input[type="checkbox"].crm-concentration:checked {
+    background: #e8b923;
+    border-color: #b8911a;
+}
+
+.dnd-table input[type="checkbox"].crm-ritual:checked {
+    background: #7b2fbe;
+    border-color: #5e2391;
+}
+
+.dnd-table input[type="checkbox"].crm-material:checked {
+    background: #2980b9;
+    border-color: #1f6391;
 }
 
 /* diamond pips (death saves, spell slots) */
@@ -706,12 +780,23 @@
     cursor: pointer;
 }
 
-/* page-2 split */
+/* page-2 split — left (spells) gets 2/3 of the page */
 .dnd-split {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 1fr;
     gap: 14px;
-    align-items: start;
+    align-items: stretch;
+}
+
+/* cantrips & prepared spells card grows to the bottom of the column */
+.dnd-spellcard {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.dnd-spellcard .dnd-table {
+    flex: 1 1 auto;
 }
 
 .dnd-spellhdr {
@@ -721,32 +806,84 @@
     margin-bottom: 12px;
 }
 
+/* spell slots — 3 columns, each stacking 3 levels as table-like rows */
 .dnd-slots {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 7px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.dnd-slotcol {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 .dnd-slot {
-    border: 1px solid var(--line-strong);
-    border-radius: 5px;
-    padding: 4px;
-    text-align: center;
+    display: grid;
+    grid-template-columns: 34px 28px 1fr;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 6px;
+    background: var(--card);
     font-size: 10px;
     font-weight: 700;
-    background: var(--card);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--muted);
 }
 
+.dnd-slot:not(:last-child) {
+    border-bottom: 1px solid var(--line);
+}
+
+.dnd-slot-lvl {
+    white-space: nowrap;
+}
+
 .dnd-slot .tot {
-    width: 30px;
+    width: 24px;
     text-align: center;
-    margin: 2px auto;
     font-size: 13px;
     color: var(--ink);
+    border-bottom: 1px solid var(--line-strong) !important;
+}
+
+.dnd-slot-stars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* star-shaped expended-slot pips */
+.pip.star {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex: 0 0 auto;
+    background: #d4d4d4;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.pip.star.on {
+    background: var(--mark);
+}
+
+/* magic-item attunement — checkbox + item name per row */
+.dnd-attune {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+}
+
+.dnd-attune input[type="checkbox"] {
+    width: auto;
+    flex: 0 0 auto;
+    accent-color: var(--mark);
 }
 
 .dnd-coins {
@@ -762,10 +899,13 @@
     font-weight: 600;
 }
 
+/* coin name sits above its input */
 .dnd-coins label {
+    display: block;
     font-size: 10px;
     font-weight: 700;
     color: var(--muted);
+    margin-bottom: 2px;
 }
 
 @media (max-width: 900px) {

@@ -63,6 +63,31 @@ const ABILITIES: AbilityDef[] = [
     }
 ]
 
+// hex value for each marker Color (NONE → empty so the picker stays neutral)
+const COLOR_HEX: Record<number, string> = {
+    [Color.NONE]: '',
+    [Color.BLACK]: '#000000',
+    [Color.GREY]: '#808080',
+    [Color.PURPLE]: '#7b2fbe',
+    [Color.RED]: '#c0392b',
+    [Color.PINK]: '#e84393',
+    [Color.ORANGE]: '#e67e22',
+    [Color.YELLOW]: '#f1c40f',
+    [Color.GREEN]: '#27ae60',
+    [Color.BLUE]: '#2980b9',
+    [Color.WHITE]: '#ffffff'
+}
+
+// readable text color (black/white) for a given background hex
+const contrastInk = (hex: string): string => {
+    if (!hex) return ''
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+    return luminance > 0.6 ? '#000' : '#fff'
+}
+
 const CharacterSheet = (props: Props) => {
     const character = props.character as any
 
@@ -217,6 +242,14 @@ const CharacterSheet = (props: Props) => {
     const attackRows = Math.max(6, (character.attacks?.length || 0) + 1)
     const spellRows = Math.max(24, (character.spells?.length || 0) + 1)
 
+    // current-HP percentage for the vitals HP bar
+    const hpPct = (() => {
+        const cur = Number(character.hp)
+        const max = Number(character.maxHp)
+        if (!max || isNaN(cur) || isNaN(max)) return 0
+        return Math.max(0, Math.min(100, (cur / max) * 100))
+    })()
+
     return (
         <div className='dnd-sheet'>
             {/* toolbar: player name (left, outside the sheet) + language + color picker */}
@@ -232,6 +265,10 @@ const CharacterSheet = (props: Props) => {
                     </button>
                     <label style={{fontSize: 11, color: '#6b6b6b'}}>{t('Color', 'Farbe')}:</label>
                     <select value={character.color ?? Color.NONE}
+                            style={{
+                                background: COLOR_HEX[character.color ?? Color.NONE] || undefined,
+                                color: contrastInk(COLOR_HEX[character.color ?? Color.NONE]) || undefined
+                            }}
                             onChange={(e) => set('color', Number(e.target.value))}>
                         <option value={Color.NONE}>{t('None', 'Keine')}</option>
                         <option value={Color.BLACK}>{t('Black', 'Schwarz')}</option>
@@ -284,6 +321,7 @@ const CharacterSheet = (props: Props) => {
 
                     {/* hit points + hit dice + death saves — one box, captions on top */}
                     <div className='dnd-card dnd-vitals'>
+                        <div className='dnd-vitals-row'>
                         <div className='dnd-vital hp'>
                             <div className='dnd-title'>{t('Hit Points', 'Trefferpunkte')}</div>
                             <div className='dnd-hp-grid'>
@@ -332,6 +370,10 @@ const CharacterSheet = (props: Props) => {
                                 </div>
                             </div>
                         </div>
+                        </div>
+                        <div className='dnd-hpbar' title={`${character.hp || 0} / ${character.maxHp || 0}`}>
+                            <div className='dnd-hpbar-fill' style={{width: hpPct + '%'}}/>
+                        </div>
                     </div>
                 </div>
 
@@ -353,17 +395,16 @@ const CharacterSheet = (props: Props) => {
                                     <input className='v' type='text' value={character.inspiration || ''}
                                            onChange={(e) => set('inspiration', e.target.value)}/>
                                 </div>
+                                <button className='dnd-recalc' onClick={recalc} type='button'>
+                                    {t('Re-Calculate Modifiers', 'Modifikatoren neu berechnen')}
+                                </button>
                             </div>
                             <div className='dnd-abilcol'>
                                 {ABILITIES.slice(3).map(renderAbility)}
                             </div>
                         </div>
 
-                        <button className='dnd-recalc' onClick={recalc} type='button'>
-                            {t('Re-Calculate Modifiers', 'Modifikatoren neu berechnen')}
-                        </button>
-
-                        <div className='dnd-card'>
+                        <div className='dnd-card dnd-equip'>
                             <div className='dnd-title'>{t('Equipment Training & Proficiencies', 'Ausrüstungstraining & Übungen')}</div>
                             <label className='dnd-sublabel'>{t('Armor Training', 'Rüstungstraining')}</label>
                             <div className='dnd-togglerow'>
@@ -392,7 +433,7 @@ const CharacterSheet = (props: Props) => {
 
                         <div className='dnd-card'>
                             <div className='dnd-title'>{t('Weapons & Damage Cantrips', 'Waffen & Schadenszauber')}</div>
-                            <table className='dnd-table'>
+                            <table className='dnd-table dnd-table--ruled'>
                                 <thead>
                                 <tr>
                                     <th style={{width: '34%'}}>{t('Name', 'Name')}</th>
@@ -459,33 +500,43 @@ const CharacterSheet = (props: Props) => {
                             </div>
 
                             <div className='dnd-title'>{t('Spell Slots', 'Zauberplätze')}</div>
+                            {/* 3 columns, each holding 3 spell levels — slot total + star pips per level */}
                             <div className='dnd-slots'>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => {
-                                    const totalField = `lvl${lvl}SpellSlotsTotal`
-                                    const expField = `lvl${lvl}SpellSlotsExpended`
-                                    const total = Number(character[totalField]) || 0
-                                    return (
-                                        <div className='dnd-slot' key={lvl}>
-                                            <div>{t('Lvl', 'Grad')} {lvl}</div>
-                                            <input className='tot' type='text' value={character[totalField] || ''}
-                                                   onChange={(e) => set(totalField, e.target.value)}/>
-                                            <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 5, marginTop: 5}}>
-                                                {Pips(expField, character[expField] || 0, total, 'pip diamond')}
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                                {[[1, 2, 3], [4, 5, 6], [7, 8, 9]].map((group, gi) => (
+                                    <div className='dnd-slotcol' key={gi}>
+                                        {group.map((lvl) => {
+                                            const totalField = `lvl${lvl}SpellSlotsTotal`
+                                            const expField = `lvl${lvl}SpellSlotsExpended`
+                                            const total = Number(character[totalField]) || 0
+                                            return (
+                                                <div className='dnd-slot' key={lvl}>
+                                                    <div className='dnd-slot-lvl'>{t('Lvl', 'Grad')} {lvl}</div>
+                                                    <input className='tot' type='text' value={character[totalField] || ''}
+                                                           onChange={(e) => set(totalField, e.target.value)}/>
+                                                    <div className='dnd-slot-stars'>
+                                                        {Pips(expField, character[expField] || 0, total, 'pip star')}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                ))}
                             </div>
+                        </div>
 
+                        <div className='dnd-card dnd-spellcard'>
                             <div className='dnd-title'>{t('Cantrips & Prepared Spells', 'Zaubertricks & vorbereitete Zauber')}</div>
-                            <table className='dnd-table'>
+                            <table className='dnd-table dnd-table--ruled'>
                                 <thead>
                                 <tr>
                                     <th style={{width: '8%'}}>{t('Lvl', 'Grad')}</th>
                                     <th style={{width: '30%'}}>{t('Name', 'Name')}</th>
                                     <th style={{width: '15%'}}>{t('Time', 'Zeit')}</th>
                                     <th style={{width: '12%'}}>{t('Range', 'Reichw.')}</th>
-                                    <th style={{width: '13%'}}>C/R/M</th>
+                                    <th style={{width: '13%'}} title={t(
+                                        'C = Concentration, R = Ritual, M = Material',
+                                        'C = Konzentration, R = Ritual, M = Material'
+                                    )}>C/R/M</th>
                                     <th style={{width: '22%'}}>{t('Notes', 'Notizen')}</th>
                                 </tr>
                                 </thead>
@@ -501,8 +552,12 @@ const CharacterSheet = (props: Props) => {
                                         <td><input type='text' value={rowVal('spells', i, 'range')}
                                                    onChange={(e) => setRow('spells', i, 'range', e.target.value)}/></td>
                                         <td style={{whiteSpace: 'nowrap'}}>
-                                            {(['concentration', 'ritual', 'material'] as const).map((flag) => (
-                                                <input key={flag} type='checkbox' title={flag}
+                                            {([
+                                                ['concentration', t('Concentration', 'Konzentration')],
+                                                ['ritual', t('Ritual', 'Ritual')],
+                                                ['material', t('Material', 'Material')]
+                                            ] as const).map(([flag, label]) => (
+                                                <input key={flag} type='checkbox' title={label} className={`crm crm-${flag}`}
                                                        checked={rowFlag('spells', i, flag)}
                                                        onChange={(e) => setRow('spells', i, flag, e.target.checked)}/>
                                             ))}
@@ -543,24 +598,29 @@ const CharacterSheet = (props: Props) => {
                             <textarea rows={8} value={character.equipment || ''}
                                       onChange={(e) => set('equipment', e.target.value)}/>
                             <label className='dnd-sublabel' style={{marginTop: 6}}>{t('Magic Item Attunement', 'Magische Einstimmung')}</label>
-                            {Txt('attunement1', '')}
-                            {Txt('attunement2', '')}
-                            {Txt('attunement3', '')}
+                            {[1, 2, 3].map((n) => (
+                                <div className='dnd-attune' key={n}>
+                                    <input type='checkbox' checked={!!character[`attunement${n}Checked`]}
+                                           onChange={(e) => set(`attunement${n}Checked`, e.target.checked)}/>
+                                    <input type='text' value={character[`attunement${n}`] || ''}
+                                           onChange={(e) => set(`attunement${n}`, e.target.value)}/>
+                                </div>
+                            ))}
                         </div>
 
                         <div className='dnd-card'>
                             <div className='dnd-title'>{t('Coins', 'Münzen')}</div>
                             <div className='dnd-coins'>
-                                <div><input className='center' type='text' value={character.cp || ''}
-                                            onChange={(e) => set('cp', e.target.value)}/><label>{t('CP', 'KM')}</label></div>
-                                <div><input className='center' type='text' value={character.sp || ''}
-                                            onChange={(e) => set('sp', e.target.value)}/><label>{t('SP', 'SM')}</label></div>
-                                <div><input className='center' type='text' value={character.ep || ''}
-                                            onChange={(e) => set('ep', e.target.value)}/><label>{t('EP', 'EM')}</label></div>
-                                <div><input className='center' type='text' value={character.gp || ''}
-                                            onChange={(e) => set('gp', e.target.value)}/><label>{t('GP', 'GM')}</label></div>
-                                <div><input className='center' type='text' value={character.pp || ''}
-                                            onChange={(e) => set('pp', e.target.value)}/><label>{t('PP', 'PM')}</label></div>
+                                <div><label>{t('CP', 'KM')}</label><input className='center' type='text' value={character.cp || ''}
+                                            onChange={(e) => set('cp', e.target.value)}/></div>
+                                <div><label>{t('SP', 'SM')}</label><input className='center' type='text' value={character.sp || ''}
+                                            onChange={(e) => set('sp', e.target.value)}/></div>
+                                <div><label>{t('EP', 'EM')}</label><input className='center' type='text' value={character.ep || ''}
+                                            onChange={(e) => set('ep', e.target.value)}/></div>
+                                <div><label>{t('GP', 'GM')}</label><input className='center' type='text' value={character.gp || ''}
+                                            onChange={(e) => set('gp', e.target.value)}/></div>
+                                <div><label>{t('PP', 'PM')}</label><input className='center' type='text' value={character.pp || ''}
+                                            onChange={(e) => set('pp', e.target.value)}/></div>
                             </div>
                         </div>
                     </div>
