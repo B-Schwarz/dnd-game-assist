@@ -32,6 +32,8 @@ const App = () => {
     const [users, setUsers] = useState<User[]>([])
     const [assignSel, setAssignSel] = useState<{ [id: string]: string }>({})
 
+    const fileInputRef = React.useRef<HTMLInputElement>(null)
+
     const toast = useToast()
 
     const prefix = process.env.REACT_APP_API_PREFIX
@@ -72,6 +74,30 @@ const App = () => {
             })
     }
 
+    const onImportFile = (file: File) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+            try {
+                const parsed = JSON.parse(String(reader.result))
+                const characters = Array.isArray(parsed) ? parsed : parsed.characters
+                if (!Array.isArray(characters)) {
+                    throw new Error('bad shape')
+                }
+                axios.post(prefix + '/api/char/import', {characters})
+                    .then((r) => {
+                        toast({title: 'Import erfolgreich', description: `${r.data?.created ?? characters.length} Charaktere importiert (ohne Besitzer).`, status: 'success', duration: 3000, isClosable: true})
+                        getChars()
+                    })
+                    .catch(() => {
+                        toast({title: 'Import fehlgeschlagen', status: 'error', duration: 3000, isClosable: true})
+                    })
+            } catch (_) {
+                toast({title: 'Ungültige Datei', description: 'Erwartet wird eine exportierte JSON-Datei.', status: 'error', duration: 3000, isClosable: true})
+            }
+        }
+        reader.readAsText(file)
+    }
+
     const reassign = (charID: string) => {
         const toUserID = assignSel[charID]
         if (!toUserID) {
@@ -92,7 +118,18 @@ const App = () => {
             <VStack align='stretch' w='95%' marginX='auto' spacing='1rem'>
                 <HStack justifyContent='space-between'>
                     <Text fontSize='lg' fontWeight='bold'>CHARAKTERE</Text>
-                    <Button colorScheme='blue' onClick={exportAll}>Alle exportieren</Button>
+                    <HStack>
+                        <input ref={fileInputRef} type='file' accept='application/json,.json' style={{display: 'none'}}
+                               onChange={(e) => {
+                                   const f = e.currentTarget.files?.[0]
+                                   if (f) {
+                                       onImportFile(f)
+                                   }
+                                   e.currentTarget.value = ''
+                               }}/>
+                        <Button onClick={() => fileInputRef.current?.click()}>Importieren</Button>
+                        <Button colorScheme='blue' onClick={exportAll}>Alle exportieren</Button>
+                    </HStack>
                 </HStack>
                 <Divider/>
                 <Center>
@@ -114,20 +151,26 @@ const App = () => {
                                         <Td>{c.npc ? 'NPC' : 'PC'}</Td>
                                         <Td>{c.owner ? c.owner.name : '—'}</Td>
                                         <Td>
-                                            <Select size='sm' placeholder='Benutzer wählen'
-                                                    value={assignSel[c._id] || ''}
-                                                    onChange={(e) => {
-                                                        const v = e.currentTarget.value
-                                                        setAssignSel((prev) => ({...prev, [c._id]: v}))
-                                                    }}>
-                                                {users.map((u) => (
-                                                    <option key={u._id} value={u._id}>{u.name}</option>
-                                                ))}
-                                            </Select>
+                                            {c.npc ? (
+                                                <Text fontSize='sm' color='gray.500'>nicht zuweisbar</Text>
+                                            ) : (
+                                                <Select size='sm' placeholder='Benutzer wählen'
+                                                        value={assignSel[c._id] || ''}
+                                                        onChange={(e) => {
+                                                            const v = e.currentTarget.value
+                                                            setAssignSel((prev) => ({...prev, [c._id]: v}))
+                                                        }}>
+                                                    {users.map((u) => (
+                                                        <option key={u._id} value={u._id}>{u.name}</option>
+                                                    ))}
+                                                </Select>
+                                            )}
                                         </Td>
                                         <Td>
-                                            <Button size='sm' isDisabled={!assignSel[c._id]}
-                                                    onClick={() => reassign(c._id)}>Zuweisen</Button>
+                                            {!c.npc &&
+                                                <Button size='sm' isDisabled={!assignSel[c._id]}
+                                                        onClick={() => reassign(c._id)}>Zuweisen</Button>
+                                            }
                                         </Td>
                                     </Tr>
                                 ))

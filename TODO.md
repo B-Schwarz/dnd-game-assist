@@ -69,8 +69,9 @@
 ## Characters
 
 1. [x] Button to export all characters
-2. [ ] Import characters
+2. [x] Import characters
 3. [x] Reassign character sheets
+4. [x] NPC should not be reassignable
 
 ## Books
 

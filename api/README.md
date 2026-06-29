@@ -26,7 +26,8 @@ Start the server by first installing all modules with ``npm install`` and then r
 |----------------------|:--------:|:----------------------------------------:|:--------------------:|-------------------------------------------------|-------------------------------------|
 | /api/char/new        |  `GET`   |                  `none`                  |        `user`        | Creates a new character, links it with the user | `{_id:ObjectID}`                    |
 | /api/char/export     |  `GET`   |                  `none`                  |       `admin`        | Exports every character with its current owner  | `[{_id, character, npc, owner}]`    |
-| /api/char/reassign   |  `PUT`   | `charID:ObjectID`<br/>`toUserID:ObjectID`|       `admin`        | Moves a character to another user               | `none`                              |
+| /api/char/import     |  `POST`  |        `characters:[exported]`           |       `admin`        | Recreates characters as new, unowned documents  | `{created:number}`                  |
+| /api/char/reassign   |  `PUT`   | `charID:ObjectID`<br/>`toUserID:ObjectID`|       `admin`        | Moves a (non-NPC) character to another user     | `none`                              |
 | /api/char/get/:id    |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets a specified character sheet from anyone    | `{_id:ObjectID, character:Player }` |
 | /api/char/me/get/:id |  `GET`   |                  `none`                  |        `user`        | Gets a specified character sheet from me        | `{_id:ObjectID, character:Player }` |
 | /api/char            |  `POST`  | `character:Player`<br/>`charID:ObjectID` | `admin`<br/>`master` | Saves the someones character sheet (preserves current HP) | `none`                    |

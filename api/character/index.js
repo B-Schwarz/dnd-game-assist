@@ -313,6 +313,30 @@ const exportCharacters = async (req, res) => {
     }
 }
 
+// Import characters from an exported list. Each character is recreated as a
+// new, unowned document; an admin assigns owners afterwards via reassign.
+// REQUIRES ADMIN
+const importCharacters = async (req, res) => {
+    const list = req.body.characters
+
+    if (!Array.isArray(list)) {
+        return res.sendStatus(400)
+    }
+
+    try {
+        let created = 0
+        for (const item of list) {
+            if (item && item.character) {
+                await Character.create({character: item.character, npc: Boolean(item.npc)})
+                created += 1
+            }
+        }
+        res.send({created})
+    } catch (_) {
+        res.sendStatus(400)
+    }
+}
+
 // Move a character to another user: pull it from any current owner, then add
 // it to the target user.
 // REQUIRES ADMIN
@@ -329,6 +353,9 @@ const reassignCharacter = async (req, res) => {
         const target = await User.findOne({_id: toUserID})
         if (!char || !target) {
             return res.sendStatus(404)
+        }
+        if (char.npc) {
+            return res.sendStatus(400)
         }
 
         await User.updateMany(
@@ -364,5 +391,6 @@ module.exports = {
     setNPC,
     getNPCList,
     exportCharacters,
+    importCharacters,
     reassignCharacter
 }
