@@ -500,10 +500,15 @@ const CharacterSheet = (props: Props) => {
                             </div>
 
                             <div className='dnd-title'>{t('Spell Slots', 'Zauberplätze')}</div>
-                            {/* 3 columns, each holding 3 spell levels — slot total + star pips per level */}
+                            {/* 3 columns, each holding 3 spell levels — Total input + Expended diamond pips, like the PDF */}
                             <div className='dnd-slots'>
                                 {[[1, 2, 3], [4, 5, 6], [7, 8, 9]].map((group, gi) => (
                                     <div className='dnd-slotcol' key={gi}>
+                                        <div className='dnd-slot dnd-slot-head'>
+                                            <div/>
+                                            <div>{t('Total', 'Gesamt')}</div>
+                                            <div>{t('Expended', 'Verbraucht')}</div>
+                                        </div>
                                         {group.map((lvl) => {
                                             const totalField = `lvl${lvl}SpellSlotsTotal`
                                             const expField = `lvl${lvl}SpellSlotsExpended`
@@ -513,8 +518,8 @@ const CharacterSheet = (props: Props) => {
                                                     <div className='dnd-slot-lvl'>{t('Lvl', 'Grad')} {lvl}</div>
                                                     <input className='tot' type='text' value={character[totalField] || ''}
                                                            onChange={(e) => set(totalField, e.target.value)}/>
-                                                    <div className='dnd-slot-stars'>
-                                                        {Pips(expField, character[expField] || 0, total, 'pip star')}
+                                                    <div className='dnd-slot-pips'>
+                                                        {Pips(expField, character[expField] || 0, total, 'pip diamond')}
                                                     </div>
                                                 </div>
                                             )
@@ -600,8 +605,8 @@ const CharacterSheet = (props: Props) => {
                             <label className='dnd-sublabel' style={{marginTop: 6}}>{t('Magic Item Attunement', 'Magische Einstimmung')}</label>
                             {[1, 2, 3].map((n) => (
                                 <div className='dnd-attune' key={n}>
-                                    <input type='checkbox' checked={!!character[`attunement${n}Checked`]}
-                                           onChange={(e) => set(`attunement${n}Checked`, e.target.checked)}/>
+                                    <div className={'pip diamond' + (character[`attunement${n}Checked`] ? ' on' : '')}
+                                         onClick={() => set(`attunement${n}Checked`, !character[`attunement${n}Checked`])}/>
                                     <input type='text' value={character[`attunement${n}`] || ''}
                                            onChange={(e) => set(`attunement${n}`, e.target.value)}/>
                                 </div>

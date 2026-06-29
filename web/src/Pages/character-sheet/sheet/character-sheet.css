@@ -123,8 +123,8 @@
 
 .dnd-card {
     background: var(--card);
-    border: 1px solid var(--line-strong);
-    border-radius: 6px;
+    border: 3px double var(--line-strong);
+    border-radius: 4px;
     padding: 9px 10px 11px;
 }
 
@@ -840,6 +840,17 @@
     border-bottom: 1px solid var(--line);
 }
 
+/* "Total / Expended" header row above each slot column (like the PDF) */
+.dnd-slot-head {
+    background: var(--card-soft);
+    font-size: 7px;
+    color: var(--muted);
+}
+
+.dnd-slot-head > div {
+    text-align: center;
+}
+
 .dnd-slot-lvl {
     white-space: nowrap;
 }
@@ -852,38 +863,22 @@
     border-bottom: 1px solid var(--line-strong) !important;
 }
 
-.dnd-slot-stars {
+.dnd-slot-pips {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 5px;
 }
 
-/* star-shaped expended-slot pips */
-.pip.star {
-    width: 14px;
-    height: 14px;
-    cursor: pointer;
-    flex: 0 0 auto;
-    background: #d4d4d4;
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-}
-
-.pip.star.on {
-    background: var(--mark);
-}
-
-/* magic-item attunement — checkbox + item name per row */
+/* magic-item attunement — diamond bullet + item name per row (like the PDF) */
 .dnd-attune {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 3px;
+    gap: 8px;
+    margin-top: 4px;
 }
 
-.dnd-attune input[type="checkbox"] {
-    width: auto;
+.dnd-attune .pip.diamond {
     flex: 0 0 auto;
-    accent-color: var(--mark);
 }
 
 .dnd-coins {

@@ -17,6 +17,8 @@
 14. [x] The expert pip should be green
 15. [x] The weapons table should have vertical lines separating the columns
 16. [x] The dnd-vitals should fill the whole card
+17. [ ] Modify the visual of the level input to match the pdf
+18. [ ] Examine the autosave feature. Decouple the current hit points from the remainder. This is needed for a future feature.
 
 ## Page 2
 1. [x] The spell slots part should be like the PDF, i.e. a table with 3 columns, each having 3 spell levels, an input field for the amount of available slots and according to the number an amount of star shaped check boxes to check expended slots
@@ -28,7 +30,12 @@
 7. [x] Change the color of the checkboxes for the spell attributes. Concentraion should be yellow/gold, ritual should be purple and material blue
 8. [x] Add a tooltip to the C/R/M that explains what it stands for
 9. [x] Remove the tick from the C/R/M checkboxes
+10. [ ] Increase the page height to match the first page
 
 # Character List
 
 1. [x] Add Players name
+
+# Initiative
+
+1. [ ] Add a button to save the current health of the players to their character sheet. The current health should update for the character sheet automatically by polling for a change every 10 seconds
