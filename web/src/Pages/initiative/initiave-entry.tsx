@@ -32,7 +32,6 @@ import {DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
 import {Mutex} from "async-mutex"
 import {useSortable} from "@dnd-kit/sortable";
-import {CSS} from "@dnd-kit/utilities";
 import "./initiative.css";
 
 const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMaster: boolean, isTurn: boolean, isOpen: boolean, onToggle: () => void, update: () => void }) => {
@@ -91,7 +90,9 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
         animateLayoutChanges: () => false
     })
     const sortableStyle: React.CSSProperties = {
-        transform: CSS.Transform.toString(transform),
+        // translate only — ignore @dnd-kit's scaleX/scaleY so the dragged row
+        // keeps its own size instead of stretching to match a taller (expanded) row
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
         transition,
         position: 'relative',
         zIndex: isDragging ? 2 : undefined
@@ -703,7 +704,9 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
                                      : '#fafafa'
                  }
                  opacity={(dead && npc) ? 0.55 : 1}
-                 borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
+                 borderColor={(props.isTurn) ? '#d69e2e' : 'blackAlpha.200'}
+                 borderLeftWidth={(props.isTurn) ? '6px' : '1px'}
+                 boxShadow={(props.isTurn) ? '0 0 0 2px #d69e2e' : undefined}>
                 <HStack w='100%' spacing={0} align='center'>
                     {props.isMaster && createHideButton()}
                     <Box as='button' type='button'
