@@ -3,17 +3,30 @@ const {Character} = require('../db/models/character.model')
 const _ = require('lodash')
 const mongoose = require('mongoose')
 
+// Current hit points are managed on their own channel (see *CharacterHp below)
+// so the initiative tracker can push HP without a bulk save clobbering it, and an
+// open sheet can poll for HP changes. A bulk save must therefore preserve the
+// stored current HP instead of overwriting it.
+const preserveHp = async (char, charID) => {
+    const existing = await Character.findOne({_id: charID})
+    if (existing && existing.character) {
+        char.hp = existing.character.hp
+    }
+    return char
+}
+
 // REQUIRES MASTER OR ADMIN
 const saveCharacter = async (req, res) => {
     const char = req.body.character
     const charID = req.body.charID
 
     try {
+        await preserveHp(char, charID)
         await Character.findOneAndUpdate({
             _id: charID
         }, {character: char})
     } catch (_) {
-        res.sendStatus(404)
+        return res.sendStatus(404)
     }
     res.sendStatus(200)
 }
@@ -24,7 +37,7 @@ const saveOwnCharacter = async (req, res) => {
 
     if (isOwnedByUser(req.user.character, charID)) {
         try {
-
+            await preserveHp(char, charID)
             await Character.findOneAndUpdate({
                 _id: charID
             }, {character: char})
@@ -35,6 +48,85 @@ const saveOwnCharacter = async (req, res) => {
         }
     } else {
         res.sendStatus(401)
+    }
+}
+
+// ----- current HP, decoupled from the bulk character document -----
+
+const setHp = async (charID, hp) => {
+    await Character.findOneAndUpdate({_id: charID}, {$set: {'character.hp': hp}})
+}
+
+const readHp = async (charID) => {
+    const char = await Character.findOne({_id: charID})
+    if (!char) return null
+    return {hp: char.character ? char.character.hp : undefined}
+}
+
+// REQUIRES MASTER OR ADMIN
+const saveCharacterHp = async (req, res) => {
+    const {charID, hp} = req.body
+    if (!charID) return res.sendStatus(400)
+    try {
+        await setHp(charID, hp)
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(404)
+    }
+}
+
+const saveOwnCharacterHp = async (req, res) => {
+    const {charID, hp} = req.body
+    if (!charID) return res.sendStatus(400)
+    if (isOwnedByUser(req.user.character, charID)) {
+        try {
+            await setHp(charID, hp)
+            res.sendStatus(200)
+        } catch (_) {
+            res.sendStatus(404)
+        }
+    } else {
+        res.sendStatus(401)
+    }
+}
+
+// REQUIRES MASTER — push current HP for many characters at once (initiative tracker).
+// Invalid / non-character ids (e.g. monsters) are skipped silently.
+const saveCharacterHpBulk = async (req, res) => {
+    const updates = req.body.updates
+    if (!Array.isArray(updates)) return res.sendStatus(400)
+    await Promise.all(updates.map(async (u) => {
+        if (!u || !mongoose.Types.ObjectId.isValid(u.charID)) return
+        try {
+            await setHp(u.charID, u.hp)
+        } catch (_) {
+        }
+    }))
+    res.sendStatus(200)
+}
+
+// REQUIRES MASTER OR ADMIN
+const getCharacterHp = async (req, res) => {
+    if (!req.params.id) return res.sendStatus(400)
+    try {
+        const hp = await readHp(req.params.id)
+        hp ? res.send(hp) : res.sendStatus(404)
+    } catch (_) {
+        res.sendStatus(404)
+    }
+}
+
+const getOwnCharacterHp = async (req, res) => {
+    if (!req.params.id) return res.sendStatus(400)
+    if (isOwnedByUser(req.user.character, req.params.id)) {
+        try {
+            const hp = await readHp(req.params.id)
+            hp ? res.send(hp) : res.sendStatus(404)
+        } catch (_) {
+            res.sendStatus(404)
+        }
+    } else {
+        res.sendStatus(404)
     }
 }
 
@@ -196,6 +288,11 @@ const isOwnedByUser = (character, id) => {
 module.exports = {
     saveCharacter,
     saveOwnCharacter,
+    saveCharacterHp,
+    saveOwnCharacterHp,
+    saveCharacterHpBulk,
+    getCharacterHp,
+    getOwnCharacterHp,
     getCharacter,
     getOwnCharacter,
     getCharacterList,

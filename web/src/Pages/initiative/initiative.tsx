@@ -15,6 +15,7 @@ import {
     ModalOverlay,
     StackItem,
     useDisclosure,
+    useToast,
     VStack
 } from "@chakra-ui/react";
 import { flushSync } from "react-dom";
@@ -44,6 +45,8 @@ const App = () => {
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {isOpen: isConfirmOpen, onOpen: onConfirmOpen, onClose: onConfirmClose} = useDisclosure()
+
+    const toast = useToast()
 
     function nextTurn() {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/initiative/turn/next')
@@ -132,6 +135,38 @@ const App = () => {
         get(isMaster)
     }
 
+    // Push every board entry's current HP to its character sheet. Entries that are
+    // not real characters (e.g. monsters) are skipped server-side.
+    function saveHealthToSheets() {
+        const updates = player
+            .filter((p) => p && p.id && p.character && p.character.hp !== undefined)
+            .map((p) => ({charID: p.id, hp: p.character.hp}))
+
+        if (updates.length === 0) {
+            return
+        }
+
+        axios.post(process.env.REACT_APP_API_PREFIX + '/api/char/hp/bulk', {updates})
+            .then(() => {
+                toast({
+                    title: 'Leben gespeichert',
+                    description: `${updates.length} Charakterbögen aktualisiert.`,
+                    status: 'success',
+                    duration: 2500,
+                    isClosable: true
+                })
+            })
+            .catch(() => {
+                toast({
+                    title: 'Fehler',
+                    description: 'Leben konnte nicht gespeichert werden.',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true
+                })
+            })
+    }
+
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
             .then(() => {
@@ -186,6 +221,7 @@ const App = () => {
                                     <Button colorScheme='blue' onClick={nextTurn} isDisabled={turnBtnActive}>Nächster</Button>
                                 </GridItem>
                                 <Button colorScheme='green' onClick={onOpen}>Hinzufügen</Button>
+                                <Button colorScheme='teal' onClick={saveHealthToSheets}>Leben speichern</Button>
                             </Grid>
                         </StackItem>
                     }

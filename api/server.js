@@ -9,7 +9,8 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, setNPC, getNPCList
+    deleteOwnCharacter, setNPC, getNPCList,
+    saveCharacterHp, saveOwnCharacterHp, saveCharacterHpBulk, getCharacterHp, getOwnCharacterHp
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
@@ -90,6 +91,11 @@ app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
 app.put('/api/char/npc/toggle', isAuth, isMaster, setNPC)
 app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
 app.post('/api/char/me', isAuth, saveOwnCharacter)
+app.put('/api/char/hp', isAuth, isMasterOrAdmin, saveCharacterHp)
+app.put('/api/char/me/hp', isAuth, saveOwnCharacterHp)
+app.post('/api/char/hp/bulk', isAuth, isMaster, saveCharacterHpBulk)
+app.get('/api/char/hp/:id', isAuth, isMasterOrAdmin, getCharacterHp)
+app.get('/api/char/me/hp/:id', isAuth, getOwnCharacterHp)
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
 

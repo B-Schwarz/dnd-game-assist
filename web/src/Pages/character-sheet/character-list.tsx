@@ -153,14 +153,14 @@ const App = () => {
                                 <HStack>
                                     <Text color='gray'>Name:</Text>
                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
-                                    <Text color='gray'>Spieler:</Text>
-                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'},</Text>
                                     <Text color='gray'>Klasse:</Text>
                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
                                     <Text color='gray'>Spezies:</Text>
                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
                                     <Text color='gray'>Stufe:</Text>
-                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'}</Text>
+                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'},</Text>
+                                    <Text color='gray'>Spieler:</Text>
+                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
                                     <Text>{item.npc}</Text>
                                 </HStack>
                             </Button>
@@ -208,14 +208,14 @@ const App = () => {
                                                 <HStack>
                                                     <Text color='gray'>Name:</Text>
                                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
-                                                    <Text color='gray'>Spieler:</Text>
-                                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'},</Text>
                                                     <Text color='gray'>Klasse:</Text>
                                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
                                                     <Text color='gray'>Spezies:</Text>
                                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
                                                     <Text color='gray'>Stufe:</Text>
-                                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'}</Text>
+                                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'},</Text>
+                                                    <Text color='gray'>Spieler:</Text>
+                                                    <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
                                                 </HStack>
                                             </Button>
                                             <Button borderWidth='1px' borderRadius='lg'

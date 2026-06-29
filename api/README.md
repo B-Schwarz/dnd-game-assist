@@ -27,8 +27,13 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/char/new        |  `GET`   |                  `none`                  |        `user`        | Creates a new character, links it with the user | `{_id:ObjectID}`                    |
 | /api/char/get/:id    |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets a specified character sheet from anyone    | `{_id:ObjectID, character:Player }` |
 | /api/char/me/get/:id |  `GET`   |                  `none`                  |        `user`        | Gets a specified character sheet from me        | `{_id:ObjectID, character:Player }` |
-| /api/char            |  `POST`  | `character:Player`<br/>`charID:ObjectID` | `admin`<br/>`master` | Saves the someones character sheet              | `none`                              |
-| /api/char/me         |  `POST`  | `character:Player`<br/>`charID:ObjectID` |        `user`        | Saves one of my characters                      | `none`                              |
+| /api/char            |  `POST`  | `character:Player`<br/>`charID:ObjectID` | `admin`<br/>`master` | Saves the someones character sheet (preserves current HP) | `none`                    |
+| /api/char/me         |  `POST`  | `character:Player`<br/>`charID:ObjectID` |        `user`        | Saves one of my characters (preserves current HP)         | `none`                    |
+| /api/char/hp         |  `PUT`   |    `charID:ObjectID`<br/>`hp:any`        | `admin`<br/>`master` | Sets only the current HP of someones character  | `none`                              |
+| /api/char/me/hp      |  `PUT`   |    `charID:ObjectID`<br/>`hp:any`        |        `user`        | Sets only the current HP of one of my characters| `none`                              |
+| /api/char/hp/bulk    |  `POST`  | `updates:[{charID:ObjectID, hp:any}]`    |       `master`       | Sets current HP for many characters at once (invalid/non-character ids skipped) | `none` |
+| /api/char/hp/:id     |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets only the current HP of someones character  | `{hp:any}`                          |
+| /api/char/me/hp/:id  |  `GET`   |                  `none`                  |        `user`        | Gets only the current HP of one of my characters| `{hp:any}`                          |
 | /api/char/:id        | `DELETE` |                  `none`                  | `admin`<br/>`master` | Deletes someones character sheet                | `none`                              |
 | /api/char/me/:id     | `DELETE` |                  `none`                  |        `user`        | Deletes one of my character sheets              | `none`                              |
 | /api/char/npc/toggle |  `PUT`   |            `charID:ObjectID`             |       `master`       | Toggle whether the character is an NPC or not   | `none`                              |
