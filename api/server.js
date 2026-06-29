@@ -10,7 +10,8 @@ const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
     deleteOwnCharacter, setNPC, getNPCList,
-    saveCharacterHp, saveOwnCharacterHp, saveCharacterHpBulk, getCharacterHp, getOwnCharacterHp
+    saveCharacterHp, saveOwnCharacterHp, saveCharacterHpBulk, getCharacterHp, getOwnCharacterHp,
+    exportCharacters, reassignCharacter
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
@@ -86,6 +87,8 @@ app.get('/api/charlist/npc', isAuth, isMaster, getNPCList)
 //  CHARACTER
 //
 app.get('/api/char/new', isAuth, createCharacter)
+app.get('/api/char/export', isAuth, isAdmin, exportCharacters)
+app.put('/api/char/reassign', isAuth, isAdmin, reassignCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
 app.put('/api/char/npc/toggle', isAuth, isMaster, setNPC)

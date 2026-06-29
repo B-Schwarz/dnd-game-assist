@@ -285,6 +285,67 @@ const isOwnedByUser = (character, id) => {
     return (character.filter(c => c.toString() === id).length > 0)
 }
 
+// Export every character with its current owner (ownership lives in the user's
+// `character` array). Shape is import-friendly.
+// REQUIRES ADMIN
+const exportCharacters = async (req, res) => {
+    try {
+        const chars = await Character.find()
+        const users = await User.find({}, {name: 1, character: 1})
+
+        const ownerByChar = {}
+        users.forEach((u) => {
+            (u.character || []).forEach((cid) => {
+                ownerByChar[cid.toString()] = {userID: u._id, name: u.name}
+            })
+        })
+
+        const out = chars.map((c) => ({
+            _id: c._id,
+            character: c.character,
+            npc: c.npc,
+            owner: ownerByChar[c._id.toString()] || null
+        }))
+
+        res.send(out)
+    } catch (_) {
+        res.sendStatus(500)
+    }
+}
+
+// Move a character to another user: pull it from any current owner, then add
+// it to the target user.
+// REQUIRES ADMIN
+const reassignCharacter = async (req, res) => {
+    const charID = req.body.charID
+    const toUserID = req.body.toUserID
+
+    if (!charID || !toUserID) {
+        return res.sendStatus(400)
+    }
+
+    try {
+        const char = await Character.findOne({_id: charID})
+        const target = await User.findOne({_id: toUserID})
+        if (!char || !target) {
+            return res.sendStatus(404)
+        }
+
+        await User.updateMany(
+            {character: mongoose.Types.ObjectId(charID)},
+            {$pull: {character: mongoose.Types.ObjectId(charID)}}
+        )
+        await User.updateOne(
+            {_id: toUserID},
+            {$addToSet: {character: mongoose.Types.ObjectId(charID)}}
+        )
+
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(400)
+    }
+}
+
 module.exports = {
     saveCharacter,
     saveOwnCharacter,
@@ -301,5 +362,7 @@ module.exports = {
     deleteCharacter,
     deleteOwnCharacter,
     setNPC,
-    getNPCList
+    getNPCList,
+    exportCharacters,
+    reassignCharacter
 }

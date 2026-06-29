@@ -64,13 +64,13 @@
 # Admin
 
 1. [x] Add capability to set a users password (as admin)
-2. [ ] Add a new menu called characters
+2. [x] Add a new menu called characters
 
 ## Characters
 
-1. [ ] Button to export all characters
+1. [x] Button to export all characters
 2. [ ] Import characters
-3. [ ] Reassign character sheets
+3. [x] Reassign character sheets
 
 ## Books
 
