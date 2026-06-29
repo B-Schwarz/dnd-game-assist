@@ -1,0 +1,108 @@
+/* ===== Initiative controls — styled to match the D&D 2024 character sheet =====
+   Monochrome ink/gray palette, thin dark borders, uppercase letter-spaced
+   labels and subtle hover, mirroring sheet/character-sheet.css. */
+
+.init-controls {
+    --ink: #1d1d1d;
+    --muted: #5d5d5d;
+    --line-dark: #555;
+    --card: #ffffff;
+    --card-soft: #f4f4f4;
+    --danger: #8a2b2b;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.init-round {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+/* base button — outline card with ink text */
+.init-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    border: 1px solid var(--line-dark, #555);
+    background: var(--card, #fff);
+    color: var(--ink, #1d1d1d);
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1;
+    white-space: nowrap;
+    transition: background 120ms ease, border-color 120ms ease,
+                box-shadow 120ms ease, transform 60ms ease;
+}
+
+.init-btn:hover {
+    background: var(--card-soft, #f4f4f4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.init-btn:active {
+    transform: translateY(1px);
+}
+
+.init-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* solid ink — the primary, most-used action (add to board) */
+.init-btn--primary {
+    background: var(--ink, #1d1d1d);
+    border-color: var(--ink, #1d1d1d);
+    color: #fff;
+}
+
+.init-btn--primary:hover {
+    background: #000;
+}
+
+/* restrained dark red — destructive (clear board) */
+.init-btn--danger {
+    color: var(--danger, #8a2b2b);
+    border-color: var(--danger, #8a2b2b);
+}
+
+.init-btn--danger:hover {
+    background: var(--danger, #8a2b2b);
+    color: #fff;
+}
+
+/* prev / next grouped as a single segmented control */
+.init-segmented {
+    display: inline-flex;
+}
+
+.init-segmented .init-btn {
+    border-radius: 0;
+}
+
+.init-segmented .init-btn:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.init-segmented .init-btn:last-child {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+}
+
+/* footer button rows inside the modals reuse the same buttons */
+.init-modal-actions {
+    display: flex;
+    gap: 10px;
+}

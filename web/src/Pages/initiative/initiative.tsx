@@ -4,10 +4,7 @@ import {Divider, Text} from "@chakra-ui/layout";
 import InitiaveEntry from "./initiave-entry";
 import {
     Accordion,
-    Button,
     Center,
-    Grid,
-    GridItem,
     Modal,
     ModalContent,
     ModalFooter,
@@ -18,6 +15,7 @@ import {
     useToast,
     VStack
 } from "@chakra-ui/react";
+import "./initiative.css";
 import { flushSync } from "react-dom";
 import {Player} from "./player.type";
 import axios from "axios";
@@ -204,25 +202,25 @@ const App = () => {
         <>
             <TitleService title={'Initiative'}/>
                 <VStack>
-                    <Text fontSize='2xl'>Runde: {round}</Text>
+                    <Text fontSize='2xl' className='init-round'>Runde: {round}</Text>
                     { isMaster &&
                         <StackItem>
-                            <Grid templateColumns='repeat(4, 1fr)' gap={3}>
-                                <Button colorScheme='red' onClick={() => {
+                            <div className='init-controls'>
+                                <button className='init-btn init-btn--danger' onClick={() => {
                                     setConfirm(confirmType.RESET)
                                     onConfirmOpen()
-                                }}>Board Löschen</Button>
-                                <Button colorScheme='blue' onClick={() => {
+                                }}>Board Löschen</button>
+                                <button className='init-btn' onClick={() => {
                                     setConfirm(confirmType.SORT)
                                     onConfirmOpen()
-                                }}>Sortieren</Button>
-                                <GridItem>
-                                    <Button colorScheme='blue' onClick={prevTurn} isDisabled={turnBtnActive}>Vorheriger</Button>
-                                    <Button colorScheme='blue' onClick={nextTurn} isDisabled={turnBtnActive}>Nächster</Button>
-                                </GridItem>
-                                <Button colorScheme='green' onClick={onOpen}>Hinzufügen</Button>
-                                <Button colorScheme='teal' onClick={saveHealthToSheets}>Leben speichern</Button>
-                            </Grid>
+                                }}>Sortieren</button>
+                                <div className='init-segmented'>
+                                    <button className='init-btn' onClick={prevTurn} disabled={turnBtnActive}>Vorheriger</button>
+                                    <button className='init-btn' onClick={nextTurn} disabled={turnBtnActive}>Nächster</button>
+                                </div>
+                                <button className='init-btn init-btn--primary' onClick={onOpen}>Hinzufügen</button>
+                                <button className='init-btn' onClick={saveHealthToSheets}>Leben speichern</button>
+                            </div>
                         </StackItem>
                     }
                     <Divider marginTop='1rem'/>
@@ -244,10 +242,10 @@ const App = () => {
                 <ModalContent maxW='35rem' maxH='40rem'>
                     <Add u={update}/>
                     <ModalFooter>
-                        <Button onClick={() => {
+                        <button className='init-btn' onClick={() => {
                             update()
                             onClose()
-                        }}>Schließen</Button>
+                        }}>Schließen</button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
@@ -260,25 +258,27 @@ const App = () => {
                         Bist Du sicher?
                     </ModalHeader>
                     <ModalFooter m='auto'>
+                        <div className='init-modal-actions'>
                             {
-                                confirm === confirmType.SORT && <Button onClick={() => {
+                                confirm === confirmType.SORT && <button className='init-btn init-btn--primary' onClick={() => {
                                     sort()
                                     onConfirmClose()
-                                }} marginRight='1rem' colorScheme='blue'>
+                                }}>
                                     Sortieren
-                                </Button>
+                                </button>
                             }
                             {
-                                confirm === confirmType.RESET && <Button onClick={() => {
+                                confirm === confirmType.RESET && <button className='init-btn init-btn--danger' onClick={() => {
                                     reset()
                                     onConfirmClose()
-                                }} marginRight='1rem' colorScheme='red'>
+                                }}>
                                     Board Löschen
-                                </Button>
+                                </button>
                             }
-                            <Button onClick={() => {
+                            <button className='init-btn' onClick={() => {
                                 onConfirmClose()
-                            }}>Schließen</Button>
+                            }}>Schließen</button>
+                        </div>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
