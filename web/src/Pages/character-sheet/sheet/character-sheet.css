@@ -123,9 +123,11 @@
     flex-direction: column;
 }
 
-/* keep both pages the same height on the desktop layout (page 1 is ~1500px) so
-   page 2 reaches the bottom like the first page; its content stretches to fill */
-@media (min-width: 901px) {
+/* keep both pages the same height on the multi-column layout (page 1 is ~1500px)
+   so page 2 reaches the bottom like the first page; its content stretches to fill.
+   The breakpoint is below tablet portrait width so iPad / iPad mini keep the
+   two-column sheet rather than collapsing. */
+@media (min-width: 641px) {
     .dnd-page {
         min-height: 1500px;
     }
@@ -932,7 +934,8 @@
     margin-bottom: 2px;
 }
 
-@media (max-width: 900px) {
+/* collapse to a single column only on phones; tablets keep the multi-column sheet */
+@media (max-width: 640px) {
     .dnd-body,
     .dnd-split,
     .dnd-header {
