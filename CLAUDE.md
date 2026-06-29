@@ -21,10 +21,11 @@ All three packages use **yarn** (yarn.lock present in each).
 ### API (`cd api`)
 - `npm run dev` — run with nodemon. Env vars are injected by `api/nodemon.json` (sets `DB_URI=mongodb://127.0.0.1:27017/dnd`, `CORS_URL=http://localhost:3000`, etc.), so a local MongoDB on 27017 is the only prerequisite. Listens on **4000**.
 - `npm run start` — plain `node server.js` (production; requires env vars set externally).
+- `npm test` — Jest unit/integration suite (see **Testing** below). No local MongoDB needed: `mongodb-memory-server` spins up an isolated Mongo per run. Run one suite: `npm test -- <pattern>` (e.g. `npm test -- initiative`).
 
 ### Web (`cd web`)
 - `npm start` — CRA dev server on **3000**. Uses `.env.development` → `REACT_APP_API_PREFIX=http://localhost:4000`.
-- `npm run build` — production build into `web/build/`. Uses `.env.production` (empty prefix → same-origin API).
+- `npm run build` — production build into `web/build/`. Uses `.env.production` (empty prefix → same-origin API). The `start`/`build` scripts inject `REACT_APP_VERSION=$npm_package_version`; the settings page reads `process.env.REACT_APP_VERSION` for the displayed version (it no longer imports `package.json`, which would have bundled the whole dependency list into the client).
 - `npm test` — CRA/Jest test runner (watch mode). Run a single test: `npm test -- <pattern>` or `CI=true npm test -- <pattern>` for one-shot.
 - To check for lint/type errors as the CI/Docker build would, run `CI=true npm run build` — it promotes warnings to errors and prints "Compiled successfully." on a clean tree.
 
@@ -56,6 +57,13 @@ Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter
 - The character sheet page (`web/src/Pages/character-sheet/character.tsx`) renders `<CharacterSheet>` from `sheet/` and autosaves on change. The initiative board imports the **same** `DnDCharacter` type from `sheet/dnd-character.ts`, so the sheet model and the combat tracker are coupled through that type — but the tracker only *reads* a subset (`name`, `hp`/`maxHp`/`tempHp`, `ac`, `dex`, the six `*Save` fields, `speed`, `color`), and monster/encounter "add" flows in `initiative/add/` synthesize that same subset.
 - The initiative tracker is the most complex feature: `web/src/Pages/initiative/initiave-entry.tsx` (note the misspelled filename) is the largest component, with master-only controls (turn/round, reordering, hidden players, adding players/monsters/encounters/NPCs from `initiative/add/`).
 - To verify sheet/UI changes visually, the app can be driven with Playwright against a running stack (log in at `/login` with the seeded `admin`/`asdasdasd`, then create/open a character).
+
+### Testing (API)
+- Suites live in `api/__tests__/*.test.js` (Jest, `jest.config.js` runs serially). Two styles:
+  - **Pure-logic** (`initiative.test.js`): the initiative board is module-level state, so tests `jest.resetModules()` + re-`require` for isolation and call the `(req, res)` handlers with a mock res (`__tests__/helpers.js`).
+  - **Integration** (`auth`/`character`/`admin`/`settings`/`books`/`monster-encounter`/`user-model`/`server`): drive the real Express app with `supertest` against an in-memory Mongo. The shared harness `__tests__/db.js` provides `connect`/`clear`/`disconnect`, role-user + character factories, and a cookie-persisting `loginAgent`.
+- `server.js` exports `{app, start}` and only calls `listen()` when run directly (`require.main === module`), so supertest can mount the app without binding a port. **Set env vars before requiring the app** — call the harness `connect()` (which sets `DB_URI` etc.) first, then `getApp()`.
+- When a test asserts a status code that differs from the handler, the handler is usually the thing to fix — several validation bugs (missing-id → 400, `setRound` NaN, `sortPlayer` tie-break, `deleteAllMaster` round reset) were found and fixed this way.
 
 ### Conventions to match
 - API responses are typically bare HTTP status codes (`res.sendStatus(200/401/404)`) rather than JSON bodies; follow that style.
