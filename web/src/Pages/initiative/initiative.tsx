@@ -3,7 +3,7 @@ import WithAuth from "../login/withAuth";
 import {Divider, Text} from "@chakra-ui/layout";
 import InitiaveEntry from "./initiave-entry";
 import {
-    Accordion,
+    Box,
     Center,
     Modal,
     ModalContent,
@@ -290,14 +290,16 @@ const App = () => {
             <Center marginTop='2rem'>
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                     <SortableContext items={player.map((p) => p.turnId)} strategy={verticalListSortingStrategy}>
-                        <Accordion allowToggle width='80%' index={accordionIndex}
-                                   onChange={(i) => setAccordionIndex(i as number)}>
+                        <Box width='80%'>
                             {
                                 player.map((m, i) => (
-                                    <InitiaveEntry player={m} statusEffects={m.statusEffects} index={i} first={i === 0} last={i === player.length - 1} isMaster={isMaster} isTurn={i === turn} update={update} key={m.turnId}/>
+                                    <InitiaveEntry player={m} statusEffects={m.statusEffects} isMaster={isMaster} isTurn={i === turn}
+                                                   isOpen={accordionIndex === i}
+                                                   onToggle={() => setAccordionIndex((prev) => prev === i ? -1 : i)}
+                                                   update={update} key={m.turnId}/>
                                 ))
                             }
-                        </Accordion>
+                        </Box>
                     </SortableContext>
                 </DndContext>
             </Center>

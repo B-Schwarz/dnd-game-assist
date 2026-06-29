@@ -1,12 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import {
-    AccordionButton,
-    AccordionItem,
-    AccordionPanel,
     Badge,
     Box,
     Button,
-    ButtonGroup,
+    Collapse,
     HStack,
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -39,7 +36,7 @@ import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import "./initiative.css";
 
-const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index: number, first: boolean, last: boolean, isMaster: boolean, isTurn: boolean, update: () => void }) => {
+const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMaster: boolean, isTurn: boolean, isOpen: boolean, onToggle: () => void, update: () => void }) => {
 
     const [hp, setHp] = useState(props.player.character.hp || '0')
     const [tempHp, setTempHp] = useState(props.player.character.tempHp || '0')
@@ -695,23 +692,26 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
 
     // @ts-ignore
     return (
-        <>
-            <AccordionItem ref={setNodeRef} style={sortableStyle}
-                           borderWidth='1px' borderRadius='md' width='100%' bg='#fafafa' marginBottom='0.5rem'
-                           padding='0.4rem 0.75rem'
-                           background={
-                               (dead && !npc) ? 'red.100'
-                                   : (dead && npc) ? '#e2e2e2'
-                                       : (props.isTurn) ? '#fff9e1'
-                                           : hidden ? 'purple.100'
-                                               : '#fafafa'
-                           }
-                           opacity={(dead && npc) ? 0.55 : 1}
-                           borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
-                <ButtonGroup isAttached w='100%'>
+        <div ref={setNodeRef} style={sortableStyle}>
+            <Box borderWidth='1px' borderRadius='md' width='100%' marginBottom='0.5rem'
+                 padding='0.4rem 0.75rem'
+                 background={
+                     (dead && !npc) ? 'red.100'
+                         : (dead && npc) ? '#e2e2e2'
+                             : (props.isTurn) ? '#fff9e1'
+                                 : hidden ? 'purple.100'
+                                     : '#fafafa'
+                 }
+                 opacity={(dead && npc) ? 0.55 : 1}
+                 borderColor={(props.isTurn) ? 'black' : 'blackAlpha.200'}>
+                <HStack w='100%' spacing={0} align='center'>
                     {props.isMaster && createHideButton()}
-                    <AccordionButton _expanded={props.isMaster ? {bg: '#ebebeb'} : undefined}
-                                     style={{outline: 'none', border: 'none', boxShadow: 'none'}}>
+                    <Box as='button' type='button'
+                         onClick={props.isMaster ? props.onToggle : undefined}
+                         flex='1' display='flex' alignItems='center' minW={0}
+                         textAlign='left' background={props.isOpen && props.isMaster ? '#ebebeb' : 'transparent'}
+                         cursor={props.isMaster ? 'pointer' : 'default'}
+                         paddingX='3' paddingY='2' borderRadius='sm'>
                         {
                             colorMarker !== ColorMarkerEnum.NONE &&
                             <><Badge variant='solid' bg={getColor(colorMarker)}
@@ -739,7 +739,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                         {(!npc || props.isMaster) && write('AC:', acDisplay())}
                         {(!npc || props.isMaster) && divider()}
                         {write('Initiative:', String(props.player.initiative))}
-                    </AccordionButton>
+                    </Box>
                     {props.isMaster &&
                         <button className='init-btn init-btn--icon init-drag-handle'
                                 ref={setActivatorNodeRef}
@@ -747,10 +747,11 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                             <MdDragIndicator size={18}/>
                         </button>
                     }
-                </ButtonGroup>
+                </HStack>
                 {createHPBar()}
                 {props.isMaster &&
-                    <AccordionPanel>
+                    <Collapse in={props.isOpen} animateOpacity>
+                        <Box paddingTop='3'>
                         <div className='init-panel'>
                             <div className='init-panel-card'>
                                 <span className='init-panel-title'>Zustände</span>
@@ -942,10 +943,11 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], index:
                                 </VStack>
                             </div>
                         </div>
-                    </AccordionPanel>
+                        </Box>
+                    </Collapse>
                 }
-            </AccordionItem>
-        </>
+            </Box>
+        </div>
     )
 }
 
