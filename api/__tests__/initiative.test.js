@@ -281,11 +281,19 @@ describe('nextTurn / prevTurn wrapping', () => {
         expect(roundValue()).toBe(2)
     })
 
-    test('prevTurn wraps to the last index and decrements round (floored at 0)', () => {
+    test('prevTurn wraps to the last index and decrements round (floored at 1)', () => {
         setBoard([mkPlayer({name: 'A'}), mkPlayer({name: 'B'})])
-        init.prevTurn({}, mockRes()) // from 0 wraps to last (1), round floored at 0
+        init.prevTurn({}, mockRes()) // from 0 wraps to last (1), round floored at 1
         expect(masterView().turn).toBe(1)
-        expect(roundValue()).toBe(0)
+        expect(roundValue()).toBe(1)
+    })
+
+    test('prevTurn does not take the round below 1 even after several presses', () => {
+        setBoard([mkPlayer({name: 'A'}), mkPlayer({name: 'B'})])
+        init.prevTurn({}, mockRes())
+        init.prevTurn({}, mockRes())
+        init.prevTurn({}, mockRes())
+        expect(roundValue()).toBe(1)
     })
 
     test('next/prev are no-ops on an empty board', () => {
@@ -387,9 +395,11 @@ describe('round get/set', () => {
         expect(roundValue()).toBe(7)
     })
 
-    test('negative rounds are accepted (no validation)', () => {
+    test('rounds below 1 are clamped to 1', () => {
         init.setRound({body: {round: -3}}, mockRes())
-        expect(roundValue()).toBe(-3)
+        expect(roundValue()).toBe(1)
+        init.setRound({body: {round: 0}}, mockRes())
+        expect(roundValue()).toBe(1)
     })
 
     test('a non-numeric round is rejected with 400 and leaves round unchanged', () => {

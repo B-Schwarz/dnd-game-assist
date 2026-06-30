@@ -210,7 +210,8 @@ const setRound = (req, res) => {
     if (Number.isNaN(r)) {
         return res.sendStatus(400)
     }
-    round = r
+    // The round never goes below 1.
+    round = Math.max(1, r)
     res.sendStatus(200)
 }
 
@@ -260,7 +261,8 @@ const prevTurn = (req, res) => {
                 turn -= 1
             } else {
                 turn = Math.max(0, master.length - 1)
-                round = Math.max(0, round - 1)
+                // The round never goes below 1.
+                round = Math.max(1, round - 1)
             }
             guard += 1
         } while (isDeadMonster(master[turn]) && guard <= master.length)
