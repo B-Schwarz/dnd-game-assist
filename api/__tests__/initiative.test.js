@@ -89,6 +89,18 @@ describe('addMaster', () => {
         expect(res.statusCode).toBe(200)
         expect(masterView().player).toEqual([])
     })
+
+    // ⚠️ The handler wraps its body in try/catch and swallows errors. A player
+    // whose property access throws is silently dropped — pin that it still
+    // returns 200 and leaves the board untouched rather than crashing.
+    test('a malformed player that throws is caught → 200, board unchanged', () => {
+        const evil = {}
+        Object.defineProperty(evil, 'npc', {get() { throw new Error('boom') }})
+        const res = mockRes()
+        init.addMaster({body: {player: evil}}, res)
+        expect(res.statusCode).toBe(200)
+        expect(masterView().player).toEqual([]) // never pushed
+    })
 })
 
 describe('updateMaster', () => {
@@ -108,6 +120,18 @@ describe('updateMaster', () => {
         init.updateMaster({body: {player: mkPlayer({turnId: 0})}}, res)
         expect(res.statusCode).toBe(200)
         expect(masterView().player).toEqual([])
+    })
+
+    // ⚠️ Same swallowed-error behaviour as addMaster: a player whose turnId
+    // access throws during the match loop is caught → 200, board untouched.
+    test('a malformed player that throws is caught → 200, board unchanged', () => {
+        setBoard([mkPlayer({name: 'A'})])
+        const evil = {}
+        Object.defineProperty(evil, 'turnId', {get() { throw new Error('boom') }})
+        const res = mockRes()
+        init.updateMaster({body: {player: evil}}, res)
+        expect(res.statusCode).toBe(200)
+        expect(masterView().player.map(p => p.name)).toEqual(['A'])
     })
 })
 
@@ -187,6 +211,21 @@ describe('sortPlayer', () => {
         ])
         init.sortPlayer({}, mockRes())
         expect(masterView().player.map(p => p.name)).toEqual(['pc', 'deadMon'])
+    })
+
+    // ⚠️ Initiative is coerced with Number(...). A non-numeric initiative
+    // becomes NaN, so the comparator returns NaN and V8 leaves that pair in its
+    // original order — i.e. non-numeric initiatives are NOT sorted into place.
+    // Pin the current (buggy) behaviour: the garbage entry stays put.
+    test('non-numeric initiative is treated as NaN and is not reordered', () => {
+        setBoard([
+            mkPlayer({name: 'garbage', initiative: 'abc'}),
+            mkPlayer({name: 'high', initiative: 20}),
+        ])
+        init.sortPlayer({}, mockRes())
+        // A correct numeric sort would put 'high' first; the NaN comparator
+        // keeps the original order instead.
+        expect(masterView().player.map(p => p.name)).toEqual(['garbage', 'high'])
     })
 })
 

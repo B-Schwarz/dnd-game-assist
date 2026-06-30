@@ -129,3 +129,28 @@ describe('COLOR_HEX', () => {
         expect(contrastInk(COLOR_HEX[Color.WHITE])).toBe('#000')
     })
 })
+
+describe('Color enum shape', () => {
+    it('keeps NONE at 0 so an unset colour is falsy/neutral', () => {
+        expect(Color.NONE).toBe(0)
+    })
+
+    it('has a stable order (persisted as numbers in stored characters)', () => {
+        expect({
+            NONE: Color.NONE,
+            BLACK: Color.BLACK,
+            GREY: Color.GREY,
+            PURPLE: Color.PURPLE,
+            RED: Color.RED,
+            PINK: Color.PINK,
+            ORANGE: Color.ORANGE,
+            YELLOW: Color.YELLOW,
+            GREEN: Color.GREEN,
+            BLUE: Color.BLUE,
+            WHITE: Color.WHITE,
+        }).toEqual({
+            NONE: 0, BLACK: 1, GREY: 2, PURPLE: 3, RED: 4, PINK: 5,
+            ORANGE: 6, YELLOW: 7, GREEN: 8, BLUE: 9, WHITE: 10,
+        })
+    })
+})

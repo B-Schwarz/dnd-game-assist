@@ -52,7 +52,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `addMaster` appends an entry, forces `isMaster:true` (overriding the body), and assigns a `colorMarker` for NPCs.
 - [x] `addMaster` does **not** assign a colour to a player character (`npc:false`), even if one is passed.
 - [x] `addMaster` colour index cycles `(index + 1) % 10` — the 11th NPC wraps back to the first marker.
-- [ ] `addMaster`/`updateMaster` with a malformed player object are caught and still return 200 (silent no-op). ⚠️ swallows errors.
+- [x] `addMaster`/`updateMaster` with a malformed player object are caught and still return 200 (silent no-op). ⚠️ swallows errors.
 - [x] `updateMaster` is a no-op early-return when `master` is empty.
 - [x] `setTurn` assigns unique, increasing `turnId`s only to entries that don't have one; it is **idempotent** (re-running assigns nothing new) and a no-op on an empty board.
 - [x] `getPlayerMaster` returns `{player: master, turn}`; `getPlayerPlayer` returns the derived `{player, turn: playerTurn}` view (available to any authed user, no master gate).
@@ -62,7 +62,7 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] `deleteMaster` removes the entry matching `turnId` and decrements `turn` (floored at 0) when the removed `turnId < turn`.
 - [x] `deleteAllMaster` clears master/player, resets `turn`/`playerTurn`, `round` (to 1) and `colorMarkerIndex`, and **shuffles** `colorMarkers`.
 - [x] `sortPlayer` runs `setTurn` first, orders by initiative **desc**, ties broken by `turnId` **asc**, then runs `reorderDeadMonsters`.
-- [ ] `sortPlayer` coerces initiative via `Number(...)`; document behaviour for non-numeric/NaN values. ⚠️
+- [x] `sortPlayer` coerces initiative via `Number(...)`; document behaviour for non-numeric/NaN values. ⚠️
 - [x] `nextTurn` advances, wraps to 0 and increments `round` at the end; no-op on an empty board.
 - [x] `prevTurn` steps back, wraps to last (`max(0, len-1)`) and decrements `round` (floored at 0); no-op on an empty board.
 - [x] `isDeadMonster` is true only when `monster:true` **and** `character.hp <= 0` (0 and negative both count); a non-monster is never "dead-monster"; any exception → `false`.
@@ -140,13 +140,13 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] Connection is configured with `strictQuery:false` and uses `DB_URI`.
 
 ## Web — character sheet model & math (`web/src/Pages/character-sheet/sheet`)
-- [ ] `DnDCharacter` / `Color` enum shape is stable (snapshot of default object; `Color.NONE === 0`).
-- [ ] `modOf` ability modifier: `10`→`''`, `14`→`'+2'`, `8`→`'-1'`, `20`→`'+5'`; `undefined`/`NaN` → `''`.
-- [ ] `contrastInk` returns black on light backgrounds and white on dark (luminance threshold); invalid/empty hex → `''`.
-- [ ] `recalc` derives saves/skills from scores + proficiency: `none` adds 0, `normal` adds `pb`, `expert` adds `2·pb`; missing score/pb → base 0.
-- [ ] HP bar fill `hpPct` = `cur/max·100` clamped to 0–100 and NaN-safe (`max:0` → 0).
-- [ ] EN/DE language toggle flips labels and persists to `localStorage` (`dnd-character-language`); first load defaults to EN.
-- [ ] Colour picker maps each `Color` to its hex (`COLOR_HEX`); `NONE` → no background.
+- [x] `DnDCharacter` / `Color` enum shape is stable (snapshot of default object; `Color.NONE === 0`).
+- [x] `modOf` ability modifier: `10`→`''`, `14`→`'+2'`, `8`→`'-1'`, `20`→`'+5'`; `undefined`/`NaN` → `''`.
+- [x] `contrastInk` returns black on light backgrounds and white on dark (luminance threshold); invalid/empty hex → `''`.
+- [x] `recalc` derives saves/skills from scores + proficiency: `none` adds 0, `normal` adds `pb`, `expert` adds `2·pb`; missing score/pb → base 0.
+- [x] HP bar fill `hpPct` = `cur/max·100` clamped to 0–100 and NaN-safe (`max:0` → 0).
+- [x] EN/DE language toggle flips labels and persists to `localStorage` (`dnd-character-language`); first load defaults to EN.
+- [x] Colour picker maps each `Color` to its hex (`COLOR_HEX`); `NONE` → no background.
 
 ## Web — initiative entry helpers (`web/src/Pages/initiative`)
 - [ ] `calcHp` formats `hp(+temp)/max` (temp only shown when > 0).

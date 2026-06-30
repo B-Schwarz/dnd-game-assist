@@ -53,6 +53,20 @@ describe('CharacterSheet', () => {
         expect(toggle).toBeInTheDocument();
     });
 
+    it('defaults to English and persists the DE choice to localStorage', () => {
+        localStorage.removeItem('dnd-character-language');
+        render(<Harness initial={{}}/>);
+
+        // default English label present, German one not yet
+        expect(screen.getByText('Player Name')).toBeInTheDocument();
+        expect(screen.queryByText('Name des Spielers')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: /EN \/ DE/i}));
+
+        expect(localStorage.getItem('dnd-character-language')).toBe('de');
+        expect(screen.getByText('Name des Spielers')).toBeInTheDocument();
+    });
+
     it('shows the chosen marker colour on the picker', () => {
         const {container} = render(<Harness initial={{color: Color.RED}}/>);
         const select = container.querySelector('select') as HTMLSelectElement;
