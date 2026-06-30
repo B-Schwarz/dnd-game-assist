@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {Color, DnDCharacter} from './dnd-character'
+import {abilityModifierValue, COLOR_HEX, contrastInk, formatModifier, hpPercent, withProficiency} from './sheet-utils'
 import './character-sheet.css'
 
 interface Props {
@@ -63,31 +64,6 @@ const ABILITIES: AbilityDef[] = [
     }
 ]
 
-// hex value for each marker Color (NONE → empty so the picker stays neutral)
-const COLOR_HEX: Record<number, string> = {
-    [Color.NONE]: '',
-    [Color.BLACK]: '#000000',
-    [Color.GREY]: '#808080',
-    [Color.PURPLE]: '#7b2fbe',
-    [Color.RED]: '#c0392b',
-    [Color.PINK]: '#e84393',
-    [Color.ORANGE]: '#e67e22',
-    [Color.YELLOW]: '#f1c40f',
-    [Color.GREEN]: '#27ae60',
-    [Color.BLUE]: '#2980b9',
-    [Color.WHITE]: '#ffffff'
-}
-
-// readable text color (black/white) for a given background hex
-const contrastInk = (hex: string): string => {
-    if (!hex) return ''
-    const r = parseInt(hex.slice(1, 3), 16)
-    const g = parseInt(hex.slice(3, 5), 16)
-    const b = parseInt(hex.slice(5, 7), 16)
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-    return luminance > 0.6 ? '#000' : '#fff'
-}
-
 const CharacterSheet = (props: Props) => {
     const character = props.character as any
 
@@ -107,11 +83,7 @@ const CharacterSheet = (props: Props) => {
         props.onCharacterChanged({...character, [field]: value})
     }
 
-    const modOf = (score: any): string => {
-        if (score === undefined || score === '' || isNaN(Number(score))) return ''
-        const m = Math.floor((Number(score) - 10) / 2)
-        return m >= 0 ? '+' + m : String(m)
-    }
+    const modOf = formatModifier
 
     // ----- proficiency pips (saves + skills) -----
     const profClass = (checked?: string) => {
@@ -139,16 +111,12 @@ const CharacterSheet = (props: Props) => {
     const recalc = () => {
         const pb = Number(character.proficiencyBonus) || 0
         const c: any = {...character}
-        const prof = (base: number, checked?: string) =>
-            checked === 'expert' ? base + 2 * pb : checked === 'normal' ? base + pb : base
 
         ABILITIES.forEach((a) => {
-            const score = character[a.key]
-            const base = (score === undefined || score === '' || isNaN(Number(score)))
-                ? 0 : Math.floor((Number(score) - 10) / 2)
-            c[a.key + 'Save'] = String(prof(base, character[a.key + 'SaveChecked']))
+            const base = abilityModifierValue(character[a.key]) ?? 0
+            c[a.key + 'Save'] = String(withProficiency(base, character[a.key + 'SaveChecked'], pb))
             a.skills.forEach((s) => {
-                c[s.field] = String(prof(base, character[s.field + 'Checked']))
+                c[s.field] = String(withProficiency(base, character[s.field + 'Checked'], pb))
             })
         })
         props.onCharacterChanged(c)
@@ -273,12 +241,7 @@ const CharacterSheet = (props: Props) => {
     const spellRows = Math.max(spellFillRows, (character.spells?.length || 0) + 1)
 
     // current-HP percentage for the vitals HP bar
-    const hpPct = (() => {
-        const cur = Number(character.hp)
-        const max = Number(character.maxHp)
-        if (!max || isNaN(cur) || isNaN(max)) return 0
-        return Math.max(0, Math.min(100, (cur / max) * 100))
-    })()
+    const hpPct = hpPercent(character.hp, character.maxHp)
 
     return (
         <div className='dnd-sheet'>

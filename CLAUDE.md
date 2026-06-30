@@ -65,6 +65,13 @@ Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter
 - `server.js` exports `{app, start}` and only calls `listen()` when run directly (`require.main === module`), so supertest can mount the app without binding a port. **Set env vars before requiring the app** — call the harness `connect()` (which sets `DB_URI` etc.) first, then `getApp()`.
 - When a test asserts a status code that differs from the handler, the handler is usually the thing to fix — several validation bugs (missing-id → 400, `setRound` NaN, `sortPlayer` tie-break, `deleteAllMaster` round reset) were found and fixed this way.
 
+### Testing (Web)
+- CRA/Jest + React Testing Library. Run one-shot with `CI=true npm test -- <pattern>` (or `--watchAll=false`).
+- The character sheet's pure math lives in `web/src/Pages/character-sheet/sheet/sheet-utils.ts` (ability modifiers, proficiency, HP%, contrast ink, the `Color`→hex map). `CharacterSheet.tsx` imports from it, so the math is unit-tested there (`sheet-utils.test.ts`) without rendering, plus a controlled-component test (`CharacterSheet.test.tsx`) that exercises the reactive wiring.
+- Two CRA gotchas, both already handled — don't revert them:
+  - **axios is ESM**; CRA's Jest doesn't transform it, so any test that transitively imports axios needs the `jest.transformIgnorePatterns` override in `web/package.json` (`node_modules/(?!(axios)/)`).
+  - CRA sets **`resetMocks: true`**, which wipes `jest.fn` implementations before each test. In a `jest.mock('axios', …)` factory use **plain functions** (`get: () => Promise.reject(...)`), not `jest.fn(...)`, or the mocked calls return `undefined` and `.then`/`.catch` chains in mounted effects throw. See `App.test.tsx`.
+
 ### Conventions to match
 - API responses are typically bare HTTP status codes (`res.sendStatus(200/401/404)`) rather than JSON bodies; follow that style.
 - Some log/comment strings are in German (`"Erfolgreiche Datenbankverbindung"`); this is expected, not a bug.

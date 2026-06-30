@@ -80,7 +80,7 @@
 
 # Generic
 
-1. [ ] Unit tests
+1. [x] Unit tests
 2. [ ] Acceptance tests
 3. [ ] Update dependencies
 4. [x] Update displayed version
