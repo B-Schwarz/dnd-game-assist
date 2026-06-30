@@ -177,10 +177,10 @@ app.get('/api/monster/:id', isAuth, isMasterOrAdmin, getMonster)
 //
 //  ENCOUNTER
 //
-app.get('/api/encounter/new', isAuth, isMaster, createEncounter)
-app.get('/api/encounter/list', isAuth, isMaster, getEncounterList)
-app.put('/api/encounter', isAuth, isMaster, saveEncounter)
-app.delete('/api/encounter/:id', isAuth, isMaster, deleteEncounter)
+app.get('/api/encounter/new', isAuth, isMasterOrAdmin, createEncounter)
+app.get('/api/encounter/list', isAuth, isMasterOrAdmin, getEncounterList)
+app.put('/api/encounter', isAuth, isMasterOrAdmin, saveEncounter)
+app.delete('/api/encounter/:id', isAuth, isMasterOrAdmin, deleteEncounter)
 
 //
 //  BOOKS
