@@ -37,7 +37,7 @@ describe('filterByName', () => {
 
 describe('rollD20', () => {
     it('is Math.floor(random*20) → 0..19', () => {
-        const spy = jest.spyOn(Math, 'random').mockReturnValue(0.95)
+        const spy = vi.spyOn(Math, 'random').mockReturnValue(0.95)
         expect(rollD20()).toBe(19)
         spy.mockReturnValue(0)
         expect(rollD20()).toBe(0)

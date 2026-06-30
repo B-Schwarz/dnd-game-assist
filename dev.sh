@@ -41,7 +41,7 @@ echo "==> Starting API (nodemon) on http://localhost:4000"
 (cd "$API" && run dev) &
 pids+=($!)
 
-echo "==> Starting web (react-scripts) on http://localhost:3000"
+echo "==> Starting web (vite) on http://localhost:3000"
 (cd "$WEB" && BROWSER=none run start) &
 pids+=($!)
 

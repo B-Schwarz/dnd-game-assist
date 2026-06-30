@@ -1,6 +1,6 @@
 import {defineConfig, devices} from '@playwright/test'
 
-// Acceptance tests drive the real stack: the Express API (4000) and the CRA
+// Acceptance tests drive the real stack: the Express API (4000) and the Vite
 // dev server (3000), against a MongoDB on 127.0.0.1:27017 (see ./README.md).
 // Playwright starts both servers itself (unless they are already running) so
 // `npm test` is a single command on a clean machine that has Mongo up.

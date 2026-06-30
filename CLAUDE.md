@@ -9,7 +9,7 @@ A web app to assist running Dungeons & Dragons 5e games: character sheets, a com
 ## Repository layout
 
 - `api/` — Express + Mongoose backend (Node). Single entry point `api/server.js`; one folder per domain (`auth`, `character`, `initiative`, `monster`, `encounter`, `admin`, `settings`, `books`, `db`).
-- `web/` — Create React App frontend (React 18 + TypeScript + Chakra UI). Pages under `web/src/Pages/<domain>`.
+- `web/` — Vite frontend (React 18 + TypeScript + Chakra UI). Pages under `web/src/Pages/<domain>`.
 - `web/src/Pages/character-sheet/sheet/` — the **D&D 2024 character sheet**, embedded directly in the frontend: `dnd-character.ts` (the `DnDCharacter` model + `Color` enum — the source of truth for character data shape), `CharacterSheet.tsx` (the full two-page sheet; keeps a color picker, EN/DE language toggle, and player-name field), and `character-sheet.css`. The design punch-list lives in `TODO.md` at the repo root.
 - `dnd-character-sheets-master/` — **legacy / unused.** Formerly a vendored fork of the `dnd-character-sheets` library that `web` consumed via a `file:` dependency; the sheet was reimplemented in-app (above) and this directory is no longer built, imported, or referenced by `web/package.json`. Ignore it unless explicitly asked.
 - `Books/` — PDF source files baked into the API image and served from `/api/books`.
@@ -24,13 +24,13 @@ All three packages use **yarn** (yarn.lock present in each).
 - `npm test` — Jest unit/integration suite (see **Testing** below). No local MongoDB needed: `mongodb-memory-server` spins up an isolated Mongo per run. Run one suite: `npm test -- <pattern>` (e.g. `npm test -- initiative`).
 
 ### Web (`cd web`)
-- `npm start` — CRA dev server on **3000**. Uses `.env.development` → `REACT_APP_API_PREFIX=http://localhost:4000`.
-- `npm run build` — production build into `web/build/`. Uses `.env.production` (empty prefix → same-origin API). The `start`/`build` scripts inject `REACT_APP_VERSION=$npm_package_version`; the settings page reads `process.env.REACT_APP_VERSION` for the displayed version (it no longer imports `package.json`, which would have bundled the whole dependency list into the client).
-- `npm test` — CRA/Jest test runner (watch mode). Run a single test: `npm test -- <pattern>` or `CI=true npm test -- <pattern>` for one-shot.
+- `npm start` — Vite dev server on **3000** (`vite.config.ts` pins `server.port`). Uses `.env.development` → `REACT_APP_API_PREFIX=http://localhost:4000`. The app still reads `process.env.REACT_APP_API_PREFIX`/`_VERSION`; `vite.config.ts` keeps that contract via a `define` (the values come from the `.env[.mode]` files and `package.json`'s `version`). Vite injects them at runtime in dev and statically replaces them in the build, so no source change was needed.
+- `npm run build` — `tsc && vite build` → output into `web/build/` (Vite `outDir`, the path the API serves in production). Uses `.env.production` (empty prefix → same-origin API). The settings page reads `process.env.REACT_APP_VERSION` for the displayed version (it does not import `package.json`, which would bundle the whole dependency list into the client). The `tsc` step type-checks (replacing CRA's build-time check); run it alone to see type errors.
+- `npm test` — Vitest (watch mode; `CI=true npm test` runs once). Run a single test: `CI=true npm test -- <pattern>`.
 - To check for lint/type errors as the CI/Docker build would, run `CI=true npm run build` — it promotes warnings to errors and prints "Compiled successfully." on a clean tree.
 
 ### Both at once (dev)
-- `./dev.sh` (repo root) — starts the API (nodemon) and web (CRA) together and shuts both down on Ctrl+C. Needs a local MongoDB on 27017. The character sheet is in-app now, so there is no separate library to compile.
+- `./dev.sh` (repo root) — starts the API (nodemon) and web (Vite) together and shuts both down on Ctrl+C. Needs a local MongoDB on 27017. The character sheet is in-app now, so there is no separate library to compile.
 
 ### Full stack via Docker
 - `docker-compose up --build` — builds the web bundle, then the API (which serves the static web build in production), plus a MongoDB container. App is exposed on **localhost:5000** → container 4000. `Dockerfile` documents the build order (it no longer builds any character-sheet library).
@@ -66,11 +66,13 @@ Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter
 - When a test asserts a status code that differs from the handler, the handler is usually the thing to fix — several validation bugs (missing-id → 400, `setRound` NaN, `sortPlayer` tie-break, `deleteAllMaster` round reset) were found and fixed this way.
 
 ### Testing (Web)
-- CRA/Jest + React Testing Library. Run one-shot with `CI=true npm test -- <pattern>` (or `--watchAll=false`).
+- Vitest + React Testing Library (jsdom). Config lives in the `test` block of `web/vite.config.ts`; run one-shot with `CI=true npm test -- <pattern>`.
 - The character sheet's pure math lives in `web/src/Pages/character-sheet/sheet/sheet-utils.ts` (ability modifiers, proficiency, HP%, contrast ink, the `Color`→hex map). `CharacterSheet.tsx` imports from it, so the math is unit-tested there (`sheet-utils.test.ts`) without rendering, plus a controlled-component test (`CharacterSheet.test.tsx`) that exercises the reactive wiring.
-- Two CRA gotchas, both already handled — don't revert them:
-  - **axios is ESM**; CRA's Jest doesn't transform it, so any test that transitively imports axios needs the `jest.transformIgnorePatterns` override in `web/package.json` (`node_modules/(?!(axios)/)`).
-  - CRA sets **`resetMocks: true`**, which wipes `jest.fn` implementations before each test. In a `jest.mock('axios', …)` factory use **plain functions** (`get: () => Promise.reject(...)`), not `jest.fn(...)`, or the mocked calls return `undefined` and `.then`/`.catch` chains in mounted effects throw. See `App.test.tsx`.
+- Vitest gotchas, all already handled — don't revert them:
+  - **`mockReset: true`** in the Vitest config mirrors CRA's old `resetMocks` and wipes `vi.fn` implementations before each test. In a `vi.mock('axios', …)` factory use **plain functions** (`get: () => Promise.reject(...)`), not `vi.fn(...)`, or the mocked calls return `undefined` and `.then`/`.catch` chains in mounted effects throw. See `App.test.tsx`.
+  - **axios is consumed via a default import** (`import axios from 'axios'`), so an ESM `vi.mock('axios', …)` factory must return the mock as `default` (e.g. `return {default: api}`). See `App.test.tsx` / `withAuth.test.tsx`.
+  - **`vi.mock` factories are hoisted** above imports, so any `mock*` variable they reference must be created with `vi.hoisted` (Jest's "mock-prefixed var" allowance does not apply). See `withAuth.test.tsx`.
+  - **jsdom provides no `localStorage`/`matchMedia`** under Vitest/Node, so `src/setupTests.ts` shims them (the character sheet persists its language to `localStorage`; Chakra calls `matchMedia`).
 
 ### Testing (Acceptance / e2e)
 - `e2e/` is a standalone Playwright package (its own `package.json`, like `api`/`web`) that drives the **real** stack through a browser. Setup: `cd e2e && npm install && npx playwright install chromium`; run with `npm test`.

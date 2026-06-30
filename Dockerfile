@@ -20,6 +20,8 @@ RUN mkdir -p /temp/web
 COPY web/package.json temp/web
 COPY web/yarn.lock temp/web
 COPY web/tsconfig.json temp/web
+COPY web/vite.config.ts temp/web
+COPY web/index.html temp/web
 COPY web/.env.production temp/web
 COPY web/public temp/web/public
 RUN cd /temp/web \
