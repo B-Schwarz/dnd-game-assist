@@ -11,7 +11,6 @@ A web app to assist running Dungeons & Dragons 5e games: character sheets, a com
 - `api/` — Express + Mongoose backend (Node). Single entry point `api/server.js`; one folder per domain (`auth`, `character`, `initiative`, `monster`, `encounter`, `admin`, `settings`, `books`, `db`).
 - `web/` — Vite frontend (React 18 + TypeScript + Chakra UI). Pages under `web/src/Pages/<domain>`.
 - `web/src/Pages/character-sheet/sheet/` — the **D&D 2024 character sheet**, embedded directly in the frontend: `dnd-character.ts` (the `DnDCharacter` model + `Color` enum — the source of truth for character data shape), `CharacterSheet.tsx` (the full two-page sheet; keeps a color picker, EN/DE language toggle, and player-name field), and `character-sheet.css`. The design punch-list lives in `TODO.md` at the repo root.
-- `dnd-character-sheets-master/` — **legacy / unused.** Formerly a vendored fork of the `dnd-character-sheets` library that `web` consumed via a `file:` dependency; the sheet was reimplemented in-app (above) and this directory is no longer built, imported, or referenced by `web/package.json`. Ignore it unless explicitly asked.
 - `Books/` — PDF source files baked into the API image and served from `/api/books`.
 
 ## Common commands
@@ -27,13 +26,14 @@ All three packages use **yarn** (yarn.lock present in each).
 - `npm start` — Vite dev server on **3000** (`vite.config.ts` pins `server.port`). Uses `.env.development` → `REACT_APP_API_PREFIX=http://localhost:4000`. The app still reads `process.env.REACT_APP_API_PREFIX`/`_VERSION`; `vite.config.ts` keeps that contract via a `define` (the values come from the `.env[.mode]` files and `package.json`'s `version`). Vite injects them at runtime in dev and statically replaces them in the build, so no source change was needed.
 - `npm run build` — `tsc && vite build` → output into `web/build/` (Vite `outDir`, the path the API serves in production). Uses `.env.production` (empty prefix → same-origin API). The settings page reads `process.env.REACT_APP_VERSION` for the displayed version (it does not import `package.json`, which would bundle the whole dependency list into the client). The `tsc` step type-checks (replacing CRA's build-time check); run it alone to see type errors.
 - `npm test` — Vitest (watch mode; `CI=true npm test` runs once). Run a single test: `CI=true npm test -- <pattern>`.
-- To check for lint/type errors as the CI/Docker build would, run `CI=true npm run build` — it promotes warnings to errors and prints "Compiled successfully." on a clean tree.
+- `npm run build` is the type-check gate the CI/Docker build uses: the `tsc` step fails on any type error before `vite build` runs (Vite itself only transpiles, it does not type-check).
 
 ### Both at once (dev)
-- `./dev.sh` (repo root) — starts the API (nodemon) and web (Vite) together and shuts both down on Ctrl+C. Needs a local MongoDB on 27017. The character sheet is in-app now, so there is no separate library to compile.
+- `./dev.sh` (repo root) — starts the API (nodemon) and web (Vite) together and shuts both down on Ctrl+C. Needs a local MongoDB on 27017.
 
 ### Full stack via Docker
-- `docker-compose up --build` — builds the web bundle, then the API (which serves the static web build in production), plus a MongoDB container. App is exposed on **localhost:5000** → container 4000. `Dockerfile` documents the build order (it no longer builds any character-sheet library).
+- `docker-compose up --build` — builds the web bundle, then the API (which serves the static web build in production), plus a MongoDB container. App is exposed on **localhost:5000** → container 4000; `Dockerfile` documents the build order.
+- The DB container is `mongo:8.0`. On Linux kernel 6.19+ stock `mongo:8.0` aborts on startup (SERVER-121912, a TCMalloc/rseq bug), so `docker-compose.yml` and `mongo.sh` set `GLIBC_TUNABLES=glibc.cpu.hwcaps=-SHSTK` to work around it (harmless on older kernels).
 
 ## Architecture notes
 
@@ -44,9 +44,11 @@ All three packages use **yarn** (yarn.lock present in each).
 - Defined in `api/auth/index.js`. Auth is **session-based**, not JWT. On login a random token is pushed onto the user's `session[]` array (stored in Mongo) and also kept in the express-session cookie (`dnd.sid`). `isAuth` looks up the user by `session.token`, attaching `req.user`.
 - Three role gates compose after `isAuth`: `isMaster`, `isAdmin`, `isMasterOrAdmin` (checked against boolean `master`/`admin` flags on the User). A typical "act on anyone's data" route requires master/admin; the `/me` variant of the same route lets a normal user act only on their own data (ownership checked inside the handler, e.g. `isOwnedByUser`).
 - Many endpoints come in mirrored pairs: privileged (`/api/char`) vs. self-scoped (`/api/char/me`). When adding character/initiative features, preserve this pairing.
+- `/api/monster` and `/api/encounter` routes are **master-only** (`isMaster`); the Menu hides those tabs for non-masters via the `/api/me/master` probe. Keep the route gate and the client probe in sync.
 
 ### Data models
 Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter`. Character sheet data is stored as an opaque `character` sub-document — its shape is defined by `web/src/Pages/character-sheet/sheet/dnd-character.ts`, and the backend does not interpret its fields. (Because it's opaque, sheet-model changes need no API changes; removed fields just become orphan data on existing documents.) Passwords are bcrypt-hashed in a `pre('save')` hook on the User schema.
+- **Mongoose 8** (driver v6): queries take **no callbacks** — `await` them (a query with no callback and no `await`/`.then`/`.exec` never runs), and construct ids with **`new mongoose.Types.ObjectId(x)`** (the constructor throws if called without `new`).
 
 ### Bootstrap behavior
 `api/db/index.js` seeds a default admin (`name: admin`, `password: asdasdasd`) on first connect if the users collection is empty. The MongoDB connection is configured via `DB_URI`.
