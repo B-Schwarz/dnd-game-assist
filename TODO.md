@@ -48,7 +48,7 @@
 4. [x] Change the chromatic of the leben speicher to green and put it left of board löschen
 5. [x] Modernize the additional info of selected entities
 6. [x] Add hotkeys, so that by pressing J the previous character is selected and with k the next one
-7. [x] The conditions Rage and Konzentraion should be on their own line at the bottom, as they are the most common
+7. [x] The conditions Rage and Konzentration should be on their own line at the bottom, as they are the most common
 8. [x] When the additional infos of one character is open, it should close when the turn is changed and the characters wohs turn it is should have its additional info opened
 9. [x] Put the NPC Tag at the beginning of the line
 10. [x] ~~A player should be able to click on their own character and toggle shield (with an input field to set a number) and~~ add the number behind the AC in paranthesis in this style: AC: 14 (+2). ~~Also they should be able to toggle concentraion and rage.~~ A DM should also be able to set the shield
@@ -84,3 +84,4 @@
 2. [x] Acceptance tests
 3. [ ] Update dependencies
 4. [x] Update displayed version
+5. [ ] Create github actions to require PRs to pass the unit and acceptance tests

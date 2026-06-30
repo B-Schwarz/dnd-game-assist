@@ -192,21 +192,21 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] Responsive: at iPad (768px) and iPad mini (744px) widths the sheet keeps its two-column layout.
 
 ## Initiative — master
-- [ ] Add a player, a monster, an NPC, and an encounter to the board from the add modal.
-- [ ] Sort orders by initiative; "Board Löschen" clears after confirm.
-- [ ] Next/prev turn (arrow buttons) and **hotkeys J/K** move the turn; round increments on wrap.
-- [ ] **Drag-to-reorder** changes order; the dragged row doesn't resize over an expanded entry.
-- [ ] The current-turn entry's panel auto-opens and the previous one closes on turn change.
-- [ ] Editing initiative / HP / AC / shield in the panel persists; AC shows `X (+shield)`.
-- [ ] "Leben speichern" pushes board HP to the character sheets; sheet HP polls/updates.
-- [ ] **Dead monster** greys out, drops to the bottom, and its turn is skipped automatically.
-- [ ] **Dead PC** keeps position with a red background; **dead NPC** greys out but keeps position.
-- [ ] The active turn is clearly highlighted (gold ring/accent) even over a dead red/grey row.
-- [ ] Hidden NPC row uses the hide-button colour; NPC tag and colour marker are first in the row.
+- [x] Add a player, a monster, an NPC, and an encounter to the board from the add modal.
+- [x] Sort orders by initiative; "Board Löschen" clears after confirm.
+- [x] Next/prev turn (arrow buttons) and **hotkeys J/K** move the turn; round increments on wrap.
+- [x] **Drag-to-reorder** changes order; the dragged row doesn't resize over an expanded entry.
+- [x] The current-turn entry's panel auto-opens and the previous one closes on turn change.
+- [x] Editing initiative / HP / AC / shield in the panel persists; AC shows `X (+shield)`.
+- [x] "Leben speichern" pushes board HP to the character sheets; sheet HP polls/updates.
+- [x] **Dead monster** greys out, drops to the bottom, and its turn is skipped automatically.
+- [x] **Dead PC** keeps position with a red background; **dead NPC** greys out but keeps position.
+- [x] The active turn is clearly highlighted (gold ring/accent) even over a dead red/grey row.
+- [x] Hidden NPC row uses the hide-button colour; NPC tag and colour marker are first in the row.
 
 ## Initiative — player view
-- [ ] A player sees the board, but hidden NPCs are not shown and NPC HP is hidden unless shared.
-- [ ] "HP teilen" on an NPC makes its HP visible to players.
+- [x] A player sees the board, but hidden NPCs are not shown and NPC HP is hidden unless shared.
+- [x] "HP teilen" on an NPC makes its HP visible to players.
 
 ## Admin — users
 - [x] Register a new user from the admin panel; it appears in the list.

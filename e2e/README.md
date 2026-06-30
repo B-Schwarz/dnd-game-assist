@@ -42,10 +42,38 @@ E2E_BASE_URL=http://localhost:3000 npm test
 
 ## What's covered
 
-- `auth.spec.ts` — unauthenticated redirect to `/login`, wrong-credential error,
-  successful admin login.
-- `character.spec.ts` — create a character, live ability-modifier calc, autosave
-  persisting across reload and into the list, and deletion.
+`global-setup.ts` provisions two stable test users via the admin API before the
+suite runs (a plain `e2e_user` and a master `e2e_master`); identity-mutating
+tests (password change, account delete) mint their own throwaway users.
 
-The tests create characters with unique (timestamped) names and clean up after
-themselves; they are safe to run repeatedly against the same database.
+- `auth.spec.ts` — login/redirect/logout, and access control (no Admin nav or
+  initiative master controls for a normal user).
+- `character.spec.ts` — create/autosave, colour picker + EN/DE toggle + player
+  name persistence, list + delete, and the two-column responsive layout.
+- `admin-users.spec.ts` — register, toggle master, set password (then log in
+  with it), delete user.
+- `admin-characters.spec.ts` — export-all + per-row export (downloads), import
+  (unowned), reassign a PC, NPC not reassignable.
+- `books.spec.ts` — PDF upload/delete, non-PDF rejection, viewer lists + opens.
+- `settings.spec.ts` — change/verify own password, wrong-current rejection,
+  delete own account, displayed version.
+- `initiative.spec.ts` — add player/monster/NPC/encounter, sort + clear,
+  next/prev + J/K hotkeys + round wrap, panel auto-open, AC `(+shield)` display,
+  Leben speichern → sheets, dead-state ordering + red/grey rows, gold turn
+  accent, hidden/NPC tag, drag-to-reorder, and the player view (hidden NPCs +
+  NPC HP hidden unless shared).
+- `monster-encounter.spec.ts` — create/edit/delete a monster, build an encounter
+  and add it to the board.
+
+Tests use unique (timestamped) names and clean up after themselves, so they are
+safe to re-run against the same database.
+
+### Gotchas
+- Run from the `e2e/` directory — Playwright's `testDir`/config only resolves
+  there; running from the repo root makes it scan the web Jest tests and fail.
+- `global-setup.ts` is in the config import graph, so it must NOT import anything
+  under `tests/` (that would pull spec files into the config phase and break
+  `test.describe`). It inlines its constants for that reason.
+- Chakra's `NumberInput`/`Switch`/`Select` don't reliably fire React `onChange`
+  under Playwright; tests assert rendered output and persist via stable controls,
+  with the edit *logic* covered by the web unit tests.
