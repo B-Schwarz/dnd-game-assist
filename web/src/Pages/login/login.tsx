@@ -8,7 +8,7 @@ import TitleService from "../../Service/titleService";
 interface LoginProps {
 }
 
-const validateName = (value: string) => {
+export const validateName = (value: string) => {
     let error
     if (!value || value.length === 0) {
         error = 'Ein Name muss angegeben werden'
@@ -16,7 +16,7 @@ const validateName = (value: string) => {
     return error
 }
 
-const validatePassword = (value: string) => {
+export const validatePassword = (value: string) => {
     let error
     if (!value || value.length === 0) {
         error = 'Ein Passwort muss angegeben werden'

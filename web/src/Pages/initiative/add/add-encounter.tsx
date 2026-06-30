@@ -5,6 +5,7 @@ import "../initiative.css";
 import _ from "lodash";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
+import {buildEncounterInstances} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -12,8 +13,8 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<EncounterType[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        // @ts-ignore — encounter rows carry a `name`, not a `character.name`
+        setValue(_.cloneDeep(data.filter(d => (d.name || '').toLowerCase().includes(val.toLowerCase()))))
     }
 
     const getMonster = () => {
@@ -77,20 +78,13 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (m: EncounterType) => {
-        m.encounter.forEach((encounter: EncounterMonster) => {
-            for (let i = 0; i < encounter.amount; i++) {
-                const roll = Math.floor(Math.random() * 20)
-
-                if (encounter.data && encounter.data.character.dex) {
-                    const dexMod = Math.floor((Number(encounter.data.character.dex) - 10) / 2)
-                    encounter.data.initiative = dexMod + roll
-                }
-
-                axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: encounter.data})
-                    .then(() => props.u())
-                    .catch(() => {
-                    })
-            }
+        // One independently-rolled (deep-cloned) board entry per monster per
+        // amount; see buildEncounterInstances.
+        buildEncounterInstances(m).forEach((player) => {
+            axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player})
+                .then(() => props.u())
+                .catch(() => {
+                })
         })
     }
 

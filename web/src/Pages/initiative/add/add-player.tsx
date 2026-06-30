@@ -17,7 +17,7 @@ import "../initiative.css";
 import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
-import {DnDCharacter} from "../../character-sheet/sheet/dnd-character";
+import {colorToMarker, filterByName, playableEntries} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -25,32 +25,13 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        setValue(_.cloneDeep(filterByName(data, val)))
     }
 
     const getPlayer = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist')
             .then((d) => {
-                setValue([])
-                let players: Player[] = []
-                d.data.forEach((c: {
-                    character: DnDCharacter;
-                    _id: string;
-                    npc: boolean;
-                }) => {
-                    if (!c.npc) {
-                        players.push({
-                            character: c.character,
-                            id: c._id,
-                            initiative: 0,
-                            isMaster: false,
-                            isTurnSet: false,
-                            statusEffects: [],
-                            turnId: 0
-                        })
-                    }
-                })
+                const players = playableEntries(d.data)
                 setValue(players)
                 setData(players)
             })
@@ -61,7 +42,7 @@ const App = (props: {u: () => void}) => {
     const onAdd = (p: Player) => {
         let _p = p
         if (_p.character.color) {
-            _p.colorMarker = Number(_p.character.color)
+            _p.colorMarker = colorToMarker(_p.character.color)
         }
         axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: _p})
             .then(() => props.u())

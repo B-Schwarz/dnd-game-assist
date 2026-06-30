@@ -3,10 +3,8 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from "./App";
 import {ChakraProvider} from '@chakra-ui/react';
-import axios from "axios";
+import "./Service/api";
 import {Helmet, HelmetProvider} from "react-helmet-async";
-
-axios.defaults.withCredentials = true
 
 const root = createRoot(document.getElementById('root')!)
 

@@ -5,7 +5,7 @@ import "../initiative.css";
 import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
-import {DnDCharacter} from "../../character-sheet/sheet/dnd-character";
+import {abilityModifier, applyHidden, colorToMarker, filterByName, npcEntries, rollD20} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -13,34 +13,13 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        setValue(_.cloneDeep(filterByName(data, val)))
     }
 
     const getPlayer = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist/npc')
             .then((d) => {
-                setValue([])
-                let npcs: Player[] = []
-                d.data.forEach((c: {
-                    character: DnDCharacter;
-                    _id: string;
-                    npc: boolean;
-                }) => {
-                    if (c.npc) {
-                        npcs.push({
-                            character: c.character,
-                            id: c._id,
-                            initiative: 0,
-                            isMaster: false,
-                            isTurnSet: false,
-                            statusEffects: [],
-                            turnId: 0,
-                            hidden: false,
-                            npc: true
-                        })
-                    }
-                })
+                const npcs = npcEntries(d.data)
                 setValue(npcs)
                 setData(npcs)
             })
@@ -49,11 +28,10 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (p: Player) => {
-        const roll = Math.floor(Math.random() * 20)
-        const dexMod = Math.floor((Number(p.character.dex) - 10) / 2) || 0
-        p.initiative = dexMod + roll
+        const dexMod = abilityModifier(p.character.dex) || 0
+        p.initiative = dexMod + rollD20()
         if (p.character.color) {
-            p.colorMarker = Number(p.character.color)
+            p.colorMarker = colorToMarker(p.character.color)
         }
         axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: p})
             .then(() => props.u())
@@ -62,7 +40,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const onHide = (p: Player, val: boolean) => {
-        p.hidden = val
+        applyHidden(p, val)
     }
 
     useEffect(() => {

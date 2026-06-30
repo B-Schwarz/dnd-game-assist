@@ -6,6 +6,7 @@ import {Player} from "../player.type";
 import _ from "lodash";
 import axios from "axios";
 import {Monster} from "../../monster/monster.type";
+import {abilityModifier, applyHidden, filterByName, rollD20} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -13,8 +14,7 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        setValue(_.cloneDeep(filterByName(data, val)))
     }
 
     const getMonster = () => {
@@ -58,9 +58,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (m: Player) => {
-        const roll = Math.floor(Math.random() * 20)
-        const dexMod = Math.floor((Number(m.character.dex) - 10) / 2)
-        m.initiative = dexMod + roll
+        m.initiative = abilityModifier(m.character.dex) + rollD20()
 
         axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: m})
             .then(() => props.u())
@@ -69,7 +67,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const onHide = (m: Player, val: boolean) => {
-        m.hidden = val
+        applyHidden(m, val)
     }
 
     useEffect(() => {

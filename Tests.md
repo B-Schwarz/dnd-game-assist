@@ -162,18 +162,18 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] Enum snapshots: `StatusEffectsEnum` (all conditions present) and `ColorMarkerEnum` (`NONE…WHITE`) are stable.
 
 ## Web — initiative add modals (`web/src/Pages/initiative/add`)
-- [ ] `add-player` `search` filters by name, case-insensitively, without mutating the source list; empty query → full list.
-- [ ] `add-player` `getPlayer` lists only non-NPC characters; `add-npc` `getPlayer` lists only NPCs.
-- [ ] Monster/NPC `onAdd` rolls initiative as `1d20 + dexMod`; a missing/non-numeric dex → modifier 0.
-- [ ] `add-npc` `onAdd` maps a character `color` to `colorMarker`.
-- [ ] `onHide` toggles `hidden` on the entry before it is added.
-- [ ] `add-encounter` `onAdd` instantiates each monster `amount` times with independently rolled initiatives; `amount:0` adds none.
+- [x] `add-player` `search` filters by name, case-insensitively, without mutating the source list; empty query → full list.
+- [x] `add-player` `getPlayer` lists only non-NPC characters; `add-npc` `getPlayer` lists only NPCs.
+- [x] Monster/NPC `onAdd` rolls initiative as `1d20 + dexMod`; a missing/non-numeric dex → modifier 0.
+- [x] `add-npc` `onAdd` maps a character `color` to `colorMarker`.
+- [x] `onHide` toggles `hidden` on the entry before it is added.
+- [x] `add-encounter` `onAdd` instantiates each monster `amount` times with independently rolled initiatives; `amount:0` adds none.
 
 ## Web — login & shared
-- [ ] `validateName` / `validatePassword` return a German error on empty input, `undefined` otherwise.
-- [ ] `withAuth` HOC redirects to `/login` on a 401 from `/api/me`, renders the wrapped component otherwise.
-- [ ] Axios is configured with the API prefix (`REACT_APP_API_PREFIX`) and sends credentials (`withCredentials`).
-- [ ] The settings page renders the version from `process.env.REACT_APP_VERSION` (build injects it; the full `package.json` is **not** bundled).
+- [x] `validateName` / `validatePassword` return a German error on empty input, `undefined` otherwise.
+- [x] `withAuth` HOC redirects to `/login` on a 401 from `/api/me`, renders the wrapped component otherwise.
+- [x] Axios is configured with the API prefix (`REACT_APP_API_PREFIX`) and sends credentials (`withCredentials`).
+- [x] The settings page renders the version from `process.env.REACT_APP_VERSION` (build injects it; the full `package.json` is **not** bundled).
 
 ---
 
