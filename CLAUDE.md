@@ -72,6 +72,11 @@ Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter
   - **axios is ESM**; CRA's Jest doesn't transform it, so any test that transitively imports axios needs the `jest.transformIgnorePatterns` override in `web/package.json` (`node_modules/(?!(axios)/)`).
   - CRA sets **`resetMocks: true`**, which wipes `jest.fn` implementations before each test. In a `jest.mock('axios', …)` factory use **plain functions** (`get: () => Promise.reject(...)`), not `jest.fn(...)`, or the mocked calls return `undefined` and `.then`/`.catch` chains in mounted effects throw. See `App.test.tsx`.
 
+### Testing (Acceptance / e2e)
+- `e2e/` is a standalone Playwright package (its own `package.json`, like `api`/`web`) that drives the **real** stack through a browser. Setup: `cd e2e && npm install && npx playwright install chromium`; run with `npm test`.
+- Prerequisite: a **MongoDB on 127.0.0.1:27017** (start it with `./mongo.sh` at the repo root, or any local `mongod`) and the seeded `admin`/`asdasdasd`. Playwright's `webServer` starts the API (`:4000`) and web (`:3000`) itself (reusing them if already up); point at a running stack instead with `E2E_BASE_URL=http://localhost:3000 npm test`.
+- Tests create timestamp-named characters and clean up, so they're safe to re-run against the same DB. Selectors lean on stable hooks: login `#name`/`#password`, the sheet's `Character Name` placeholder, and `.dnd-ability`/`.dnd-hpbar-fill` classes. See `e2e/README.md`.
+
 ### Conventions to match
 - API responses are typically bare HTTP status codes (`res.sendStatus(200/401/404)`) rather than JSON bodies; follow that style.
 - Some log/comment strings are in German (`"Erfolgreiche Datenbankverbindung"`); this is expected, not a bug.
