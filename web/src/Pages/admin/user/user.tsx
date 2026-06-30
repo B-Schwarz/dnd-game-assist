@@ -23,7 +23,7 @@ import {
     useToast,
     VStack
 } from "@chakra-ui/react";
-import {Divider} from "@chakra-ui/layout";
+import {Divider} from "@chakra-ui/react";
 import axios from "axios";
 import {User} from "../user.type";
 

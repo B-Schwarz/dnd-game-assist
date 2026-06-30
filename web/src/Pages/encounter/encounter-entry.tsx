@@ -17,7 +17,7 @@ import {
     Input,
     Select,
     Stack,
-    StackItem,
+    Box,
     Switch,
     Table,
     Tbody,
@@ -133,7 +133,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const editName = () => {
         return (
             <Stack direction={edit ? 'column' : 'row'} w='100%'><Text fontWeight='bold'>{encounter.name}:</Text>
-                {edit && <StackItem><Input defaultValue={name} onChange={(evt) => setName(evt.currentTarget.value)}/></StackItem> }
+                {edit && <Box><Input defaultValue={name} onChange={(evt) => setName(evt.currentTarget.value)}/></Box> }
                 {!edit && <Text maxWidth="65vw" wordBreak="break-word">
                         {name}
                     </Text>}

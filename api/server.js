@@ -76,8 +76,10 @@ app.use(sess)
 
 const limiter = RateLimit({
     windowMs: 60*1000,
-    max: 10000,
-    standardHeaders: true
+    limit: 10000,
+    // express-rate-limit v8 defaults to the draft-8 combined `RateLimit` header;
+    // pin draft-6 to keep the discrete `RateLimit-Limit`/`-Remaining`/`-Reset` headers.
+    standardHeaders: 'draft-6'
 })
 
 app.use('/api', limiter)

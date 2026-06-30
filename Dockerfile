@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.19
+FROM node:lts-alpine3.22
 # API
 COPY api/admin app/admin
 COPY api/auth app/auth

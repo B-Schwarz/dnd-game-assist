@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import WithAuth from "../login/withAuth";
-import {Accordion, Button, HStack, IconButton, Input, StackItem, VStack} from "@chakra-ui/react";
+import {Accordion, Button, HStack, IconButton, Input, Box, VStack} from "@chakra-ui/react";
 import axios from "axios";
 import {AddIcon} from "@chakra-ui/icons";
 import TitleService from "../../Service/titleService";
-import {Text} from "@chakra-ui/layout";
+import {Text} from "@chakra-ui/react";
 import {AiOutlineArrowLeft} from "@react-icons/all-files/ai/AiOutlineArrowLeft";
 import {AiOutlineArrowRight} from "@react-icons/all-files/ai/AiOutlineArrowRight";
 import {EncounterType} from "./encounter.type";
@@ -96,7 +96,7 @@ const App = () => {
                         }
                     )}
                 </Accordion>
-                <StackItem>
+                <Box>
                     <HStack spacing='1rem'>
                         <Button disabled={disableLeft}
                                 onClick={() => switchPage(encounter, page - 1)}><AiOutlineArrowLeft/></Button>
@@ -104,7 +104,7 @@ const App = () => {
                         <Button disabled={disableRight}
                                 onClick={() => switchPage(encounter, page + 1)}><AiOutlineArrowRight/></Button>
                     </HStack>
-                </StackItem>
+                </Box>
             </VStack>
         </React.Fragment>
     )

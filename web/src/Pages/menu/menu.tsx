@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Box, Button, HStack, Spacer, Tag} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
-import {Divider} from "@chakra-ui/layout";
+import {Divider} from "@chakra-ui/react";
 import {Link as ReactRouterLink, useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";

@@ -82,6 +82,6 @@
 
 1. [x] Unit tests
 2. [x] Acceptance tests
-3. [ ] Update dependencies
+3. [x] Update dependencies
 4. [x] Update displayed version
 5. [x] Create github actions to require PRs to pass the unit and acceptance tests

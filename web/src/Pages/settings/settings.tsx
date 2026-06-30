@@ -24,7 +24,7 @@ import {DeleteIcon, ExternalLinkIcon} from "@chakra-ui/icons";
 import WithAuth from "../login/withAuth";
 import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
 import TitleService from "../../Service/titleService";
-import {Text} from "@chakra-ui/layout";
+import {Text} from "@chakra-ui/react";
 import {LanguageType} from "./language.type";
 
 const App = () => {

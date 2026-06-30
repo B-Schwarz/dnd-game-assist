@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import WithAuth from "../login/withAuth";
-import {Divider, Text} from "@chakra-ui/layout";
+import {Divider, Text} from "@chakra-ui/react";
 import InitiaveEntry from "./initiave-entry";
 import {
     Box,
@@ -10,7 +10,6 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
-    StackItem,
     useDisclosure,
     useToast,
     VStack
@@ -266,7 +265,7 @@ const App = () => {
                 <VStack>
                     <Text fontSize='2xl' className='init-round'>Runde: {round}</Text>
                     { isMaster &&
-                        <StackItem>
+                        <Box>
                             <div className='init-controls'>
                                 <button className='init-btn init-btn--success' onClick={saveHealthToSheets}>Leben speichern</button>
                                 <button className='init-btn init-btn--danger' onClick={() => {
@@ -283,7 +282,7 @@ const App = () => {
                                 </div>
                                 <button className='init-btn init-btn--primary' onClick={onOpen}>Hinzufügen</button>
                             </div>
-                        </StackItem>
+                        </Box>
                     }
                     <Divider marginTop='1rem'/>
                 </VStack>

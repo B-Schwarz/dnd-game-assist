@@ -11,6 +11,6 @@ services:
       - DND_COOKIE_SECRET="asdasdasd"
       - CORS_URL="localhost:5000"
   db:
-    image: mongo:4.4.11-rc1
+    image: mongo:6.0
     volumes:
       - ./mongo_volume:/data/db

@@ -16,7 +16,7 @@ import {
     Text
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
-import {Divider} from "@chakra-ui/layout";
+import {Divider} from "@chakra-ui/react";
 import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
 import WithAuth from "../login/withAuth";
 import {Player} from "../initiative/player.type";

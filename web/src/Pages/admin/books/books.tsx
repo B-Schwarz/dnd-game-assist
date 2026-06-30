@@ -9,7 +9,7 @@ import {
     VStack
 } from "@chakra-ui/react";
 import {DeleteIcon} from "@chakra-ui/icons";
-import {Divider} from "@chakra-ui/layout";
+import {Divider} from "@chakra-ui/react";
 import axios from "axios";
 
 const App = () => {
