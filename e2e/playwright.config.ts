@@ -10,6 +10,7 @@ const reuse = !process.env.CI
 
 export default defineConfig({
     testDir: './tests',
+    globalSetup: require.resolve('./global-setup'),
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 1 : 0,

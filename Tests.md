@@ -180,16 +180,16 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 # Acceptance Tests (E2E)
 
 ## Auth & access control
-- [ ] Login with valid creds lands on the app; invalid creds shows an error and stays on `/login`.
-- [ ] Logout returns to `/login` and protected routes redirect when unauthenticated.
-- [ ] A normal user does **not** see the Admin nav entry; direct `/admin` is blocked.
-- [ ] A non-master does **not** see the initiative master controls.
+- [x] Login with valid creds lands on the app; invalid creds shows an error and stays on `/login`.
+- [x] Logout returns to `/login` and protected routes redirect when unauthenticated.
+- [x] A normal user does **not** see the Admin nav entry; direct `/admin` is blocked.
+- [x] A non-master does **not** see the initiative master controls.
 
 ## Character sheet lifecycle
-- [ ] Create a new character, open it, edit fields → autosaves (reload shows persisted values).
-- [ ] Colour picker reflects the chosen colour; EN/DE language toggle switches labels; player-name field persists.
-- [ ] Character list shows player name; delete removes the character.
-- [ ] Responsive: at iPad (768px) and iPad mini (744px) widths the sheet keeps its two-column layout.
+- [x] Create a new character, open it, edit fields → autosaves (reload shows persisted values).
+- [x] Colour picker reflects the chosen colour; EN/DE language toggle switches labels; player-name field persists.
+- [x] Character list shows player name; delete removes the character.
+- [x] Responsive: at iPad (768px) and iPad mini (744px) widths the sheet keeps its two-column layout.
 
 ## Initiative — master
 - [ ] Add a player, a monster, an NPC, and an encounter to the board from the add modal.
@@ -209,31 +209,31 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [ ] "HP teilen" on an NPC makes its HP visible to players.
 
 ## Admin — users
-- [ ] Register a new user from the admin panel; it appears in the list.
-- [ ] Toggle admin/master flags; the change persists.
-- [ ] **Set a user's password**, then log in as that user with the new password (old one fails).
-- [ ] Delete a user (with confirm) removes them and their characters.
+- [x] Register a new user from the admin panel; it appears in the list.
+- [x] Toggle admin/master flags; the change persists.
+- [x] **Set a user's password**, then log in as that user with the new password (old one fails).
+- [x] Delete a user (with confirm) removes them and their characters.
 
 ## Admin — characters
-- [ ] "Alle exportieren" downloads a JSON file containing every character + owner.
-- [ ] Per-row **Export** downloads a single, re-importable character file.
-- [ ] **Import** a file creates the characters as unowned; they appear with owner `—`.
-- [ ] **Reassign** a PC to another user updates the owner; round-trips back.
-- [ ] An **NPC row shows "nicht zuweisbar"** and cannot be reassigned.
+- [x] "Alle exportieren" downloads a JSON file containing every character + owner.
+- [x] Per-row **Export** downloads a single, re-importable character file.
+- [x] **Import** a file creates the characters as unowned; they appear with owner `—`.
+- [x] **Reassign** a PC to another user updates the owner; round-trips back.
+- [x] An **NPC row shows "nicht zuweisbar"** and cannot be reassigned.
 
 ## Admin — books
-- [ ] Upload a PDF; it appears in the list.
-- [ ] Uploading a non-PDF is rejected with an error toast.
-- [ ] Delete a book removes it from the list.
+- [x] Upload a PDF; it appears in the list.
+- [x] Uploading a non-PDF is rejected with an error toast.
+- [x] Delete a book removes it from the list.
 
 ## Account self-service (settings)
-- [ ] Change own password with the correct current password; re-login works with the new one, fails with the old.
-- [ ] Wrong current password shows an error and does not change the password.
-- [ ] Delete own account removes the user (and their characters) and lands back on `/login`.
-- [ ] The settings page shows the current app version (`2.0`).
+- [x] Change own password with the correct current password; re-login works with the new one, fails with the old.
+- [x] Wrong current password shows an error and does not change the password.
+- [x] Delete own account removes the user (and their characters) and lands back on `/login`.
+- [x] The settings page shows the current app version (`2.0`).
 
 ## Books viewer
-- [ ] The Books page lists available PDFs and opens one in the viewer.
+- [x] The Books page lists available PDFs and opens one in the viewer.
 
 ## Monster & Encounter editors
 - [ ] Create, edit, and delete a monster (master/admin).
