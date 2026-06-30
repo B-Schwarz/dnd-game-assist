@@ -8,7 +8,7 @@ Re-check before acting — dates and statuses move. Most items below are coupled
 
 | Component | Where | Status | Date | Notes / remediation |
 |---|---|---|---|---|
-| ~~**MongoDB 6.0**~~ | `docker-compose.yml`, `mongo.sh` | ✅ **Resolved 2026-06-30** → `mongo:8.0` | — | Bumped to 7.0 (Phase 1), then to 8.0 (EOL 2029-10) once Mongoose 8 (Phase 2) landed. |
+| ~~**MongoDB 6.0**~~ | `docker-compose.yml`, `mongo.sh` | ✅ **Resolved 2026-06-30** → `mongo:8.0` | — | Bumped to 7.0 (Phase 1), then to 8.0 (EOL 2029-10) once Mongoose 8 (Phase 2) landed. **Note:** on Linux kernel 6.19+ mongo:8.0 aborts on startup (SERVER-121912 — TCMalloc rseq ABI bug); both files set `GLIBC_TUNABLES=glibc.cpu.hwcaps=-SHSTK` to work around it (verified on kernel 7.0.14; harmless on older kernels). Remove when the upstream TCMalloc fix ships. |
 
 Not EOL (for reference): Node `lts` base image (Node 24 LTS, EOL 2028-04); **Express 4** — endoflife.date reports `eol: false` (maintenance + security support).
 
