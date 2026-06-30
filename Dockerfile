@@ -25,7 +25,7 @@ COPY web/index.html temp/web
 COPY web/.env.production temp/web
 COPY web/public temp/web/public
 RUN cd /temp/web \
-    && yarn install --ignore-engines
+    && yarn install --frozen-lockfile --ignore-engines
 
 COPY web/src temp/web/src
 
@@ -36,7 +36,7 @@ RUN cd /temp/web \
 
 # BUILD API
 RUN cd /app \
-    && yarn install --ignore-engines \
+    && yarn install --frozen-lockfile --ignore-engines \
     && rm -rf /temp
 
 WORKDIR /app
