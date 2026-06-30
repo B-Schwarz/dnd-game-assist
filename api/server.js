@@ -168,19 +168,19 @@ app.get('/api/initiative/turn/prev', isAuth, isMaster, prevTurn)
 //
 //  MONSTER
 //
-app.get('/api/monster/new', isAuth, isMasterOrAdmin, createMonster)
-app.get('/api/monster/list', isAuth, getMonsterList)
-app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
-app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
-app.get('/api/monster/:id', isAuth, isMasterOrAdmin, getMonster)
+app.get('/api/monster/new', isAuth, isMaster, createMonster)
+app.get('/api/monster/list', isAuth, isMaster, getMonsterList)
+app.put('/api/monster', isAuth, isMaster, saveMonster)
+app.delete('/api/monster/:id', isAuth, isMaster, deleteMonster)
+app.get('/api/monster/:id', isAuth, isMaster, getMonster)
 
 //
 //  ENCOUNTER
 //
-app.get('/api/encounter/new', isAuth, isMasterOrAdmin, createEncounter)
-app.get('/api/encounter/list', isAuth, isMasterOrAdmin, getEncounterList)
-app.put('/api/encounter', isAuth, isMasterOrAdmin, saveEncounter)
-app.delete('/api/encounter/:id', isAuth, isMasterOrAdmin, deleteEncounter)
+app.get('/api/encounter/new', isAuth, isMaster, createEncounter)
+app.get('/api/encounter/list', isAuth, isMaster, getEncounterList)
+app.put('/api/encounter', isAuth, isMaster, saveEncounter)
+app.delete('/api/encounter/:id', isAuth, isMaster, deleteEncounter)
 
 //
 //  BOOKS

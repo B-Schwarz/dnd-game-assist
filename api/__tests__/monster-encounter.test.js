@@ -34,8 +34,8 @@ describe('monster', () => {
         const got = await gm.get(`/api/monster/${created._id}`)
         expect(got.body.monster.name).toBe('Goblin')
 
-        // list is available to any authed user and omits __v
-        const list = await plain.get('/api/monster/list')
+        // list is master-only and omits __v
+        const list = await gm.get('/api/monster/list')
         expect(list.statusCode).toBe(200)
         expect(list.body[0].__v).toBeUndefined()
 
@@ -58,9 +58,19 @@ describe('monster', () => {
         expect(names).toEqual([...names].sort())
     })
 
-    test('a plain user cannot create a monster (401)', async () => {
+    // Monster is a master-only tab: every route (including list) requires the
+    // master flag — a plain user and an admin-without-master are both rejected.
+    test('non-masters cannot use any monster route (401)', async () => {
         await seed()
-        expect((await plain.get('/api/monster/new')).statusCode).toBe(401)
+        await makeUser({name: 'adminOnly', master: false, admin: true})
+        const adminOnly = await loginAgent(app, 'adminOnly')
+        for (const agent of [plain, adminOnly]) {
+            expect((await agent.get('/api/monster/new')).statusCode).toBe(401)
+            expect((await agent.get('/api/monster/list')).statusCode).toBe(401)
+            expect((await agent.put('/api/monster').send({charID: 'x', monster: {}})).statusCode).toBe(401)
+            expect((await agent.delete('/api/monster/123')).statusCode).toBe(401)
+            expect((await agent.get('/api/monster/123')).statusCode).toBe(401)
+        }
     })
 })
 
@@ -112,32 +122,21 @@ describe('encounter', () => {
         expect(await Encounter.findById(enc._id)).toBeNull()
     })
 
-    test('a plain user cannot list encounters (401)', async () => {
-        await seed()
-        expect((await plain.get('/api/encounter/list')).statusCode).toBe(401)
-    })
-
-    // Regression: the encounter routes were gated on isMaster only, so the
-    // seeded admin (admin:true, master:false) got 401 opening the Encounter
-    // tab. The frontend gates the tab on /api/me/admin/master, so the routes
-    // must accept admin OR master (like the monster routes).
-    test('an admin without the master flag can create and list encounters', async () => {
+    // Encounter is a master-only tab: a plain user and an admin-without-master
+    // are both rejected from every route.
+    test('non-masters cannot use any encounter route (401)', async () => {
         await seed()
         await makeUser({name: 'adminOnly', master: false, admin: true})
         const adminOnly = await loginAgent(app, 'adminOnly')
-        expect((await adminOnly.get('/api/encounter/new')).statusCode).toBe(200)
-        expect((await adminOnly.get('/api/encounter/list')).statusCode).toBe(200)
-
-        const enc = await Encounter.findOne()
-        expect((await adminOnly.put('/api/encounter').send({
-            encounterID: enc._id.toString(),
-            name: 'Admin Ambush',
-            encounter: {encounter: []},
-        })).statusCode).toBe(200)
-        expect((await adminOnly.delete(`/api/encounter/${enc._id}`)).statusCode).toBe(200)
+        for (const agent of [plain, adminOnly]) {
+            expect((await agent.get('/api/encounter/new')).statusCode).toBe(401)
+            expect((await agent.get('/api/encounter/list')).statusCode).toBe(401)
+            expect((await agent.put('/api/encounter').send({encounterID: 'x', encounter: {encounter: []}})).statusCode).toBe(401)
+            expect((await agent.delete('/api/encounter/123')).statusCode).toBe(401)
+        }
     })
 
-    test('a master without the admin flag can still create encounters', async () => {
+    test('a master without the admin flag can create and list encounters', async () => {
         await seed()
         await makeUser({name: 'masterOnly', master: true, admin: false})
         const masterOnly = await loginAgent(app, 'masterOnly')

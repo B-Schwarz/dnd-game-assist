@@ -14,7 +14,7 @@ const App = () => {
 
     const [monster, setMonster] = useState<Monster[]>([])
     const [value, setValue] = useState<Monster[]>([])
-    const [isAdminOrMaster, setIsAdminOrMaster] = useState(false)
+    const [isMaster, setIsMaster] = useState(false)
 
     const [page, setPage] = useState(1)
 
@@ -31,8 +31,8 @@ const App = () => {
                 switchPage(data.data, 1)
             })
             .finally(() => {
-                axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/admin/master')
-                    .then(() => setIsAdminOrMaster(true))
+                axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
+                    .then(() => setIsMaster(true))
                     .catch(() => {
                     })
             })
@@ -88,13 +88,13 @@ const App = () => {
                     <Input placeholder='Suchen...' onChange={async (evt) => {
                         await search(evt.currentTarget.value)
                     }}/>
-                    {isAdminOrMaster && <IconButton aria-label={'add new monster'} colorScheme='green' icon={<AddIcon/>}
+                    {isMaster && <IconButton aria-label={'add new monster'} colorScheme='green' icon={<AddIcon/>}
                                                     onClick={createMonster}/>}
                 </HStack>
                 <Accordion allowToggle w='100%' h='80vh' overflowY='scroll'>
                     {value.map((m: Monster) => {
                             if (!m.hidden)
-                                return (<MonsterEntry m={m} u={update} e={isAdminOrMaster} key={m._id}/>)
+                                return (<MonsterEntry m={m} u={update} e={isMaster} key={m._id}/>)
                             else
                                 return <React.Fragment key={m._id}/>
                         }
