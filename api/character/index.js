@@ -251,15 +251,13 @@ const getNPCList = async (req, res) => {
 const deleteCharacter = async (req, res) => {
     const charID = req.params.id
 
-    User.updateOne({character: mongoose.Types.ObjectId(charID)}, {
+    await User.updateOne({character: new mongoose.Types.ObjectId(charID)}, {
         $pullAll: {
-            character: [mongoose.Types.ObjectId(charID)]
+            character: [new mongoose.Types.ObjectId(charID)]
         }
-    }, () => {
     })
 
-    Character.deleteOne({_id: charID}, () => {
-    })
+    await Character.deleteOne({_id: charID})
 
     res.sendStatus(200)
 }
@@ -267,15 +265,13 @@ const deleteCharacter = async (req, res) => {
 const deleteOwnCharacter = async (req, res) => {
     const charID = req.params.id
 
-    User.updateOne({_id: req.user._id, character: mongoose.Types.ObjectId(charID)}, {
+    await User.updateOne({_id: req.user._id, character: new mongoose.Types.ObjectId(charID)}, {
         $pullAll: {
-            character: [mongoose.Types.ObjectId(charID)]
+            character: [new mongoose.Types.ObjectId(charID)]
         }
-    }, () => {
     })
 
-    Character.deleteOne({_id: charID}, () => {
-    })
+    await Character.deleteOne({_id: charID})
 
     res.sendStatus(200)
 }
@@ -368,12 +364,12 @@ const reassignCharacter = async (req, res) => {
         }
 
         await User.updateMany(
-            {character: mongoose.Types.ObjectId(charID)},
-            {$pull: {character: mongoose.Types.ObjectId(charID)}}
+            {character: new mongoose.Types.ObjectId(charID)},
+            {$pull: {character: new mongoose.Types.ObjectId(charID)}}
         )
         await User.updateOne(
             {_id: toUserID},
-            {$addToSet: {character: mongoose.Types.ObjectId(charID)}}
+            {$addToSet: {character: new mongoose.Types.ObjectId(charID)}}
         )
 
         res.sendStatus(200)

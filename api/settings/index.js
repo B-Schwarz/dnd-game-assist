@@ -9,14 +9,12 @@ const deleteOwnAccount = async (req, res) => {
             _id: {
                 $in: chars
             }
-        }, () => {
         }).catch(() => {
         })
     }
 
 
-    await User.deleteOne({_id: req.user._id}, () => {
-    }).catch(() => {})
+    await User.deleteOne({_id: req.user._id}).catch(() => {})
     req.session.destroy()
 
     res.sendStatus(200)
@@ -41,12 +39,10 @@ const deleteAccount = async (req, res) => {
                     _id: {
                         $in: chars
                     }
-                }, () => {
                 }).catch(() => {})
             }
 
-            await User.deleteOne({_id: userID}, () => {
-            }).catch(() => {})
+            await User.deleteOne({_id: userID}).catch(() => {})
 
             res.sendStatus(200)
         } catch (_) {

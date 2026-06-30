@@ -8,7 +8,7 @@ Re-check before acting — dates and statuses move. Most items below are coupled
 
 | Component | Where | Status | Date | Notes / remediation |
 |---|---|---|---|---|
-| ~~**MongoDB 6.0**~~ | `docker-compose.yml`, `mongo.sh` | ✅ **Resolved 2026-06-30** → `mongo:7.0` | — | Bumped to 7.0 (EOL 2027-08). 8.0 (EOL 2029-10) is unlocked by the Mongoose 8 upgrade (Phase 2). |
+| ~~**MongoDB 6.0**~~ | `docker-compose.yml`, `mongo.sh` | ✅ **Resolved 2026-06-30** → `mongo:8.0` | — | Bumped to 7.0 (Phase 1), then to 8.0 (EOL 2029-10) once Mongoose 8 (Phase 2) landed. |
 
 Not EOL (for reference): Node `lts` base image (Node 24 LTS, EOL 2028-04); **Express 4** — endoflife.date reports `eol: false` (maintenance + security support).
 
@@ -17,7 +17,7 @@ Not EOL (for reference): Node `lts` base image (Node 24 LTS, EOL 2028-04); **Exp
 | Package | Where | Status | Notes / remediation |
 |---|---|---|---|
 | **create-react-app / `react-scripts` 5.0.1** | `web` (build toolchain) | **Deprecated/sunset by React team (Feb 2025)**, unmaintained | Not flagged by npm, but the project is dead. Migrate to Vite (or Next). Also the source of most dev-only `npm audit` noise. Large structural task. |
-| **`mongoose` 6.13.x** | `api` | **Out of support window** (only latest two majors maintained — now 9 + 8) | Upgrade to Mongoose 8 unlocks MongoDB 7/8 and clears the AWS-SDK transitive audit chain. Held back (breaking). Phase 2. |
+| ~~**`mongoose` 6.13.x**~~ | `api` | ✅ **Resolved 2026-06-30** → `^8.24.1` | Upgraded to Mongoose 8 (bundles mongodb driver v6). Fixed the 7→8 breaking changes in handlers: removed callback args from `deleteOne`/`deleteMany`/`updateOne` (callbacks dropped in v7) and `await`ed them, and switched `mongoose.Types.ObjectId(x)` → `new mongoose.Types.ObjectId(x)`. Unlocked MongoDB 8.0. |
 | ~~**`moment` 2.x**~~ | `api` | ✅ **Resolved 2026-06-30** → removed | Was a direct dependency but imported nowhere in source; dropped entirely (no replacement needed). |
 
 ## npm-flagged deprecated packages (in use)
@@ -31,5 +31,5 @@ Not EOL (for reference): Node `lts` base image (Node 24 LTS, EOL 2028-04); **Exp
 ## Suggested order of remediation
 
 1. ✅ **Quick wins (done 2026-06-30):** `uuid@9 → 11`; remove `moment` (unused); remove `lz-string` + `@types/lz-string` (unused); `mongo:6.0 → 7.0`. API (106) + web (89) test suites and `CI=true npm run build` all green.
-2. **Medium:** Mongoose 6 → 8 (then MongoDB 8.0; clears most prod audit advisories).
+2. ✅ **Medium (done 2026-06-30):** Mongoose 6 → 8 (`^8.24.1`) + MongoDB 8.0. Handler call-sites fixed for the v7 callback removal and `new`-required `ObjectId`. API suite 106/106 green; `strictQuery` deprecation warning gone.
 3. **Large/structural:** Replace Create React App (Vite) — unblocks React 19 / Chakra v3 and the dev-toolchain audit items.
