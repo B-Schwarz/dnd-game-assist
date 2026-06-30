@@ -236,5 +236,5 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] The Books page lists available PDFs and opens one in the viewer.
 
 ## Monster & Encounter editors
-- [ ] Create, edit, and delete a monster (master/admin).
-- [ ] Build an encounter from monsters and add it to the initiative board.
+- [x] Create, edit, and delete a monster (master/admin).
+- [x] Build an encounter from monsters and add it to the initiative board.
