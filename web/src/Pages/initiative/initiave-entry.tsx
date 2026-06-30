@@ -30,6 +30,18 @@ import {IoEyeOffSharp, IoEyeSharp} from "react-icons/io5";
 import {MdDragIndicator} from "react-icons/md";
 import {DeleteIcon} from "@chakra-ui/icons";
 import {ColorMarkerEnum} from "./color-marker.enum";
+import {
+    acDisplay as acDisplayUtil,
+    applyDamage,
+    applyHeal,
+    calcHp as calcHpUtil,
+    calcMaxHp as calcMaxHpUtil,
+    canSeeHp,
+    formatSave,
+    isDead,
+    isRowHiddenFromPlayer,
+    markerColor,
+} from "./initiative-entry.utils";
 import {Mutex} from "async-mutex"
 import {useSortable} from "@dnd-kit/sortable";
 import "./initiative.css";
@@ -74,7 +86,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
     const [effects, setEffects] = useState([])
 
     const [schaden, setSchaden] = useState(0)
-    const [dead, setDead] = useState(Number(hp) === 0)
+    const [dead, setDead] = useState(isDead(hp))
 
     const [colorMarker, setColorMarker] = useState<ColorMarkerEnum>(props.player.colorMarker ?? ColorMarkerEnum.NONE)
 
@@ -147,13 +159,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
     }
 
     // AC, with the active shield bonus shown in parentheses, e.g. "14 (+2)"
-    const acDisplay = () => {
-        if (shieldActive && Number(shield) !== 0) {
-            const s = Number(shield)
-            return `${ac} (${s > 0 ? '+' : ''}${s})`
-        }
-        return String(ac)
-    }
+    const acDisplay = () => acDisplayUtil(ac, shieldActive, shield)
 
     const onDelete = () => {
         axios.delete(process.env.REACT_APP_API_PREFIX + `/api/initiative/player/${props.player.turnId}`)
@@ -175,134 +181,19 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
         )
     }
 
-    const strSave = () => {
-        try {
-            let save = Number(props.player.character.strSave)
-            if (!Number.isNaN(save)) {
-                return (
-                    <Text>{save > 0 && '+'}{save}</Text>
-                )
-            }
-
-        } catch (_) {
-        }
-
-        return (
-            <Text>0</Text>
-        )
-
-    }
-
-    const dexSave = () => {
-        try {
-            let save = Number(props.player.character.dexSave)
-            if (!Number.isNaN(save)) {
-                return (
-                    <Text>{save > 0 && '+'}{save}</Text>
-                )
-            }
-        } catch (_) {
-        }
-
-        return (
-            <Text>0</Text>
-        )
-    }
-
-    const conSave = () => {
-        try {
-            let save = Number(props.player.character.conSave)
-            if (!Number.isNaN(save)) {
-                return (
-                    <Text>{save > 0 && '+'}{save}</Text>
-                )
-            }
-        } catch (_) {
-        }
-
-        return (
-            <Text>0</Text>
-        )
-    }
-
-    const intSave = () => {
-        try {
-            let save = Number(props.player.character.intSave)
-            if (!Number.isNaN(save)) {
-                return (
-                    <Text>{save > 0 && '+'}{save}</Text>
-                )
-            }
-        } catch (_) {
-        }
-
-        return (
-            <Text>0</Text>
-        )
-    }
-
-    const wisSave = () => {
-        try {
-            let save = Number(props.player.character.wisSave)
-            if (!Number.isNaN(save)) {
-                return (
-                    <Text>{save > 0 && '+'}{save}</Text>
-                )
-            }
-        } catch (_) {
-        }
-
-        return (
-            <Text>0</Text>
-        )
-    }
-
-    const chaSave = () => {
-        try {
-            let save = Number(props.player.character.chaSave)
-            if (!Number.isNaN(save)) {
-                return (
-                    <Text>{save > 0 && '+'}{save}</Text>
-                )
-            }
-        } catch (_) {
-        }
-
-        return (
-            <Text>0</Text>
-        )
-    }
+    const strSave = () => <Text>{formatSave(props.player.character.strSave)}</Text>
+    const dexSave = () => <Text>{formatSave(props.player.character.dexSave)}</Text>
+    const conSave = () => <Text>{formatSave(props.player.character.conSave)}</Text>
+    const intSave = () => <Text>{formatSave(props.player.character.intSave)}</Text>
+    const wisSave = () => <Text>{formatSave(props.player.character.wisSave)}</Text>
+    const chaSave = () => <Text>{formatSave(props.player.character.chaSave)}</Text>
 
     function calcHp() {
-        let out = hp
-        try {
-            if (Number(tempHp) > 0) {
-                out += `(+${tempHp})`
-            }
-        } catch (_) {
-        }
-        out += '/' + maxHp
-        return out!
+        return calcHpUtil(hp, tempHp, maxHp)
     }
 
     function calcMaxHp() {
-        if (!tempHp && maxHp) {
-            return maxHp
-        }
-
-        try {
-            const m = Number(maxHp)
-            const h = Number(hp)
-            const t = Number(tempHp)
-
-            if (h + t > m) {
-                return h + t
-            } else {
-                return m
-            }
-        } catch (_) {
-            return 0
-        }
+        return calcMaxHpUtil(hp, tempHp, maxHp)
     }
 
     function createStatusIcons() {
@@ -494,45 +385,20 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
     }
 
     const doSchaden = () => {
-        let dmg = schaden
-        try {
-            const tempHPval = Number(tempHp)
-            if (tempHPval > 0) {
-
-                if (tempHPval > schaden) {
-                    onTempHpEdit(String(Number(tempHp) - dmg))
-                    dmg = 0
-                } else {
-                    onTempHpEdit('0')
-                    dmg -= tempHPval
-                }
-            }
-        } catch (_) {
+        const result = applyDamage(hp, tempHp, schaden)
+        if (result.tempHpChanged) {
+            onTempHpEdit(result.tempHp)
         }
-
-        if (dmg > 0) {
-            try {
-                const hpVal = Number(hp) - dmg
-
-                if (hpVal > 0) {
-                    onHpEdit(String(hpVal))
-                } else {
-                    onHpEdit('0')
-                }
-            } catch (_) {
-            }
+        if (result.hpChanged) {
+            onHpEdit(result.hp)
         }
 
         setSchaden(0)
         updatePlayer()
-
     }
 
     const doHeal = () => {
-        let heal = schaden
-
-        const hpVal = Math.min(Number(hp) + heal, Number(maxHp))
-        onHpEdit(String(hpVal))
+        onHpEdit(applyHeal(hp, maxHp, schaden))
         setSchaden(0)
         updatePlayer()
     }
@@ -579,7 +445,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
         setTempHp(props.player.character.tempHp || '0')
         setAc(props.player.character.ac || '0')
 
-        if (Number(hp) === 0) {
+        if (isDead(hp)) {
             setDead(true)
         } else {
             setDead(false)
@@ -613,14 +479,14 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
         setShieldActive(props.player.shieldActive || false)
     }, [props.player.shieldActive]);
 
-    if (!props.isMaster && hidden) {
+    if (isRowHiddenFromPlayer(props.isMaster, hidden)) {
         return (
             <></>
         )
     }
 
     function writePlayerHP() {
-        if (!npc || props.isMaster || shareHp) {
+        if (canSeeHp(npc, props.isMaster, shareHp)) {
             return (
                 <React.Fragment>
                     {divider()}
@@ -633,7 +499,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
     }
 
     function createHPBar() {
-        if (!npc || props.isMaster || shareHp) {
+        if (canSeeHp(npc, props.isMaster, shareHp)) {
             return (
                 <React.Fragment>
                     <Progress size='sm' colorScheme='yellow'
@@ -664,32 +530,7 @@ const App = (props: { player: Player, statusEffects: StatusEffectsEnum[], isMast
         }
     }
 
-    const getColor = (color: ColorMarkerEnum) => {
-        switch (color) {
-            case ColorMarkerEnum.BLACK:
-                return 'black'
-            case ColorMarkerEnum.GREY:
-                return 'grey'
-            case ColorMarkerEnum.PURPLE:
-                return 'purple'
-            case ColorMarkerEnum.RED:
-                return 'red'
-            case ColorMarkerEnum.PINK:
-                return 'pink'
-            case ColorMarkerEnum.ORANGE:
-                return 'orange'
-            case ColorMarkerEnum.YELLOW:
-                return 'yellow'
-            case ColorMarkerEnum.GREEN:
-                return 'green'
-            case ColorMarkerEnum.BLUE:
-                return 'blue'
-            case ColorMarkerEnum.WHITE:
-                return 'white'
-            default:
-                return ''
-        }
-    }
+    const getColor = (color: ColorMarkerEnum) => markerColor(color)
 
     // @ts-ignore
     return (

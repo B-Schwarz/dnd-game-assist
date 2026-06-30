@@ -149,17 +149,17 @@ Each entry below is one test (or tight cluster of assertions) to be written. Che
 - [x] Colour picker maps each `Color` to its hex (`COLOR_HEX`); `NONE` → no background.
 
 ## Web — initiative entry helpers (`web/src/Pages/initiative`)
-- [ ] `calcHp` formats `hp(+temp)/max` (temp only shown when > 0).
-- [ ] `calcMaxHp` accounts for temp HP exceeding max (`hp+temp` when it overflows `maxHp`); NaN/missing → 0.
-- [ ] **`acDisplay`** renders `"14"` normally, `"14 (+2)"` when the shield is active, `"14"` when shield is 0, and a signed `"14 (-1)"` for a negative shield.
-- [ ] Save accessors (`strSave`…`chaSave`) render signed values and fall back to 0 on NaN.
-- [ ] Dead detection (`hp === 0`, string `'0'` included) drives the dead styling/icon.
-- [ ] `doSchaden` absorbs damage from temp HP first, overflows into real HP, and clamps at 0; `doHeal` caps at `maxHp`.
-- [ ] `getColor` maps each `ColorMarkerEnum` to the right colour; `NONE`/out-of-range → `''`.
-- [ ] `getIcon` returns a tooltip-wrapped icon (with a German description) for every `StatusEffectsEnum`; an unknown effect → `undefined`.
-- [ ] Hidden entries: a master sees them (purple badge); a non-master gets an empty render.
-- [ ] HP visibility: NPC HP hidden from players unless `shareHp` (or master); PC HP always shown.
-- [ ] Enum snapshots: `StatusEffectsEnum` (all conditions present) and `ColorMarkerEnum` (`NONE…WHITE`) are stable.
+- [x] `calcHp` formats `hp(+temp)/max` (temp only shown when > 0).
+- [x] `calcMaxHp` accounts for temp HP exceeding max (`hp+temp` when it overflows `maxHp`); NaN/missing → 0.
+- [x] **`acDisplay`** renders `"14"` normally, `"14 (+2)"` when the shield is active, `"14"` when shield is 0, and a signed `"14 (-1)"` for a negative shield.
+- [x] Save accessors (`strSave`…`chaSave`) render signed values and fall back to 0 on NaN.
+- [x] Dead detection (`hp === 0`, string `'0'` included) drives the dead styling/icon.
+- [x] `doSchaden` absorbs damage from temp HP first, overflows into real HP, and clamps at 0; `doHeal` caps at `maxHp`.
+- [x] `getColor` maps each `ColorMarkerEnum` to the right colour; `NONE`/out-of-range → `''`.
+- [x] `getIcon` returns a tooltip-wrapped icon (with a German description) for every `StatusEffectsEnum`; an unknown effect → `undefined`.
+- [x] Hidden entries: a master sees them (purple badge); a non-master gets an empty render.
+- [x] HP visibility: NPC HP hidden from players unless `shareHp` (or master); PC HP always shown.
+- [x] Enum snapshots: `StatusEffectsEnum` (all conditions present) and `ColorMarkerEnum` (`NONE…WHITE`) are stable.
 
 ## Web — initiative add modals (`web/src/Pages/initiative/add`)
 - [ ] `add-player` `search` filters by name, case-insensitively, without mutating the source list; empty query → full list.
