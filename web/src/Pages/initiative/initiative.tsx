@@ -24,6 +24,7 @@ import axios from "axios";
 import _ from "lodash";
 import Add from "./add/add";
 import TitleService from "../../Service/titleService";
+import {accordionIndexOnTurn} from "./initiative-entry.utils";
 
 enum confirmType {
     RESET,
@@ -221,10 +222,14 @@ const App = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMaster, updatePing])
 
-    // When the turn changes, collapse whatever entry was open and expand the
+    // When the turn is advanced, collapse whatever entry was open and expand the
     // entry whose turn it now is, so its additional info is shown automatically.
+    // The first observation is skipped so entries start closed by default (e.g.
+    // right after a player is added) instead of auto-opening the turn-0 entry.
+    const turnInitialized = useRef(false)
     useEffect(() => {
-        setAccordionIndex(turn)
+        setAccordionIndex((prev) => accordionIndexOnTurn(turnInitialized.current, prev, turn))
+        turnInitialized.current = true
     }, [turn])
 
     // Master hotkeys: J steps to the previous turn, K to the next. Ignored while

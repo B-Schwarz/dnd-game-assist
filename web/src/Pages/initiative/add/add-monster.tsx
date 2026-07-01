@@ -6,7 +6,7 @@ import {Player} from "../player.type";
 import _ from "lodash";
 import axios from "axios";
 import {Monster} from "../../monster/monster.type";
-import {abilityModifier, applyHidden, filterByName, rollD20} from "./add.utils";
+import {abilityModifier, applyHidden, filterByName, monsterBoardEntry, rollD20} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -23,32 +23,7 @@ const App = (props: {u: () => void}) => {
                 setValue([])
                 let monsters: Player[] = []
                 d.data.forEach((m: Monster) => {
-                    monsters.push({
-                        character: {
-                            name: m.monster.name,
-                            ac: m.monster.ac,
-                            hp: m.monster.hp,
-                            maxHp: m.monster.hp,
-                            tempHp: "",
-                            dex: String(m.monster.stats.dex),
-                            strSave: String(m.monster.saving.str),
-                            conSave: String(m.monster.saving.con),
-                            dexSave: String(m.monster.saving.dex),
-                            intSave: String(m.monster.saving.int),
-                            wisSave: String(m.monster.saving.wis),
-                            chaSave: String(m.monster.saving.cha),
-                            speed: String(m.monster.speed)
-                        },
-                        id: m._id,
-                        initiative: 0,
-                        isMaster: false,
-                        isTurnSet: false,
-                        statusEffects: [],
-                        turnId: 0,
-                        hidden: false,
-                        npc: true,
-                        monster: true
-                    })
+                    monsters.push(monsterBoardEntry(m.monster, m._id, false))
                 })
                 setValue(monsters)
                 setData(monsters)

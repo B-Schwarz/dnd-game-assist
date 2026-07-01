@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {
+    Badge,
     Center,
+    HStack,
     Input,
     NumberInput,
     NumberInputField,
@@ -71,7 +73,12 @@ const App = (props: {u: () => void}) => {
                     {
                         values.map((item, index) => (
                             <Tr key={index}>
-                                <Td><Text isTruncated maxW='11rem'>{item.character.name}</Text></Td>
+                                <Td>
+                                    <HStack spacing='0.4rem'>
+                                        {item.primary && <Badge colorScheme='yellow'>PRIMÄR</Badge>}
+                                        <Text isTruncated maxW='11rem'>{item.character.name}</Text>
+                                    </HStack>
+                                </Td>
                                 <Td><NumberInput defaultValue={values[index]['initiative'] || 0} min={0}
                                                  onChange={(val) => {
                                                      // @ts-ignore

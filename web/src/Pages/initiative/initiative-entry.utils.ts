@@ -83,6 +83,14 @@ export const applyDamage = (hp: any, tempHp: any, dmg: any): {
 export const applyHeal = (hp: any, maxHp: any, heal: any): string =>
     String(Math.min(Number(hp) + Number(heal), Number(maxHp)))
 
+// When the board's turn pointer changes, decide which entry's panel should be
+// open. The very first observation (initialized=false) leaves the current
+// selection untouched, so entries default to closed and a freshly added entry
+// does not auto-expand; every later turn change opens the entry whose turn it
+// now is.
+export const accordionIndexOnTurn = (initialized: boolean, currentIndex: number, turn: number): number =>
+    initialized ? turn : currentIndex
+
 // A hidden entry is rendered as nothing for a non-master; the master still
 // sees it (with the "hidden" badge).
 export const isRowHiddenFromPlayer = (isMaster: boolean, hidden: boolean): boolean =>

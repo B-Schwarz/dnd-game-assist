@@ -5,7 +5,7 @@ import "../initiative.css";
 import _ from "lodash";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
-import {buildEncounterInstances} from "./add.utils";
+import {buildEncounterInstances, monsterBoardEntry} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -32,31 +32,7 @@ const App = (props: {u: () => void}) => {
                                 monsters.push({
                                     monster: encounter.monster,
                                     name: mon.monster.name,
-                                    data: {
-                                        character: {
-                                            name: mon.monster.name,
-                                            ac: mon.monster.ac,
-                                            hp: mon.monster.hp,
-                                            maxHp: mon.monster.hp,
-                                            tempHp: "",
-                                            dex: String(mon.monster.stats.dex),
-                                            strSave: String(mon.monster.saving.str),
-                                            conSave: String(mon.monster.saving.con),
-                                            dexSave: String(mon.monster.saving.dex),
-                                            intSave: String(mon.monster.saving.int),
-                                            wisSave: String(mon.monster.saving.wis),
-                                            chaSave: String(mon.monster.saving.cha),
-                                            speed: String(mon.monster.speed)
-                                        },
-                                        id: mon._id,
-                                        initiative: 0,
-                                        isMaster: false,
-                                        isTurnSet: false,
-                                        statusEffects: [],
-                                        turnId: 0,
-                                        hidden: encounter.hidden,
-                                        npc: true
-                                    },
+                                    data: monsterBoardEntry(mon.monster, mon._id, encounter.hidden),
                                     hidden: encounter.hidden,
                                     amount: encounter.amount
                                 })

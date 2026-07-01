@@ -60,6 +60,7 @@
 15. [x] swap out the arrows that change the order to an area that can be dragged to change the area that way.
 16. [x] the color of the character should be the first item in the row.
 17. [x] the tooltips for the conditions should contain a brief description to what the effect is
+18. [x] All primary characters are at the top of the list when adding them
 
 # Admin
 
@@ -73,6 +74,8 @@
 3. [x] Reassign character sheets
 4. [x] NPC should not be reassignable
 5. [x] Export singular characters
+6. [x] Mark a character as a primary
+7. [ ] Marking should be done in the character sheet by the player
 
 ## Books
 
@@ -85,3 +88,4 @@
 3. [x] Update dependencies
 4. [x] Update displayed version
 5. [x] Create github actions to require PRs to pass the unit and acceptance tests
+6. [ ] Create a python migration script to download all data from the prod DB and upload it again after migrating to 2.0

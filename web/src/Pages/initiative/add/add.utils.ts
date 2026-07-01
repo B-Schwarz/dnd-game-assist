@@ -21,7 +21,7 @@ export const abilityModifier = (score: any): number => Math.floor((Number(score)
 // A character colour maps straight onto a board colour marker.
 export const colorToMarker = (color: any): number => Number(color)
 
-type RawChar = { character: any; _id: string; npc: boolean }
+type RawChar = { character: any; _id: string; npc: boolean; primary?: boolean }
 
 const baseEntry = (character: any, id: string): Player => ({
     character,
@@ -33,9 +33,43 @@ const baseEntry = (character: any, id: string): Player => ({
     turnId: 0,
 })
 
-// add-player: only non-NPC characters become board entries.
+// Map a raw monster (the `monster` sub-document of the Monster model) onto the
+// character sub-object every board entry carries.
+export const monsterToCharacter = (mon: any) => ({
+    name: mon.name,
+    ac: mon.ac,
+    hp: mon.hp,
+    maxHp: mon.hp,
+    tempHp: "",
+    dex: String(mon.stats.dex),
+    strSave: String(mon.saving.str),
+    conSave: String(mon.saving.con),
+    dexSave: String(mon.saving.dex),
+    intSave: String(mon.saving.int),
+    wisSave: String(mon.saving.wis),
+    chaSave: String(mon.saving.cha),
+    speed: String(mon.speed),
+})
+
+// A full board entry for a monster: an NPC that is additionally flagged
+// `monster` so the board sinks it to the bottom once it dies. Shared by the
+// "add monster" modal and the encounter expansion (where it becomes each
+// instance's `data`), so both paths stay tagged the same way.
+export const monsterBoardEntry = (mon: any, id: string, hidden: boolean): Player => ({
+    ...baseEntry(monsterToCharacter(mon), id),
+    hidden,
+    npc: true,
+    monster: true,
+})
+
+// add-player: only non-NPC characters become board entries, with primaries
+// (main party characters) listed first. Array.prototype.sort is stable, so the
+// original order is preserved within the primary and non-primary groups.
 export const playableEntries = (chars: RawChar[]): Player[] =>
-    chars.filter(c => !c.npc).map(c => baseEntry(c.character, c._id))
+    chars
+        .filter(c => !c.npc)
+        .map(c => ({...baseEntry(c.character, c._id), primary: Boolean(c.primary)}))
+        .sort((a, b) => Number(Boolean(b.primary)) - Number(Boolean(a.primary)))
 
 // add-npc: only NPC characters, flagged npc + visible by default.
 export const npcEntries = (chars: RawChar[]): Player[] =>

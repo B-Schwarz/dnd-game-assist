@@ -143,7 +143,7 @@ describe('character lists', () => {
         expect(names).toContain('Mine')
         expect(names).toContain('Theirs')
         expect(names).not.toContain('GMs') // requester's own excluded
-        list.forEach(c => expect(Object.keys(c).sort()).toEqual(['_id', 'character', 'npc']))
+        list.forEach(c => expect(Object.keys(c).sort()).toEqual(['_id', 'character', 'npc', 'primary']))
 
         const own = (await agent.get('/api/charlist/me')).body
         expect(own.map(c => c.character.name)).toEqual(['Mine'])
@@ -200,6 +200,21 @@ describe('setNPC', () => {
     })
 })
 
+describe('setPrimary', () => {
+    test('toggles the primary flag; missing id → 400; unknown id → 404', async () => {
+        await seedActors()
+        const doc = await makeCharacter({character: {name: 'P'}})
+        expect((await Character.findById(doc._id)).primary).toBe(false)
+        expect((await gm.put('/api/char/primary/toggle').send({charID: doc._id.toString()})).statusCode).toBe(200)
+        expect((await Character.findById(doc._id)).primary).toBe(true)
+        // toggles back off
+        expect((await gm.put('/api/char/primary/toggle').send({charID: doc._id.toString()})).statusCode).toBe(200)
+        expect((await Character.findById(doc._id)).primary).toBe(false)
+        expect((await gm.put('/api/char/primary/toggle').send({})).statusCode).toBe(400)
+        expect((await gm.put('/api/char/primary/toggle').send({charID: 'bad'})).statusCode).toBe(404)
+    })
+})
+
 describe('export / import / reassign', () => {
     test('exportCharacters resolves owner (or null when unowned)', async () => {
         await seedActors()
@@ -216,8 +231,8 @@ describe('export / import / reassign', () => {
         expect((await gm.post('/api/char/import').send({characters: 'nope'})).statusCode).toBe(400)
         const res = await gm.post('/api/char/import').send({
             characters: [
-                {character: {name: 'I1'}, npc: 'true'}, // truthy string → true
-                {character: {name: 'I2'}},               // npc undefined → false
+                {character: {name: 'I1'}, npc: 'true', primary: 'yes'}, // truthy strings → true
+                {character: {name: 'I2'}},               // npc/primary undefined → false
                 {npc: true},                              // no character → skipped
             ],
         })
@@ -225,6 +240,9 @@ describe('export / import / reassign', () => {
         expect(res.body.created).toBe(2)
         const i1 = await Character.findOne({'character.name': 'I1'})
         expect(i1.npc).toBe(true)
+        expect(i1.primary).toBe(true)
+        const i2 = await Character.findOne({'character.name': 'I2'})
+        expect(i2.primary).toBe(false)
         // imported docs are unowned
         const owners = await User.find({character: i1._id})
         expect(owners).toHaveLength(0)

@@ -9,7 +9,7 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, setNPC, getNPCList,
+    deleteOwnCharacter, setNPC, setPrimary, getNPCList,
     saveCharacterHp, saveOwnCharacterHp, saveCharacterHpBulk, getCharacterHp, getOwnCharacterHp,
     exportCharacters, importCharacters, reassignCharacter
 } = require("./character");
@@ -101,6 +101,7 @@ app.put('/api/char/reassign', isAuth, isAdmin, reassignCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
 app.put('/api/char/npc/toggle', isAuth, isMaster, setNPC)
+app.put('/api/char/primary/toggle', isAuth, isMasterOrAdmin, setPrimary)
 app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
 app.post('/api/char/me', isAuth, saveOwnCharacter)
 app.put('/api/char/hp', isAuth, isMasterOrAdmin, saveCharacterHp)

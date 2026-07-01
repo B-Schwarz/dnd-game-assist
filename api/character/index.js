@@ -172,6 +172,28 @@ const setNPC = async (req, res) => {
     }
 }
 
+// REQUIRES MASTER OR ADMIN — flag/unflag a character as a "primary" (main party)
+// character. Primaries are listed first when adding players to the initiative.
+const setPrimary = async (req, res) => {
+    const charID = req.body.charID
+
+    if (!charID) {
+        return res.sendStatus(400)
+    }
+
+    try {
+        const char = await Character.findById(charID)
+        if (!char) {
+            return res.sendStatus(404)
+        }
+        char.primary = !char.primary
+        await char.save()
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(404)
+    }
+}
+
 // REQUIRES MASTER OR ADMIN
 const getCharacter = async (req, res) => {
     if (req.params.id) {
@@ -283,7 +305,7 @@ const filterCharacterListe = (liste) => {
 }
 
 const filterCharacter = (char) => {
-    return _.pick(char, ['_id', 'character', 'npc'])
+    return _.pick(char, ['_id', 'character', 'npc', 'primary'])
 }
 
 const isOwnedByUser = (character, id) => {
@@ -309,6 +331,7 @@ const exportCharacters = async (req, res) => {
             _id: c._id,
             character: c.character,
             npc: c.npc,
+            primary: c.primary,
             owner: ownerByChar[c._id.toString()] || null
         }))
 
@@ -332,7 +355,7 @@ const importCharacters = async (req, res) => {
         let created = 0
         for (const item of list) {
             if (item && item.character) {
-                await Character.create({character: item.character, npc: Boolean(item.npc)})
+                await Character.create({character: item.character, npc: Boolean(item.npc), primary: Boolean(item.primary)})
                 created += 1
             }
         }
@@ -394,6 +417,7 @@ module.exports = {
     deleteCharacter,
     deleteOwnCharacter,
     setNPC,
+    setPrimary,
     getNPCList,
     exportCharacters,
     importCharacters,

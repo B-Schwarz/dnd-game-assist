@@ -9,6 +9,10 @@ const CharacterSchema = new mongoose.Schema({
     npc: {
         type: Boolean,
         default: false
+    },
+    primary: {
+        type: Boolean,
+        default: false
     }
 });
 

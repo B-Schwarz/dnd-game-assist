@@ -1,4 +1,5 @@
 import {
+    accordionIndexOnTurn,
     acDisplay,
     applyDamage,
     applyHeal,
@@ -11,6 +12,21 @@ import {
     markerColor,
 } from './initiative-entry.utils'
 import {ColorMarkerEnum} from './color-marker.enum'
+
+describe('accordionIndexOnTurn', () => {
+    // Regression: entries must default to closed and only auto-open once the
+    // turn is actually advanced, so a freshly added player does not open with
+    // its panel expanded (Bugs.md, Initiative #1).
+    it('keeps the current selection on the first observation', () => {
+        expect(accordionIndexOnTurn(false, -1, 0)).toBe(-1)
+        expect(accordionIndexOnTurn(false, 2, 5)).toBe(2)
+    })
+
+    it('opens the entry whose turn it now is on later changes', () => {
+        expect(accordionIndexOnTurn(true, -1, 3)).toBe(3)
+        expect(accordionIndexOnTurn(true, 2, 0)).toBe(0)
+    })
+})
 
 describe('acDisplay', () => {
     it('shows just the AC when no shield is active', () => {

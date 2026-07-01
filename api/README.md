@@ -25,7 +25,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | URL                  |  METHOD  |                PARAMETER                 |         ROLE         | DESCR.                                          | Return                              |
 |----------------------|:--------:|:----------------------------------------:|:--------------------:|-------------------------------------------------|-------------------------------------|
 | /api/char/new        |  `GET`   |                  `none`                  |        `user`        | Creates a new character, links it with the user | `{_id:ObjectID}`                    |
-| /api/char/export     |  `GET`   |                  `none`                  |       `admin`        | Exports every character with its current owner  | `[{_id, character, npc, owner}]`    |
+| /api/char/export     |  `GET`   |                  `none`                  |       `admin`        | Exports every character with its current owner  | `[{_id, character, npc, primary, owner}]` |
 | /api/char/import     |  `POST`  |        `characters:[exported]`           |       `admin`        | Recreates characters as new, unowned documents  | `{created:number}`                  |
 | /api/char/reassign   |  `PUT`   | `charID:ObjectID`<br/>`toUserID:ObjectID`|       `admin`        | Moves a (non-NPC) character to another user     | `none`                              |
 | /api/char/get/:id    |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets a specified character sheet from anyone    | `{_id:ObjectID, character:Player }` |
@@ -40,6 +40,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/char/:id        | `DELETE` |                  `none`                  | `admin`<br/>`master` | Deletes someones character sheet                | `none`                              |
 | /api/char/me/:id     | `DELETE` |                  `none`                  |        `user`        | Deletes one of my character sheets              | `none`                              |
 | /api/char/npc/toggle |  `PUT`   |            `charID:ObjectID`             |       `master`       | Toggle whether the character is an NPC or not   | `none`                              |
+| /api/char/primary/toggle | `PUT` |           `charID:ObjectID`             |  `master` or `admin` | Toggle whether the character is a primary       | `none`                              |
 
 ## Account
 

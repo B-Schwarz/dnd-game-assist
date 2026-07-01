@@ -5,6 +5,7 @@ import {
     GridItem,
     HStack,
     Select,
+    Switch,
     Table,
     Tbody,
     Td,
@@ -23,6 +24,7 @@ interface ExportedCharacter {
     _id: string,
     character: { name?: string },
     npc: boolean,
+    primary: boolean,
     owner: { userID: string, name: string } | null
 }
 
@@ -107,6 +109,14 @@ const App = () => {
         reader.readAsText(file)
     }
 
+    const togglePrimary = (charID: string) => {
+        axios.put(prefix + '/api/char/primary/toggle', {charID})
+            .then(() => getChars())
+            .catch(() => {
+                toast({title: 'Fehler', description: 'Primär-Status konnte nicht geändert werden.', status: 'error', duration: 3000, isClosable: true})
+            })
+    }
+
     const reassign = (charID: string) => {
         const toUserID = assignSel[charID]
         if (!toUserID) {
@@ -147,6 +157,7 @@ const App = () => {
                             <Tr>
                                 <Th>Name</Th>
                                 <Th>Typ</Th>
+                                <Th>Primär</Th>
                                 <Th>Besitzer</Th>
                                 <Th>Neuer Besitzer</Th>
                                 <Th></Th>
@@ -158,6 +169,14 @@ const App = () => {
                                     <Tr key={c._id}>
                                         <Td>{c.character?.name || '(ohne Name)'}</Td>
                                         <Td>{c.npc ? 'NPC' : 'PC'}</Td>
+                                        <Td>
+                                            {c.npc ? (
+                                                <Text fontSize='sm' color='gray.500'>—</Text>
+                                            ) : (
+                                                <Switch isChecked={Boolean(c.primary)}
+                                                        onChange={() => togglePrimary(c._id)}/>
+                                            )}
+                                        </Td>
                                         <Td>{c.owner ? c.owner.name : '—'}</Td>
                                         <Td>
                                             {c.npc ? (

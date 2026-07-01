@@ -33,6 +33,7 @@ import {IoSaveSharp} from "react-icons/io5";
 import axios from "axios";
 import {EncounterType} from "./encounter.type";
 import {Monster} from "../monster/monster.type";
+import {newEncounterRow, removeMonsterAt} from "./encounter.utils";
 
 
 // m: Monster of the card
@@ -57,15 +58,9 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const closePopup = () => setIsOpen(false)
 
     const addMonster = () => {
-        const newEncounter = {
-            monster: monster,
-            hidden: hide,
-            amount: amount
-        }
-
         if (monster !== "") {
             let temp: EncounterType = _.cloneDeep(encounter)
-            temp.encounter.push(newEncounter)
+            temp.encounter.push(newEncounterRow(monster, monsterList, hide, amount))
             setEncounter(temp)
         }
     }
@@ -147,9 +142,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }
 
     const deleteMonster = (index: number) => {
-        encounter.encounter.splice(index, 1)
-        // @ts-ignore
-        document.getElementById("monster-"+index).style.backgroundColor = "IndianRed"
+        setEncounter(removeMonsterAt(encounter, index))
     }
 
     return (
