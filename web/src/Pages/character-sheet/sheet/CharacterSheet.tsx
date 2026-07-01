@@ -6,6 +6,10 @@ import './character-sheet.css'
 interface Props {
     character: DnDCharacter
     onCharacterChanged: (character: DnDCharacter) => void
+    // The "primary" (main party) flag lives on the Character document, not the
+    // sheet sub-doc, so it is passed in separately. Omit both to hide the toggle.
+    primary?: boolean
+    onPrimaryChanged?: () => void
 }
 
 interface SkillDef {
@@ -253,6 +257,14 @@ const CharacterSheet = (props: Props) => {
                            onChange={(e) => set('playerName', e.target.value)}/>
                 </div>
                 <div className='dnd-toolbar-right'>
+                    {props.onPrimaryChanged &&
+                        <button className={'dnd-lang dnd-primary' + (props.primary ? ' on' : '')}
+                                onClick={props.onPrimaryChanged} type='button'
+                                title={t('Mark as primary (main party) character', 'Als Hauptcharakter markieren')}>
+                            <span className='star'>{props.primary ? '★' : '☆'}</span>
+                            {t('Primary', 'Hauptcharakter')}
+                        </button>
+                    }
                     <button className='dnd-lang' onClick={toggleLang} type='button'>
                         <span className={german ? '' : 'on'}>EN</span> / <span className={german ? 'on' : ''}>DE</span>
                     </button>

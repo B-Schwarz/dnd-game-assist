@@ -7,7 +7,7 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
 import TitleService from "../../Service/titleService";
-import {HStack, Switch, Text, useToast} from "@chakra-ui/react";
+import {useToast} from "@chakra-ui/react";
 
 const API = process.env.REACT_APP_API_PREFIX
 
@@ -195,11 +195,8 @@ const App = () => {
         <>
             <TitleService title={character.name || ''}/>
             <div style={{"marginLeft": "auto", "marginRight": "auto", maxWidth: "1200px"}}>
-                <HStack justifyContent='flex-end' paddingX='0.5rem' paddingTop='0.5rem'>
-                    <Text fontSize='sm' fontWeight='medium'>Hauptcharakter</Text>
-                    <Switch isChecked={primary} onChange={togglePrimary}/>
-                </HStack>
-                <CharacterSheet character={character} onCharacterChanged={updateCharacter}/>
+                <CharacterSheet character={character} onCharacterChanged={updateCharacter}
+                                primary={primary} onPrimaryChanged={togglePrimary}/>
             </div>
         </>
     )

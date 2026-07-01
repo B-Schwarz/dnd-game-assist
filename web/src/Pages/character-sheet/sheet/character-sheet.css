@@ -103,6 +103,29 @@
     text-decoration: underline;
 }
 
+.dnd-toolbar .dnd-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: normal;
+}
+
+.dnd-toolbar .dnd-primary .star {
+    font-size: 14px;
+    line-height: 1;
+    color: var(--muted);
+}
+
+.dnd-toolbar .dnd-primary.on {
+    border-color: #d4af37;
+    background: #fdf6e3;
+    color: #8a6d1b;
+}
+
+.dnd-toolbar .dnd-primary.on .star {
+    color: #d4af37;
+}
+
 .dnd-toolbar select {
     border: 1px solid var(--line-dark);
     border-radius: 5px;
