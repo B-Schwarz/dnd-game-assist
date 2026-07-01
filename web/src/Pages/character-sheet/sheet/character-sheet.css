@@ -107,10 +107,13 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    line-height: 1;
     letter-spacing: normal;
 }
 
 .dnd-toolbar .dnd-primary .star {
+    display: inline-flex;
+    align-items: center;
     font-size: 14px;
     line-height: 1;
     color: var(--muted);
