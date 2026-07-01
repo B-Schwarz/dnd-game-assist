@@ -96,6 +96,11 @@ def _spell_entry(level, spell):
     return entry
 
 
+def _is_named_spell(spell):
+    """True if a 1.x spell row actually holds a spell (blank padding rows don't)."""
+    return bool(str((spell or {}).get("name") or "").strip())
+
+
 def migrate_character_sheet(ch):
     """Convert one opaque character sheet from the 1.x shape to the 2.0 shape.
 
@@ -116,13 +121,16 @@ def migrate_character_sheet(ch):
 
     # 2. cantrips (level 0) + lvl1Spells..lvl9Spells -> one unified `spells` list.
     #    The TODO only names lvlXSpells; cantrips are folded in as level 0 so the
-    #    1.x cantrip list isn't silently dropped.
+    #    1.x cantrip list isn't silently dropped. Blank padding rows (no name)
+    #    are omitted.
     merged = list(ch.get("spells") or [])
     for spell in (ch.pop("cantrips", None) or []):
-        merged.append(_spell_entry(0, spell))
+        if _is_named_spell(spell):
+            merged.append(_spell_entry(0, spell))
     for lvl in range(1, 10):
         for spell in (ch.pop(f"lvl{lvl}Spells", None) or []):
-            merged.append(_spell_entry(lvl, spell))
+            if _is_named_spell(spell):
+                merged.append(_spell_entry(lvl, spell))
     if merged:
         ch["spells"] = merged
 

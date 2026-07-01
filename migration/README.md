@@ -18,7 +18,8 @@ Two collections' worth of nuance:
     - `height` → `size`
     - the leveled spell lists (`cantrips` as level 0, plus
       `lvl1Spells`..`lvl9Spells`) fold into the unified `spells` list; a
-      `prepared` spell gets `"Prepared"` in its notes
+      `prepared` spell gets `"Prepared"` in its notes, and blank padding rows
+      (no name) are omitted
     - the old profile fields (`personalityTraits`, `ideals`, `bonds`, `flaws`,
       `age`, `weight`, `eyes`, `skin`, `hair`) are prepended to `backstory` as
       labelled lines, e.g. `Personality: …`

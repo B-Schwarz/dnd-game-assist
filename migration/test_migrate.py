@@ -48,6 +48,27 @@ class MigrateCharacterSheet(unittest.TestCase):
         for key in ("cantrips", "lvl1Spells", "lvl3Spells"):
             self.assertNotIn(key, ch)
 
+    def test_blank_spell_rows_are_omitted(self):
+        ch = migrate_character_sheet({
+            "cantrips": [{"name": "Light"}, {}, {"name": ""}],
+            "lvl1Spells": [
+                {"name": "Bless", "prepared": True},
+                {"name": "   ", "prepared": True},  # whitespace-only padding
+                {"prepared": False},
+            ],
+            "lvl2Spells": [{}, {"name": None}],  # entirely blank level
+        })
+        self.assertEqual(ch["spells"], [
+            {"level": "0", "name": "Light"},
+            {"level": "1", "name": "Bless", "notes": "Prepared"},
+        ])
+
+    def test_all_blank_spells_produce_no_spells_key(self):
+        ch = migrate_character_sheet({"lvl1Spells": [{}, {"name": ""}], "cantrips": [{}]})
+        self.assertNotIn("spells", ch)
+        self.assertNotIn("lvl1Spells", ch)
+        self.assertNotIn("cantrips", ch)
+
     def test_no_spells_key_when_empty(self):
         ch = migrate_character_sheet({"name": "Nobody"})
         self.assertNotIn("spells", ch)
