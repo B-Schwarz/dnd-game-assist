@@ -2,6 +2,7 @@
   "name": "dnd",
   "version": "2.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
