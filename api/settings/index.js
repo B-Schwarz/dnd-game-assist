@@ -9,14 +9,12 @@ const deleteOwnAccount = async (req, res) => {
             _id: {
                 $in: chars
             }
-        }, () => {
         }).catch(() => {
         })
     }
 
 
-    await User.deleteOne({_id: req.user._id}, () => {
-    }).catch(() => {})
+    await User.deleteOne({_id: req.user._id}).catch(() => {})
     req.session.destroy()
 
     res.sendStatus(200)
@@ -30,6 +28,10 @@ const deleteAccount = async (req, res) => {
         try {
             const user = await User.findOne({_id: userID})
 
+            if (!user) {
+                return res.sendStatus(404)
+            }
+
             const chars = user.character
 
             if (chars.length > 0) {
@@ -37,12 +39,10 @@ const deleteAccount = async (req, res) => {
                     _id: {
                         $in: chars
                     }
-                }, () => {
                 }).catch(() => {})
             }
 
-            await User.deleteOne({_id: userID}, () => {
-            }).catch(() => {})
+            await User.deleteOne({_id: userID}).catch(() => {})
 
             res.sendStatus(200)
         } catch (_) {
@@ -57,7 +57,7 @@ const changeOwnPassword = (req, res) => {
     const currPass = req.body.currPass
     const newPass = req.body.newPass
 
-    if (currPass && newPass) {
+    if (currPass && newPass && String(newPass).length >= 8) {
         User.findByCredentials(req.user.name, currPass)
             .then(async (u) => {
                 u.password = newPass

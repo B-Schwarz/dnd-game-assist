@@ -22,7 +22,7 @@ import {
     NumberInputField,
     NumberInputStepper,
     Stack,
-    StackItem,
+    Box,
     Table,
     Tbody,
     Td,
@@ -55,6 +55,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
 
     useEffect(() => {
         calcEntries()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [monster])
 
     const closePopup = () => setIsOpen(false)
@@ -264,7 +265,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
         } else {
             return (
                 <Stack direction={edit ? 'column' : 'row'} w='100%'><Text fontWeight='bold'>{title}:</Text>
-                    <StackItem>{editValue(key, !big)}</StackItem></Stack>
+                    <Box>{editValue(key, !big)}</Box></Stack>
             )
         }
     }

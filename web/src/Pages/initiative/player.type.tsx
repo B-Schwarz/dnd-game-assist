@@ -1,4 +1,4 @@
-import {DnDCharacter} from "dnd-character-sheets";
+import {DnDCharacter} from "../character-sheet/sheet/dnd-character";
 import {StatusEffectsEnum} from "./status-effects.enum";
 import {ColorMarkerEnum} from "./color-marker.enum";
 
@@ -12,5 +12,10 @@ export interface Player {
     id: string,
     hidden?: boolean,
     npc?: boolean,
-    colorMarker?: ColorMarkerEnum
+    monster?: boolean,
+    primary?: boolean,
+    colorMarker?: ColorMarkerEnum,
+    shareHp?: boolean,
+    shield?: number,
+    shieldActive?: boolean
 }

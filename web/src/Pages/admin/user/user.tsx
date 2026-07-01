@@ -16,12 +16,14 @@ import {
     FormControl,
     FormErrorMessage,
     GridItem,
+    HStack,
     Input,
     Switch,
     Text,
+    useToast,
     VStack
 } from "@chakra-ui/react";
-import {Divider} from "@chakra-ui/layout";
+import {Divider} from "@chakra-ui/react";
 import axios from "axios";
 import {User} from "../user.type";
 
@@ -39,6 +41,10 @@ const App = () => {
     const [delUser, setDelUser] = useState("")
     const [isOpen, setIsOpen] = useState(false)
     const cancelRef = React.useRef(null)
+
+    const [pwInputs, setPwInputs] = useState<{ [id: string]: string }>({})
+
+    const toast = useToast()
 
     const closePopup = () => setIsOpen(false)
 
@@ -98,6 +104,22 @@ const App = () => {
                 getUser()
             })
             .catch(() => {
+            })
+    }
+
+    const setPassword = (id: string) => {
+        const password = pwInputs[id] || ''
+        if (password.length < 8) {
+            toast({title: 'Passwort zu kurz', description: 'Mindestens 8 Zeichen.', status: 'error', duration: 2500, isClosable: true})
+            return
+        }
+        axios.put(process.env.REACT_APP_API_PREFIX + '/api/user/password', {userID: id, password})
+            .then(() => {
+                setPwInputs((prev) => ({...prev, [id]: ''}))
+                toast({title: 'Passwort gesetzt', status: 'success', duration: 2500, isClosable: true})
+            })
+            .catch(() => {
+                toast({title: 'Fehler', description: 'Passwort konnte nicht gesetzt werden.', status: 'error', duration: 3000, isClosable: true})
             })
     }
 
@@ -165,6 +187,16 @@ const App = () => {
                                                 onChange={(val) => setMaster(value._id, val.currentTarget.checked)}>
                                             Master
                                         </Switch><br/>
+                                        <HStack maxW='22rem' marginY='0.75rem'>
+                                            <Input type='password' placeholder='Neues Passwort' minLength={8}
+                                                   autoComplete='new-password'
+                                                   value={pwInputs[value._id] || ''}
+                                                   onChange={(e) => {
+                                                       const v = e.currentTarget.value
+                                                       setPwInputs((prev) => ({...prev, [value._id]: v}))
+                                                   }}/>
+                                            <Button onClick={() => setPassword(value._id)}>Setzen</Button>
+                                        </HStack>
                                         <Button colorScheme='red' onClick={() => {
                                             setDelUser(value._id)
                                             setIsOpen(true)

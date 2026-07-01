@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Button, Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
+import {Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
+import "../initiative.css";
 import {Player} from "../player.type";
 import _ from "lodash";
 import axios from "axios";
 import {Monster} from "../../monster/monster.type";
+import {abilityModifier, applyHidden, filterByName, monsterBoardEntry, rollD20} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -12,8 +14,7 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        setValue(_.cloneDeep(filterByName(data, val)))
     }
 
     const getMonster = () => {
@@ -22,31 +23,7 @@ const App = (props: {u: () => void}) => {
                 setValue([])
                 let monsters: Player[] = []
                 d.data.forEach((m: Monster) => {
-                    monsters.push({
-                        character: {
-                            name: m.monster.name,
-                            ac: m.monster.ac,
-                            hp: m.monster.hp,
-                            maxHp: m.monster.hp,
-                            tempHp: "",
-                            dex: String(m.monster.stats.dex),
-                            strSave: String(m.monster.saving.str),
-                            conSave: String(m.monster.saving.con),
-                            dexSave: String(m.monster.saving.dex),
-                            intSave: String(m.monster.saving.int),
-                            wisSave: String(m.monster.saving.wis),
-                            chaSave: String(m.monster.saving.cha),
-                            speed: String(m.monster.speed)
-                        },
-                        id: m._id,
-                        initiative: 0,
-                        isMaster: false,
-                        isTurnSet: false,
-                        statusEffects: [],
-                        turnId: 0,
-                        hidden: false,
-                        npc: true
-                    })
+                    monsters.push(monsterBoardEntry(m.monster, m._id, false))
                 })
                 setValue(monsters)
                 setData(monsters)
@@ -56,9 +33,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (m: Player) => {
-        const roll = Math.floor(Math.random() * 20)
-        const dexMod = Math.floor((Number(m.character.dex) - 10) / 2)
-        m.initiative = dexMod + roll
+        m.initiative = abilityModifier(m.character.dex) + rollD20()
 
         axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: m})
             .then(() => props.u())
@@ -67,7 +42,7 @@ const App = (props: {u: () => void}) => {
     }
 
     const onHide = (m: Player, val: boolean) => {
-        m.hidden = val
+        applyHidden(m, val)
     }
 
     useEffect(() => {
@@ -95,8 +70,8 @@ const App = (props: {u: () => void}) => {
                                 <Td><Switch onChange={(evt) => onHide(item, evt.currentTarget.checked)}/></Td>
                                 <Td>
                                     <Center>
-                                        <Button colorScheme='green'
-                                                onClick={() => onAdd(item)}><AddIcon/></Button>
+                                        <button className='init-btn init-btn--primary init-btn--icon'
+                                                onClick={() => onAdd(item)} aria-label='Hinzufügen'><AddIcon/></button>
                                     </Center>
                                 </Td>
                             </Tr>

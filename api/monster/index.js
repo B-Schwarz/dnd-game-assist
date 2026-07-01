@@ -34,8 +34,7 @@ const getMonsterList = async (req, res) => {
 const deleteMonster = async (req, res) => {
     const charID = req.params.id
 
-    Monster.deleteOne({_id: charID}, () => {
-    })
+    await Monster.deleteOne({_id: charID})
 
     res.sendStatus(200)
 }

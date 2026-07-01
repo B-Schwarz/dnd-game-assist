@@ -9,18 +9,21 @@ const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = re
 const {
     getCharacterList, getOwnCharacterList, getCharacter,
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
-    deleteOwnCharacter, setNPC, getNPCList
+    deleteOwnCharacter, setNPC, setPrimary, setOwnPrimary, getNPCList,
+    saveCharacterHp, saveOwnCharacterHp, saveCharacterHpBulk, getCharacterHp, getOwnCharacterHp,
+    exportCharacters, importCharacters, reassignCharacter,
+    attachUpload, validCharParam, requireOwnChar, uploadAttachment, getAttachment, deleteAttachment
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
-    setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, movePlayer,
+    setPlayer, getPlayerPlayer, getPlayerMaster, sortPlayer, movePlayer, reorderPlayer,
     setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster,
     nextTurn, prevTurn
 } = require("./initiative");
 const {createMonster, getMonsterList, saveMonster, deleteMonster, getMonster} = require("./monster");
 const {createEncounter, getEncounterList, saveEncounter, deleteEncounter} = require("./encounter");
-const {getUserList, setAdmin, setMaster} = require("./admin");
-const {getBookList, getBook} = require("./books");
+const {getUserList, setAdmin, setMaster, setPassword} = require("./admin");
+const {getBookList, uploadBook, deleteBook, bookUpload} = require("./books");
 const path = require("path");
 
 const port = 4000;
@@ -36,6 +39,12 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Credentials", "true")
+
+    // Answer CORS preflight requests here, before auth/static middleware can
+    // reject them (a preflight carries no credentials).
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204)
+    }
 
     next();
 });
@@ -68,8 +77,10 @@ app.use(sess)
 
 const limiter = RateLimit({
     windowMs: 60*1000,
-    max: 10000,
-    standardHeaders: true
+    limit: 10000,
+    // express-rate-limit v8 defaults to the draft-8 combined `RateLimit` header;
+    // pin draft-6 to keep the discrete `RateLimit-Limit`/`-Remaining`/`-Reset` headers.
+    standardHeaders: 'draft-6'
 })
 
 app.use('/api', limiter)
@@ -85,13 +96,33 @@ app.get('/api/charlist/npc', isAuth, isMaster, getNPCList)
 //  CHARACTER
 //
 app.get('/api/char/new', isAuth, createCharacter)
+app.get('/api/char/export', isAuth, isAdmin, exportCharacters)
+app.post('/api/char/import', isAuth, isAdmin, importCharacters)
+app.put('/api/char/reassign', isAuth, isAdmin, reassignCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
 app.put('/api/char/npc/toggle', isAuth, isMaster, setNPC)
+app.put('/api/char/primary/toggle', isAuth, isMasterOrAdmin, setPrimary)
+app.put('/api/char/me/primary/toggle', isAuth, setOwnPrimary)
 app.post('/api/char', isAuth, isMasterOrAdmin, saveCharacter)
 app.post('/api/char/me', isAuth, saveOwnCharacter)
+app.put('/api/char/hp', isAuth, isMasterOrAdmin, saveCharacterHp)
+app.put('/api/char/me/hp', isAuth, saveOwnCharacterHp)
+app.post('/api/char/hp/bulk', isAuth, isMaster, saveCharacterHpBulk)
+app.get('/api/char/hp/:id', isAuth, isMasterOrAdmin, getCharacterHp)
+app.get('/api/char/me/hp/:id', isAuth, getOwnCharacterHp)
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
+
+// Backstory document attachment (one file per character). Guards run before
+// multer so an unauthorized upload never lands on disk; the /me variants add an
+// ownership check on top of validating the id.
+app.post('/api/char/:id/attachment', isAuth, isMasterOrAdmin, validCharParam, attachUpload.single('file'), uploadAttachment)
+app.post('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar, attachUpload.single('file'), uploadAttachment)
+app.get('/api/char/:id/attachment', isAuth, isMasterOrAdmin, validCharParam, getAttachment)
+app.get('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar, getAttachment)
+app.delete('/api/char/:id/attachment', isAuth, isMasterOrAdmin, validCharParam, deleteAttachment)
+app.delete('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar, deleteAttachment)
 
 //
 //  AUTH
@@ -127,6 +158,7 @@ app.get('/api/me/admin/master', isAuth, isMasterOrAdmin, (req, res) => {
 app.get('/api/user', isAuth, isAdmin, getUserList)
 app.put('/api/user/admin', isAuth, isAdmin, setAdmin)
 app.put('/api/user/master', isAuth, isAdmin, setMaster)
+app.put('/api/user/password', isAuth, isAdmin, setPassword)
 
 //
 //  INITIATIVE
@@ -140,6 +172,7 @@ app.post('/api/initiative/player', isAuth, isMaster, addMaster)
 app.delete('/api/initiative/player/:id', isAuth, isMaster, deleteMaster)
 app.delete('/api/initiative/player', isAuth, isMaster, deleteAllMaster)
 app.put('/api/initiative/move', isAuth, isMaster, movePlayer)
+app.put('/api/initiative/reorder', isAuth, isMaster, reorderPlayer)
 app.put('/api/initiative/round', isAuth, isMaster, setRound)
 app.get('/api/initiative/round', isAuth, getRound)
 app.get('/api/initiative/turn/next', isAuth, isMaster, nextTurn)
@@ -148,11 +181,11 @@ app.get('/api/initiative/turn/prev', isAuth, isMaster, prevTurn)
 //
 //  MONSTER
 //
-app.get('/api/monster/new', isAuth, isMasterOrAdmin, createMonster)
-app.get('/api/monster/list', isAuth, getMonsterList)
-app.put('/api/monster', isAuth, isMasterOrAdmin, saveMonster)
-app.delete('/api/monster/:id', isAuth, isMasterOrAdmin, deleteMonster)
-app.get('/api/monster/:id', isAuth, isMasterOrAdmin, getMonster)
+app.get('/api/monster/new', isAuth, isMaster, createMonster)
+app.get('/api/monster/list', isAuth, isMaster, getMonsterList)
+app.put('/api/monster', isAuth, isMaster, saveMonster)
+app.delete('/api/monster/:id', isAuth, isMaster, deleteMonster)
+app.get('/api/monster/:id', isAuth, isMaster, getMonster)
 
 //
 //  ENCOUNTER
@@ -166,6 +199,8 @@ app.delete('/api/encounter/:id', isAuth, isMaster, deleteEncounter)
 //  BOOKS
 //
 app.get('/api/books', isAuth, getBookList)
+app.post('/api/books', isAuth, isAdmin, bookUpload.single('book'), uploadBook)
+app.delete('/api/books/:name', isAuth, isAdmin, deleteBook)
 app.use('/api/books/', isAuth, express.static('books/pdf'))
 
 const start = async () => {
@@ -187,8 +222,14 @@ if (process.env.NODE_ENV === 'production') {
     })
 }
 
-start().then(() => {
-    console.log(`Der Server wurde gestartet!`);
-});
+// Only boot the server when run directly (`node server.js`). When required from
+// a test, we export `app` so supertest can drive it without binding a port.
+if (require.main === module) {
+    start().then(() => {
+        console.log(`Der Server wurde gestartet!`);
+    });
+}
+
+module.exports = {app, start};
 
 

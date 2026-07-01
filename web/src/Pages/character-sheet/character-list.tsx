@@ -16,8 +16,8 @@ import {
     Text
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
-import {Divider} from "@chakra-ui/layout";
-import {AddIcon, DeleteIcon} from "@chakra-ui/icons"
+import {Divider} from "@chakra-ui/react";
+import {AddIcon, DeleteIcon, StarIcon} from "@chakra-ui/icons"
 import WithAuth from "../login/withAuth";
 import {Player} from "../initiative/player.type";
 import TitleService from "../../Service/titleService";
@@ -67,7 +67,8 @@ const App = () => {
                         isTurnSet: false,
                         statusEffects: [],
                         turnId: 0,
-                        npc: char['npc']
+                        npc: char['npc'],
+                        primary: char['primary']
                     }
                     // @ts-ignore
                     setOwnCharData(charData => [...charData, c])
@@ -90,7 +91,8 @@ const App = () => {
                         isTurnSet: false,
                         statusEffects: [],
                         turnId: 0,
-                        npc: char['npc']
+                        npc: char['npc'],
+                        primary: char['primary']
                     }
                     // @ts-ignore
                     setCharData(charData => [...charData, c])
@@ -111,6 +113,7 @@ const App = () => {
                 updateOwnCharList()
                 updateOtherCharList()
             })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function openCharacter(id: string) {
@@ -150,13 +153,16 @@ const App = () => {
                             <Button borderWidth='1px' borderRadius='lg' width='100%'
                                     onClick={() => openCharacter(item.id)}>
                                 <HStack>
+                                    {item.primary && <StarIcon color='#d4af37' aria-label='Hauptcharakter'/>}
                                     <Text color='gray'>Name:</Text>
                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
                                     <Text color='gray'>Klasse:</Text>
                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                                    <Text color='gray'>Rasse:</Text>
+                                    <Text color='gray'>Spezies:</Text>
                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                                    <Text color='gray'>Player:</Text>
+                                    <Text color='gray'>Stufe:</Text>
+                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'},</Text>
+                                    <Text color='gray'>Spieler:</Text>
                                     <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
                                     <Text>{item.npc}</Text>
                                 </HStack>
@@ -203,13 +209,16 @@ const App = () => {
                                                     bg={item.npc ? "rgba(49,150,148,0.60)" : "#ebf0f5"}
                                                     onClick={() => openCharacter(item.id)}>
                                                 <HStack>
+                                                    {item.primary && <StarIcon color='#d4af37' aria-label='Hauptcharakter'/>}
                                                     <Text color='gray'>Name:</Text>
                                                     <Text>{(item['character'] && item['character']['name']) || 'N/A'},</Text>
                                                     <Text color='gray'>Klasse:</Text>
                                                     <Text>{(item['character'] && item['character']['classLevel']) || 'N/A'},</Text>
-                                                    <Text color='gray'>Rasse:</Text>
+                                                    <Text color='gray'>Spezies:</Text>
                                                     <Text>{(item['character'] && item['character']['race']) || 'N/A'},</Text>
-                                                    <Text color='gray'>Player:</Text>
+                                                    <Text color='gray'>Stufe:</Text>
+                                                    <Text>{(item['character'] && item['character']['level']) || 'N/A'},</Text>
+                                                    <Text color='gray'>Spieler:</Text>
                                                     <Text>{(item['character'] && item['character']['playerName']) || 'N/A'}</Text>
                                                 </HStack>
                                             </Button>

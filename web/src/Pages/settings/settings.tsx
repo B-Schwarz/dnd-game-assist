@@ -24,8 +24,7 @@ import {DeleteIcon, ExternalLinkIcon} from "@chakra-ui/icons";
 import WithAuth from "../login/withAuth";
 import {Field, FieldProps, Form, Formik, FormikProps} from "formik";
 import TitleService from "../../Service/titleService";
-import packageJSON from "../../../package.json";
-import {Text} from "@chakra-ui/layout";
+import {Text} from "@chakra-ui/react";
 import {LanguageType} from "./language.type";
 
 const App = () => {
@@ -228,7 +227,7 @@ const App = () => {
                         </AlertDialog>
                     </Container>
                     <Text>
-                        Version: {packageJSON.version} &#8226; <Link href='https://github.com/B-Schwarz/dnd-game-assist' isExternal={true}>
+                        Version: {process.env.REACT_APP_VERSION} &#8226; <Link href='https://github.com/B-Schwarz/dnd-game-assist' isExternal={true}>
                             Github <ExternalLinkIcon mx='2px' />
                         </Link>
                     </Text>

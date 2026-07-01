@@ -20,6 +20,12 @@ const saveEncounter = async (req, res) => {
     const encounterID = req.body.encounterID
     const name = req.body.name
 
+    // Guard the id and body (reading encounter.encounter on a missing body
+    // would otherwise throw → 500).
+    if (!encounterID || !encounter) {
+        return res.sendStatus(400)
+    }
+
     Encounter.findOneAndUpdate({
         _id: encounterID
     }, {
@@ -37,13 +43,16 @@ const getEncounterList = async (req, res) => {
 
 // REQUIRES MASTER OR ADMIN
 const deleteEncounter = async (req, res) => {
-    const charID = req.params.id
+    const encounterID = req.params.id
 
-    console.log(charID)
-    Encounter.deleteOne({_id: charID}, () => {
-    })
-
-    res.sendStatus(200)
+    try {
+        // Scope the delete to the requester so a master cannot remove
+        // another user's encounter (encounters are per-user, see getEncounterList).
+        const result = await Encounter.deleteOne({_id: encounterID, user: req.user._id})
+        res.sendStatus(result.deletedCount > 0 ? 200 : 404)
+    } catch (_) {
+        res.sendStatus(404)
+    }
 }
 
 module.exports = {

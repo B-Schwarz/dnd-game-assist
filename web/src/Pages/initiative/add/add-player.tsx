@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button,
+    Badge,
     Center,
+    HStack,
     Input,
     NumberInput,
     NumberInputField,
@@ -14,11 +15,11 @@ import {
     Tr
 } from "@chakra-ui/react"
 import {AddIcon} from "@chakra-ui/icons";
+import "../initiative.css";
 import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
-import {DnDCharacter} from "dnd-character-sheets";
-import {ColorMarkerEnum} from "../color-marker.enum";
+import {colorToMarker, filterByName, playableEntries} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -26,32 +27,13 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        setValue(_.cloneDeep(filterByName(data, val)))
     }
 
     const getPlayer = () => {
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/charlist')
             .then((d) => {
-                setValue([])
-                let players: Player[] = []
-                d.data.forEach((c: {
-                    character: DnDCharacter;
-                    _id: string;
-                    npc: boolean;
-                }) => {
-                    if (!c.npc) {
-                        players.push({
-                            character: c.character,
-                            id: c._id,
-                            initiative: 0,
-                            isMaster: false,
-                            isTurnSet: false,
-                            statusEffects: [],
-                            turnId: 0
-                        })
-                    }
-                })
+                const players = playableEntries(d.data)
                 setValue(players)
                 setData(players)
             })
@@ -62,7 +44,7 @@ const App = (props: {u: () => void}) => {
     const onAdd = (p: Player) => {
         let _p = p
         if (_p.character.color) {
-            _p.colorMarker = Number(_p.character.color)
+            _p.colorMarker = colorToMarker(_p.character.color)
         }
         axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: _p})
             .then(() => props.u())
@@ -91,7 +73,12 @@ const App = (props: {u: () => void}) => {
                     {
                         values.map((item, index) => (
                             <Tr key={index}>
-                                <Td><Text isTruncated maxW='11rem'>{item.character.name}</Text></Td>
+                                <Td>
+                                    <HStack spacing='0.4rem'>
+                                        {item.primary && <Badge colorScheme='yellow'>PRIMÄR</Badge>}
+                                        <Text isTruncated maxW='11rem'>{item.character.name}</Text>
+                                    </HStack>
+                                </Td>
                                 <Td><NumberInput defaultValue={values[index]['initiative'] || 0} min={0}
                                                  onChange={(val) => {
                                                      // @ts-ignore
@@ -101,8 +88,8 @@ const App = (props: {u: () => void}) => {
                                 </NumberInput></Td>
                                 <Td>
                                     <Center>
-                                        <Button colorScheme='green'
-                                                onClick={() => onAdd(item)}><AddIcon/></Button>
+                                        <button className='init-btn init-btn--primary init-btn--icon'
+                                                onClick={() => onAdd(item)} aria-label='Hinzufügen'><AddIcon/></button>
                                     </Center>
                                 </Td>
                             </Tr>

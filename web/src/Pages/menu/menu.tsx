@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Box, Button, HStack, Spacer, Tag} from "@chakra-ui/react";
 import {SelectedEnum} from "./selected.enum";
-import {Divider} from "@chakra-ui/layout";
+import {Divider} from "@chakra-ui/react";
 import {Link as ReactRouterLink, useNavigate} from "react-router-dom";
 import {SettingsIcon, WarningTwoIcon} from "@chakra-ui/icons";
 import axios from "axios";
@@ -10,7 +10,9 @@ import {MenuButtonType} from "./menu-button.type";
 
 const Menu = (props: { selected: SelectedEnum; }) => {
 
-    const btn = [
+    // Monster and Encounter are master-only tabs (master: true); they stay
+    // hidden until the /api/me/master probe confirms the role.
+    const btn: MenuButtonType[] = [
         {
             name: 'Character',
             selected: SelectedEnum.CHARACTER
@@ -19,11 +21,12 @@ const Menu = (props: { selected: SelectedEnum; }) => {
             selected: SelectedEnum.INITIATIVE
         }, {
             name: 'Monster',
-            selected: SelectedEnum.MONSTER
+            selected: SelectedEnum.MONSTER,
+            master: true
         }, {
             name: 'Encounter',
             selected: SelectedEnum.ENCOUNTER,
-            beta: true
+            master: true
         }, {
             name: 'Einstellungen',
             icon: <SettingsIcon/>,
@@ -44,14 +47,23 @@ const Menu = (props: { selected: SelectedEnum; }) => {
         selected: SelectedEnum.ADMIN
     }
 
-    const [buttons, setButtons] = useState<MenuButtonType[]>(btn)
+    const [isMaster, setIsMaster] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
 
     useEffect(() => {
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
+            .then(() => setIsMaster(true)).catch(() => {})
         axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/admin')
-            .then(() => {
-                setButtons(buttons => buttons.filter(b => b.name === adminBtn.name).length === 0 ? [...buttons, adminBtn] : buttons)
-            }).catch(() => {})
+            .then(() => setIsAdmin(true)).catch(() => {})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    // Derive the visible buttons from the role probes; the master-only tabs
+    // keep their position and the Admin tab is appended at the end.
+    const buttons: MenuButtonType[] = [
+        ...btn.filter(b => !b.master || isMaster),
+        ...(isAdmin ? [adminBtn] : [])
+    ]
 
     const navigate = useNavigate()
 

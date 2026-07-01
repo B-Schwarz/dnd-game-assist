@@ -9,6 +9,34 @@ let playerTurn = 0
 let colorMarkerIndex = 0
 let colorMarkers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
+// A monster (not a player character or plain NPC) counts as dead once its HP
+// hits 0. Dead monsters are pushed to the bottom of the order and skipped.
+const isDeadMonster = (p) => {
+    try {
+        return Boolean(p && p.monster) && Number(p.character.hp) <= 0
+    } catch (_) {
+        return false
+    }
+}
+
+// Stably move every dead monster to the bottom of the order while keeping the
+// turn pointer on whichever creature is currently acting.
+const reorderDeadMonsters = () => {
+    if (master.length === 0) {
+        return
+    }
+    const currentId = master[turn] ? master[turn].turnId : null
+    const alive = master.filter(p => !isDeadMonster(p))
+    const deadMonsters = master.filter(p => isDeadMonster(p))
+    master = [...alive, ...deadMonsters]
+    if (currentId !== null) {
+        const idx = master.findIndex(p => p.turnId === currentId)
+        if (idx >= 0) {
+            turn = idx
+        }
+    }
+}
+
 // set master
 // REQUIRES MASTER
 const setPlayer = (req, res) => {
@@ -36,6 +64,7 @@ const deleteAllMaster = (req, res) => {
     turn = 0
     player = []
     playerTurn = 0
+    round = 1
     colorMarkerIndex = 0
     colorMarkers = _.shuffle(colorMarkers)
     res.sendStatus(200)
@@ -47,10 +76,11 @@ const deleteMaster = (req, res) => {
     if (master.length > 0) {
         const turnId = req.params.id
         if (turnId) {
-            master = master.filter(m => Number(m.turn) !== Number(turnId))
+            // Entries are keyed by turnId (assigned in setTurn); filter on that.
+            master = master.filter(m => Number(m.turnId) !== Number(turnId))
         }
-        if (turnId < turn) {
-            turn -= 1
+        if (Number(turnId) < turn) {
+            turn = Math.max(0, turn - 1)
         }
     }
     updatePlayerData()
@@ -75,6 +105,7 @@ const updateMaster = (req, res) => {
             }
         }
     }
+    reorderDeadMonsters()
     updatePlayerData()
     res.sendStatus(200)
 }
@@ -105,14 +136,17 @@ const addMaster = (req, res) => {
 // REQUIRES MASTER
 const sortPlayer = (req, res) => {
     setTurn()
+    // Initiative descending; ties broken by turnId ascending (turn order).
     master = master.sort((f, s) => {
-        if (Number(s.initiative) < Number(f.initiative) || (Number(s.initiative) === Number(f.initiative) && Number(s.turn) < Number(f.turn))) {
-            return -1
-        } else {
-            return 1
+        const byInitiative = Number(s.initiative) - Number(f.initiative)
+        if (byInitiative !== 0) {
+            return byInitiative
         }
+        return Number(f.turnId) - Number(s.turnId)
     })
 
+    reorderDeadMonsters()
+    updatePlayerData()
     res.sendStatus(200)
 }
 
@@ -142,17 +176,43 @@ const movePlayer = (req, res) => {
 
 }
 
-// REQUIES MASTER
-const setRound = (req, res) => {
-    let r = req.body.round
+// Move the entry at index `from` to index `to` (drag-to-reorder). The turn
+// pointer follows the creature that is currently acting.
+// REQUIRES MASTER
+const reorderPlayer = (req, res) => {
+    const from = Number(req.body.from)
+    const to = Number(req.body.to)
 
-    try {
-        r = Number(r)
-        round = r
+    if (Number.isInteger(from) && Number.isInteger(to) &&
+        from >= 0 && to >= 0 && from < master.length && to < master.length) {
+        const currentId = master[turn] ? master[turn].turnId : null
+        const [moved] = master.splice(from, 1)
+        master.splice(to, 0, moved)
+        if (currentId !== null) {
+            const idx = master.findIndex(p => p.turnId === currentId)
+            if (idx >= 0) {
+                turn = idx
+            }
+        }
+        reorderDeadMonsters()
+        updatePlayerData()
         res.sendStatus(200)
-    } catch (_) {
+    } else {
         res.sendStatus(400)
     }
+}
+
+// REQUIES MASTER
+const setRound = (req, res) => {
+    const r = Number(req.body.round)
+
+    // Number(...) never throws, so reject NaN explicitly instead of storing it.
+    if (Number.isNaN(r)) {
+        return res.sendStatus(400)
+    }
+    // The round never goes below 1.
+    round = Math.max(1, r)
+    res.sendStatus(200)
 }
 
 const getRound = (req, res) => {
@@ -177,24 +237,37 @@ const setTurn = () => {
 
 const nextTurn = (req, res) => {
     if (master.length > 0) {
-        turn += 1
-        if (turn + 1 > master.length) {
-            turn = 0
-            round += 1
-        }
+        // Step forward, skipping dead monsters. The guard stops us looping
+        // forever if every remaining creature is a dead monster.
+        let guard = 0
+        do {
+            turn += 1
+            if (turn + 1 > master.length) {
+                turn = 0
+                round += 1
+            }
+            guard += 1
+        } while (isDeadMonster(master[turn]) && guard <= master.length)
         updatePlayerData()
     }
     res.sendStatus(200)
 }
 
 const prevTurn = (req, res) => {
-    if (turn > 0) {
-        turn -= 1
-    } else {
-        turn = Math.max(0, master.length - 1)
-        round = Math.max(0, round - 1)
+    if (master.length > 0) {
+        let guard = 0
+        do {
+            if (turn > 0) {
+                turn -= 1
+            } else {
+                turn = Math.max(0, master.length - 1)
+                // The round never goes below 1.
+                round = Math.max(1, round - 1)
+            }
+            guard += 1
+        } while (isDeadMonster(master[turn]) && guard <= master.length)
+        updatePlayerData()
     }
-    updatePlayerData()
     res.sendStatus(200)
 }
 
@@ -228,6 +301,7 @@ module.exports = {
     deleteMaster,
     deleteAllMaster,
     movePlayer,
+    reorderPlayer,
     getRound,
     setRound,
     nextTurn,

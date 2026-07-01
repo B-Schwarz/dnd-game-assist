@@ -18,6 +18,10 @@ const setAdmin = async (req, res) => {
     const userID = req.body.userID
     const admin = req.body.admin
 
+    if (!userID) {
+        return res.sendStatus(400)
+    }
+
     await User.findOneAndUpdate({
         _id: userID
     }, {admin: admin})
@@ -34,6 +38,10 @@ const setMaster = async (req, res) => {
     const userID = req.body.userID
     const master = req.body.master
 
+    if (!userID) {
+        return res.sendStatus(400)
+    }
+
     await User.findOneAndUpdate({
         _id: userID
     }, {master: master})
@@ -45,8 +53,32 @@ const setMaster = async (req, res) => {
         })
 }
 
+// Set another user's password. The User pre('save') hook hashes it.
+// REQUIRES ADMIN
+const setPassword = async (req, res) => {
+    const userID = req.body.userID
+    const password = req.body.password
+
+    if (!userID || !password || String(password).length < 8) {
+        return res.sendStatus(400)
+    }
+
+    try {
+        const user = await User.findOne({_id: userID})
+        if (!user) {
+            return res.sendStatus(404)
+        }
+        user.password = password
+        await user.save()
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(400)
+    }
+}
+
 module.exports = {
     getUserList,
     setAdmin,
-    setMaster
+    setMaster,
+    setPassword
 }

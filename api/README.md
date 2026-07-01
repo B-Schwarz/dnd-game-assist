@@ -25,13 +25,29 @@ Start the server by first installing all modules with ``npm install`` and then r
 | URL                  |  METHOD  |                PARAMETER                 |         ROLE         | DESCR.                                          | Return                              |
 |----------------------|:--------:|:----------------------------------------:|:--------------------:|-------------------------------------------------|-------------------------------------|
 | /api/char/new        |  `GET`   |                  `none`                  |        `user`        | Creates a new character, links it with the user | `{_id:ObjectID}`                    |
+| /api/char/export     |  `GET`   |                  `none`                  |       `admin`        | Exports every character with its current owner  | `[{_id, character, npc, primary, owner}]` |
+| /api/char/import     |  `POST`  |        `characters:[exported]`           |       `admin`        | Recreates characters as new, unowned documents  | `{created:number}`                  |
+| /api/char/reassign   |  `PUT`   | `charID:ObjectID`<br/>`toUserID:ObjectID`|       `admin`        | Moves a (non-NPC) character to another user     | `none`                              |
 | /api/char/get/:id    |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets a specified character sheet from anyone    | `{_id:ObjectID, character:Player }` |
 | /api/char/me/get/:id |  `GET`   |                  `none`                  |        `user`        | Gets a specified character sheet from me        | `{_id:ObjectID, character:Player }` |
-| /api/char            |  `POST`  | `character:Player`<br/>`charID:ObjectID` | `admin`<br/>`master` | Saves the someones character sheet              | `none`                              |
-| /api/char/me         |  `POST`  | `character:Player`<br/>`charID:ObjectID` |        `user`        | Saves one of my characters                      | `none`                              |
+| /api/char            |  `POST`  | `character:Player`<br/>`charID:ObjectID` | `admin`<br/>`master` | Saves the someones character sheet (preserves current HP) | `none`                    |
+| /api/char/me         |  `POST`  | `character:Player`<br/>`charID:ObjectID` |        `user`        | Saves one of my characters (preserves current HP)         | `none`                    |
+| /api/char/hp         |  `PUT`   |    `charID:ObjectID`<br/>`hp:any`        | `admin`<br/>`master` | Sets only the current HP of someones character  | `none`                              |
+| /api/char/me/hp      |  `PUT`   |    `charID:ObjectID`<br/>`hp:any`        |        `user`        | Sets only the current HP of one of my characters| `none`                              |
+| /api/char/hp/bulk    |  `POST`  | `updates:[{charID:ObjectID, hp:any}]`    |       `master`       | Sets current HP for many characters at once (invalid/non-character ids skipped) | `none` |
+| /api/char/hp/:id     |  `GET`   |                  `none`                  | `admin`<br/>`master` | Gets only the current HP of someones character  | `{hp:any}`                          |
+| /api/char/me/hp/:id  |  `GET`   |                  `none`                  |        `user`        | Gets only the current HP of one of my characters| `{hp:any}`                          |
 | /api/char/:id        | `DELETE` |                  `none`                  | `admin`<br/>`master` | Deletes someones character sheet                | `none`                              |
 | /api/char/me/:id     | `DELETE` |                  `none`                  |        `user`        | Deletes one of my character sheets              | `none`                              |
 | /api/char/npc/toggle |  `PUT`   |            `charID:ObjectID`             |       `master`       | Toggle whether the character is an NPC or not   | `none`                              |
+| /api/char/primary/toggle | `PUT` |           `charID:ObjectID`             |  `master` or `admin` | Toggle whether the character is a primary       | `none`                              |
+| /api/char/me/primary/toggle | `PUT` |        `charID:ObjectID`             |        `user`        | Toggle whether one of my characters is a primary| `none`                              |
+| /api/char/:id/attachment    | `POST`   | `file:file` (multipart pdf/doc/docx/txt) | `admin`<br/>`master` | Uploads/replaces someones backstory document (≤100 MB) | `none` |
+| /api/char/me/:id/attachment | `POST`   | `file:file` (multipart pdf/doc/docx/txt) |        `user`        | Uploads/replaces the backstory document of one of my characters | `none` |
+| /api/char/:id/attachment    | `GET`    |                  `none`                  | `admin`<br/>`master` | Downloads someones backstory document           | `file`                              |
+| /api/char/me/:id/attachment | `GET`    |                  `none`                  |        `user`        | Downloads the backstory document of one of my characters | `file`                     |
+| /api/char/:id/attachment    | `DELETE` |                  `none`                  | `admin`<br/>`master` | Removes someones backstory document             | `none`                              |
+| /api/char/me/:id/attachment | `DELETE` |                  `none`                  |        `user`        | Removes the backstory document of one of my characters | `none`                       |
 
 ## Account
 
@@ -52,6 +68,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/user        | `GET`  |                 `none`                 | `admin` | Returns a list with all users and their roles | `[user:User]` |
 | /api/user/admin  | `PUT`  | `userID:ObjectID`<br/>`admin:boolean`  | `admin` | Sets the role status                          | `none`        |
 | /api/user/master | `PUT`  | `userID:ObjectID`<br/>`master:boolean` | `admin` | Sets the role status                          | `none`        |
+| /api/user/password | `PUT` | `userID:ObjectID`<br/>`password:string` | `admin` | Sets another user's password (min 8 chars)   | `none`        |
 
 ## Initiative Board
 
@@ -66,6 +83,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/initiative/player/:id | `DELETE` |                    `none`                    | `master` | Deletes the player or npc from the board                                 | `none`                                |
 | /api/initiative/player     | `DELETE` |                    `none`                    | `master` | Resets the curren initiative board                                       | `none`                                |
 | /api/initiative/move       |  `PUT`   | `index:number`<br/>`direction:{'UP','DOWN'}` | `master` | Swaps the position of two players                                        | `none`                                |
+| /api/initiative/reorder    |  `PUT`   |        `from:number`<br/>`to:number`         | `master` | Moves the entry at `from` to index `to` (drag-to-reorder)                | `none`                                |
 | /api/initiative/round      |  `GET`   |                    `none`                    |  `user`  | Gets the current round number                                            | `none`                                |
 | /api/initiative/round      |  `PUT`   |                `round:number`                | `master` | Sets the current round number                                            | `none`                                |
 
@@ -73,16 +91,24 @@ Start the server by first installing all modules with ``npm install`` and then r
 
 | URL               |  METHOD  |                PARAMETER                |         ROLE         | DESCR.                         | Return                              |
 |-------------------|:--------:|:---------------------------------------:|:--------------------:|--------------------------------|-------------------------------------|
-| /api/monster/new  |  `GET`   |                 `none`                  | `admin`<br/>`master` | Creates a new monster          | `none`                              |
-| /api/monster/list |  `GET`   |                 `none`                  |        `user`        | Returns a list of all monsters | `[{_id:ObjectID, monster:Monster}]` |
-| /api/monster      |  `PUT`   | `charID:ObjectID`<br/>`monster:Monster` | `admin`<br/>`master` | Updates a monster              | `none`                              |
-| /api/monster/:id  | `DELETE` |                 `none`                  | `admin`<br/>`master` | Deletes a monster              | `none`                              |
-| /api/monster/:id  |  `GET`   |                 `none`                  | `admin`<br/>`master` | Returns the specified monster  | `[{_id:ObjectID, monster:Monster}]` |
+| /api/monster/new  |  `GET`   |                 `none`                  | `master` | Creates a new monster          | `none`                              |
+| /api/monster/list |  `GET`   |                 `none`                  | `master` | Returns a list of all monsters | `[{_id:ObjectID, monster:Monster}]` |
+| /api/monster      |  `PUT`   | `charID:ObjectID`<br/>`monster:Monster` | `master` | Updates a monster              | `none`                              |
+| /api/monster/:id  | `DELETE` |                 `none`                  | `master` | Deletes a monster              | `none`                              |
+| /api/monster/:id  |  `GET`   |                 `none`                  | `master` | Returns the specified monster  | `[{_id:ObjectID, monster:Monster}]` |
 
 ## Encounter
 | URL                                  |  METHOD  |                PARAMETER                |     ROLE     | DESCR.                            | Return                              |
 |--------------------------------------|:--------:|:---------------------------------------:|:------------:|-----------------------------------|-------------------------------------|
-| /api/encounter/new                   |  `GET`   |                 `none`                  |   `master`   | Creates a new Encounter           | `none`                              |
-| /api/encounter/list                  |  `GET`   |                 `none`                  |   `master`   | Returns a list of your encounters | `[{_id:ObjectID, monster:Monster}]` |
-| /api/encounter                       |  `PUT`   | `charID:ObjectID`<br/>`monster:Monster` |   `master`   | Updates an encounter              | `none`                              |
-| /api/encounter/:id                   | `DELETE` |                 `none`                  |   `master`   | Deletes an encounter              | `none`                              |
+| /api/encounter/new                   |  `GET`   |                 `none`                  | `master` | Creates a new Encounter           | `none`                              |
+| /api/encounter/list                  |  `GET`   |                 `none`                  | `master` | Returns a list of your encounters | `[{_id:ObjectID, monster:Monster}]` |
+| /api/encounter                       |  `PUT`   | `charID:ObjectID`<br/>`monster:Monster` | `master` | Updates an encounter              | `none`                              |
+
+## Books
+| URL               |  METHOD  |          PARAMETER          |  ROLE   | DESCR.                                  | Return     |
+|-------------------|:--------:|:---------------------------:|:-------:|-----------------------------------------|------------|
+| /api/books        |  `GET`   |           `none`            | `user`  | Lists the available book file names     | `[string]` |
+| /api/books        |  `POST`  | `book:file` (multipart PDF) | `admin` | Uploads a PDF into the book directory   | `none`     |
+| /api/books/:name  | `DELETE` |           `none`            | `admin` | Deletes a book by file name             | `none`     |
+| /api/books/:name  |  `GET`   |           `none`            | `user`  | Serves the static PDF file              | `pdf`      |
+| /api/encounter/:id                   | `DELETE` |                 `none`                  | `master` | Deletes an encounter              | `none`                              |

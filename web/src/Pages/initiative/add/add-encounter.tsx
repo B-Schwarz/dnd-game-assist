@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Button, Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
+import {Center, Input, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
-import {Player} from "../player.type";
+import "../initiative.css";
 import _ from "lodash";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
-import {Monster} from "../../monster/monster.type";
+import {buildEncounterInstances, monsterBoardEntry} from "./add.utils";
 
 const App = (props: {u: () => void}) => {
 
@@ -13,8 +13,8 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<EncounterType[]>([])
 
     const search = (val: string) => {
-        // @ts-ignore
-        setValue(_.cloneDeep(data.filter(d => d.character.name.toLowerCase().includes(val.toLowerCase()))))
+        // @ts-ignore — encounter rows carry a `name`, not a `character.name`
+        setValue(_.cloneDeep(data.filter(d => (d.name || '').toLowerCase().includes(val.toLowerCase()))))
     }
 
     const getMonster = () => {
@@ -32,31 +32,7 @@ const App = (props: {u: () => void}) => {
                                 monsters.push({
                                     monster: encounter.monster,
                                     name: mon.monster.name,
-                                    data: {
-                                        character: {
-                                            name: mon.monster.name,
-                                            ac: mon.monster.ac,
-                                            hp: mon.monster.hp,
-                                            maxHp: mon.monster.hp,
-                                            tempHp: "",
-                                            dex: String(mon.monster.stats.dex),
-                                            strSave: String(mon.monster.saving.str),
-                                            conSave: String(mon.monster.saving.con),
-                                            dexSave: String(mon.monster.saving.dex),
-                                            intSave: String(mon.monster.saving.int),
-                                            wisSave: String(mon.monster.saving.wis),
-                                            chaSave: String(mon.monster.saving.cha),
-                                            speed: String(mon.monster.speed)
-                                        },
-                                        id: mon._id,
-                                        initiative: 0,
-                                        isMaster: false,
-                                        isTurnSet: false,
-                                        statusEffects: [],
-                                        turnId: 0,
-                                        hidden: encounter.hidden,
-                                        npc: true
-                                    },
+                                    data: monsterBoardEntry(mon.monster, mon._id, encounter.hidden),
                                     hidden: encounter.hidden,
                                     amount: encounter.amount
                                 })
@@ -78,20 +54,13 @@ const App = (props: {u: () => void}) => {
     }
 
     const onAdd = (m: EncounterType) => {
-        m.encounter.forEach((encounter: EncounterMonster) => {
-            for (let i = 0; i < encounter.amount; i++) {
-                const roll = Math.floor(Math.random() * 20)
-
-                if (encounter.data && encounter.data.character.dex) {
-                    const dexMod = Math.floor((Number(encounter.data.character.dex) - 10) / 2)
-                    encounter.data.initiative = dexMod + roll
-                }
-
-                axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player: encounter.data})
-                    .then(() => props.u())
-                    .catch(() => {
-                    })
-            }
+        // One independently-rolled (deep-cloned) board entry per monster per
+        // amount; see buildEncounterInstances.
+        buildEncounterInstances(m).forEach((player) => {
+            axios.post(process.env.REACT_APP_API_PREFIX + '/api/initiative/player', {player})
+                .then(() => props.u())
+                .catch(() => {
+                })
         })
     }
 
@@ -118,8 +87,8 @@ const App = (props: {u: () => void}) => {
                                 <Td><Text isTruncated maxW='11rem'>{item.name}</Text></Td>
                                 <Td>
                                     <Center>
-                                        <Button colorScheme='green'
-                                                onClick={() => onAdd(item)}><AddIcon/></Button>
+                                        <button className='init-btn init-btn--primary init-btn--icon'
+                                                onClick={() => onAdd(item)} aria-label='Hinzufügen'><AddIcon/></button>
                                     </Center>
                                 </Td>
                             </Tr>

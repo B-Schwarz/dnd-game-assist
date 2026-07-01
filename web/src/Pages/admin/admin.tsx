@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import WithAuth from "../login/withAuth";
 import {Button, Grid, GridItem, Text} from "@chakra-ui/react";
 import User from "./user/user";
+import CharacterAdmin from "./character/character";
+import BooksAdmin from "./books/books";
 import {AdminViewEnum} from "./admin-view.enum";
 import TitleService from "../../Service/titleService";
 
@@ -13,6 +15,10 @@ const App = () => {
         switch (selected) {
             case AdminViewEnum.USER:
                 return <User/>
+            case AdminViewEnum.CHARACTER:
+                return <CharacterAdmin/>
+            case AdminViewEnum.BOOKS:
+                return <BooksAdmin/>
             default:
                 return (<Text>Nothing is selected</Text>)
         }
@@ -32,6 +38,12 @@ const App = () => {
                     <Button w='100%' borderRadius={0} variant={selected === AdminViewEnum.USER ? 'solid' : 'ghost'}
                         onClick={() => setSelected(AdminViewEnum.USER)}>
                         User</Button>
+                    <Button w='100%' borderRadius={0} variant={selected === AdminViewEnum.CHARACTER ? 'solid' : 'ghost'}
+                        onClick={() => setSelected(AdminViewEnum.CHARACTER)}>
+                        Characters</Button>
+                    <Button w='100%' borderRadius={0} variant={selected === AdminViewEnum.BOOKS ? 'solid' : 'ghost'}
+                        onClick={() => setSelected(AdminViewEnum.BOOKS)}>
+                        Books</Button>
                 </GridItem>
                 {showSelected()}
             </Grid>

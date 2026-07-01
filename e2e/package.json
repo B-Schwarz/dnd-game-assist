@@ -1,0 +1,16 @@
+{
+  "name": "dnd-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Playwright acceptance tests for the D&D companion app (drives the real api + web stack).",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

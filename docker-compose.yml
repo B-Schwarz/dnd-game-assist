@@ -10,7 +10,50 @@ services:
       - DB_URI=mongodb://db:27017/dnd
       - DND_COOKIE_SECRET="asdasdasd"
       - CORS_URL="localhost:5000"
+    # Runtime-writable data that must survive image rebuilds: admin-uploaded
+    # books and per-character backstory attachments. Named volumes (not bind
+    # mounts) so the `books` volume is seeded from the PDFs baked into the image
+    # on first run; once the volume exists a rebuild will not re-seed it.
+    volumes:
+      - books:/app/books/pdf
+      - attachments:/app/attachments
   db:
-    image: mongo:4.4.11-rc1
+    image: mongo:8.0
+    # SERVER-121912: MongoDB 8.0's vendored TCMalloc violates the rseq ABI on
+    # Linux kernel 6.19+, which makes mongod abort on startup. Disabling the
+    # SHSTK CPU hwcap works around it; harmless on older kernels. Remove once
+    # MongoDB ships the upstream TCMalloc fix.
+    environment:
+      - GLIBC_TUNABLES=glibc.cpu.hwcaps=-SHSTK
     volumes:
       - ./mongo_volume:/data/db
+
+  # ---- 2.0 migration (throwaway; only runs under the "migration" profile) ----
+  # On the OLD deployment, dump the DB to the shared ./migration/dump volume:
+  #   docker compose --profile migration run --rm migration-dump
+  # Copy ./migration/dump/dump.json to the 2.0 host, then on the NEW deployment:
+  #   docker compose --profile migration run --rm migration-restore
+  migration-dump:
+    build: ./migration
+    profiles: ["migration"]
+    depends_on:
+      - db
+    environment:
+      - DB_URI=mongodb://db:27017/dnd
+    volumes:
+      - ./migration/dump:/dump
+    command: ["dump", "--out", "/dump/dump.json"]
+  migration-restore:
+    build: ./migration
+    profiles: ["migration"]
+    depends_on:
+      - db
+    environment:
+      - DB_URI=mongodb://db:27017/dnd
+    volumes:
+      - ./migration/dump:/dump
+    command: ["restore", "--in", "/dump/dump.json", "--drop"]
+
+volumes:
+  books:
+  attachments:

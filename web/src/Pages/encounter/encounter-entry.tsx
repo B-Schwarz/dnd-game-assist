@@ -15,9 +15,9 @@ import {
     GridItem,
     IconButton,
     Input,
-    Select, Spacer,
+    Select,
     Stack,
-    StackItem,
+    Box,
     Switch,
     Table,
     Tbody,
@@ -33,6 +33,7 @@ import {IoSaveSharp} from "react-icons/io5";
 import axios from "axios";
 import {EncounterType} from "./encounter.type";
 import {Monster} from "../monster/monster.type";
+import {newEncounterRow, removeMonsterAt} from "./encounter.utils";
 
 
 // m: Monster of the card
@@ -43,7 +44,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const [encounter, setEncounter] = useState<EncounterType>(props.m)
     const [edit, setEdit] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
-    const [watched, setWatched] = useState(false)
+    const [, setWatched] = useState(false)
 
     const [name, setName] = useState(props.m.name)
     const [amount, setAmount] = useState<number>(1)
@@ -57,15 +58,9 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const closePopup = () => setIsOpen(false)
 
     const addMonster = () => {
-        const newEncounter = {
-            monster: monster,
-            hidden: hide,
-            amount: amount
-        }
-
         if (monster !== "") {
             let temp: EncounterType = _.cloneDeep(encounter)
-            temp.encounter.push(newEncounter)
+            temp.encounter.push(newEncounterRow(monster, monsterList, hide, amount))
             setEncounter(temp)
         }
     }
@@ -88,10 +83,12 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
             })
 
         resolveMonsterName()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         save()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [encounter]);
 
     const save = () => {
@@ -131,7 +128,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const editName = () => {
         return (
             <Stack direction={edit ? 'column' : 'row'} w='100%'><Text fontWeight='bold'>{encounter.name}:</Text>
-                {edit && <StackItem><Input defaultValue={name} onChange={(evt) => setName(evt.currentTarget.value)}/></StackItem> }
+                {edit && <Box><Input defaultValue={name} onChange={(evt) => setName(evt.currentTarget.value)}/></Box> }
                 {!edit && <Text maxWidth="65vw" wordBreak="break-word">
                         {name}
                     </Text>}
@@ -145,9 +142,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }
 
     const deleteMonster = (index: number) => {
-        encounter.encounter.splice(index, 1)
-        // @ts-ignore
-        document.getElementById("monster-"+index).style.backgroundColor = "IndianRed"
+        setEncounter(removeMonsterAt(encounter, index))
     }
 
     return (

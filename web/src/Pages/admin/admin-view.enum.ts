@@ -1,3 +1,5 @@
 export enum AdminViewEnum {
-    USER
+    USER,
+    CHARACTER,
+    BOOKS
 }

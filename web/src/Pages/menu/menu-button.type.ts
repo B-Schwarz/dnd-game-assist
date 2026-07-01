@@ -7,5 +7,6 @@ export interface MenuButtonType {
     icon?: ReactElement<any, string | JSXElementConstructor<any>>,
     color?: string,
     link?: string,
-    beta?: boolean
+    beta?: boolean,
+    master?: boolean
 }

@@ -1,0 +1,18 @@
+# Local MongoDB data dir (root-owned; not part of the image, and unreadable in the build context)
+mongo_volume/
+
+# Dependencies and build output — reinstalled/rebuilt inside the image
+**/node_modules/
+web/build/
+
+# Test + tooling artifacts not needed by the image
+e2e/
+test-results/
+**/coverage/
+**/*.log
+
+# VCS / editor / CI
+.git/
+.github/
+.idea/
+.vscode/

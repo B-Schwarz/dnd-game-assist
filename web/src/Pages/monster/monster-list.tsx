@@ -2,11 +2,11 @@ import React, {useEffect, useState} from "react";
 import WithAuth from "../login/withAuth";
 import {Monster} from "./monster.type";
 import MonsterEntry from "./monster-entry";
-import {Accordion, Button, HStack, IconButton, Input, StackItem, VStack} from "@chakra-ui/react";
+import {Accordion, Button, HStack, IconButton, Input, Box, VStack} from "@chakra-ui/react";
 import axios from "axios";
 import {AddIcon} from "@chakra-ui/icons";
 import TitleService from "../../Service/titleService";
-import {Text} from "@chakra-ui/layout";
+import {Text} from "@chakra-ui/react";
 import {AiOutlineArrowLeft} from "@react-icons/all-files/ai/AiOutlineArrowLeft";
 import {AiOutlineArrowRight} from "@react-icons/all-files/ai/AiOutlineArrowRight";
 
@@ -14,7 +14,7 @@ const App = () => {
 
     const [monster, setMonster] = useState<Monster[]>([])
     const [value, setValue] = useState<Monster[]>([])
-    const [isAdminOrMaster, setIsAdminOrMaster] = useState(false)
+    const [isMaster, setIsMaster] = useState(false)
 
     const [page, setPage] = useState(1)
 
@@ -31,8 +31,8 @@ const App = () => {
                 switchPage(data.data, 1)
             })
             .finally(() => {
-                axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/admin/master')
-                    .then(() => setIsAdminOrMaster(true))
+                axios.get(process.env.REACT_APP_API_PREFIX + '/api/me/master')
+                    .then(() => setIsMaster(true))
                     .catch(() => {
                     })
             })
@@ -77,6 +77,7 @@ const App = () => {
 
     useEffect(() => {
         update()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
@@ -87,19 +88,19 @@ const App = () => {
                     <Input placeholder='Suchen...' onChange={async (evt) => {
                         await search(evt.currentTarget.value)
                     }}/>
-                    {isAdminOrMaster && <IconButton aria-label={'add new monster'} colorScheme='green' icon={<AddIcon/>}
+                    {isMaster && <IconButton aria-label={'add new monster'} colorScheme='green' icon={<AddIcon/>}
                                                     onClick={createMonster}/>}
                 </HStack>
                 <Accordion allowToggle w='100%' h='80vh' overflowY='scroll'>
                     {value.map((m: Monster) => {
                             if (!m.hidden)
-                                return (<MonsterEntry m={m} u={update} e={isAdminOrMaster} key={m._id}/>)
+                                return (<MonsterEntry m={m} u={update} e={isMaster} key={m._id}/>)
                             else
                                 return <React.Fragment key={m._id}/>
                         }
                     )}
                 </Accordion>
-                <StackItem>
+                <Box>
                     <HStack spacing='1rem'>
                         <Button disabled={disableLeft}
                                 onClick={() => switchPage(monster, page - 1)}><AiOutlineArrowLeft/></Button>
@@ -107,7 +108,7 @@ const App = () => {
                         <Button disabled={disableRight}
                                 onClick={() => switchPage(monster, page + 1)}><AiOutlineArrowRight/></Button>
                     </HStack>
-                </StackItem>
+                </Box>
             </VStack>
         </React.Fragment>
     )
