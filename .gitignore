@@ -171,3 +171,4 @@ migration/__pycache__/
 
 # Migration dumps (contain production data)
 migration/dump/
+e2e/yarn.lock
