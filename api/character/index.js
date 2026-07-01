@@ -194,6 +194,32 @@ const setPrimary = async (req, res) => {
     }
 }
 
+// Self-scoped variant: a player marks one of their OWN characters as a primary
+// (main party) character from the character sheet. Ownership is enforced.
+const setOwnPrimary = async (req, res) => {
+    const charID = req.body.charID
+
+    if (!charID) {
+        return res.sendStatus(400)
+    }
+
+    if (!isOwnedByUser(req.user.character, charID)) {
+        return res.sendStatus(401)
+    }
+
+    try {
+        const char = await Character.findById(charID)
+        if (!char) {
+            return res.sendStatus(404)
+        }
+        char.primary = !char.primary
+        await char.save()
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(404)
+    }
+}
+
 // REQUIRES MASTER OR ADMIN
 const getCharacter = async (req, res) => {
     if (req.params.id) {
@@ -418,6 +444,7 @@ module.exports = {
     deleteOwnCharacter,
     setNPC,
     setPrimary,
+    setOwnPrimary,
     getNPCList,
     exportCharacters,
     importCharacters,

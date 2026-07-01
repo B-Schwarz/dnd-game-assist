@@ -7,6 +7,7 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import WithAuth from "../login/withAuth";
 import TitleService from "../../Service/titleService";
+import {HStack, Switch, Text, useToast} from "@chakra-ui/react";
 
 const API = process.env.REACT_APP_API_PREFIX
 
@@ -25,6 +26,11 @@ const App = () => {
     const [isMaster, setIsMaster] = useState(true)
     const [character, setCharacter] = useState<DnDCharacter>(loadDefaultCharacter())
     const [change, setChange] = useState(false)
+    // `primary` lives on the Character document (not the sheet sub-doc), so it is
+    // tracked separately from `character` and toggled through its own endpoint.
+    const [primary, setPrimary] = useState(false)
+
+    const toast = useToast()
 
     // last known current HP — used to detect local edits and to avoid re-applying
     // a polled value that we already have
@@ -87,21 +93,22 @@ const App = () => {
         }
     }
 
-    function initUpdate(char: DnDCharacter) {
-        hpRef.current = (char as any).hp
-        setCharacter(char)
+    function initUpdate(doc: any) {
+        hpRef.current = (doc.character as any)?.hp
+        setCharacter(doc.character)
+        setPrimary(Boolean(doc.primary))
     }
 
     async function recv() {
         if (isMaster) {
             axios.get(API + `/api/char/get/${id}`)
                 .then((data) => {
-                    initUpdate(data.data.character);
+                    initUpdate(data.data);
                 })
                 .catch(() => {
                     axios.get(API + `/api/char/me/get/${id}`)
                         .then((data) => {
-                            initUpdate(data.data.character);
+                            initUpdate(data.data);
                         })
                         .catch(() => {
                         })
@@ -109,10 +116,33 @@ const App = () => {
         } else {
             axios.get(API + `/api/char/me/get/${id}`)
                 .then((data) => {
-                    initUpdate(data.data.character);
+                    initUpdate(data.data);
                 })
                 .catch(() => {
                 })
+        }
+    }
+
+    // Toggle the primary flag. Mirrors send()/saveHp(): try the privileged
+    // endpoint first, fall back to the self-scoped one for a plain owner.
+    function togglePrimary() {
+        const next = !primary
+        setPrimary(next)
+
+        const onError = () => {
+            setPrimary(!next)
+            toast({title: 'Fehler', description: 'Primär-Status konnte nicht geändert werden.', status: 'error', duration: 3000, isClosable: true})
+        }
+        const own = () => axios.put(API + '/api/char/me/primary/toggle', {charID: id}).catch(onError)
+
+        if (isMaster) {
+            axios.put(API + '/api/char/primary/toggle', {charID: id})
+                .catch(() => {
+                    setIsMaster(false)
+                    own()
+                })
+        } else {
+            own()
         }
     }
 
@@ -165,6 +195,10 @@ const App = () => {
         <>
             <TitleService title={character.name || ''}/>
             <div style={{"marginLeft": "auto", "marginRight": "auto", maxWidth: "1200px"}}>
+                <HStack justifyContent='flex-end' paddingX='0.5rem' paddingTop='0.5rem'>
+                    <Text fontSize='sm' fontWeight='medium'>Hauptcharakter</Text>
+                    <Switch isChecked={primary} onChange={togglePrimary}/>
+                </HStack>
                 <CharacterSheet character={character} onCharacterChanged={updateCharacter}/>
             </div>
         </>

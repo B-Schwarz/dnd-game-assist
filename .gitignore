@@ -165,3 +165,5 @@ docker.sh
 
 # Claude Code local session state
 .claude/
+migration/__pycache__/
+*.pyc

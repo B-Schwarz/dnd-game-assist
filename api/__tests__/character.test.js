@@ -215,6 +215,26 @@ describe('setPrimary', () => {
     })
 })
 
+describe('setOwnPrimary', () => {
+    test('a player toggles their OWN primary flag; not owned → 401; missing id → 400', async () => {
+        await seedActors()
+        const owned = await makeCharacter({owner: player, character: {name: 'Mine'}})
+        const foreign = await makeCharacter({owner: other, character: {name: 'Theirs'}})
+        const agent = await loginAgent(app, 'player')
+
+        expect((await agent.put('/api/char/me/primary/toggle').send({charID: owned._id.toString()})).statusCode).toBe(200)
+        expect((await Character.findById(owned._id)).primary).toBe(true)
+        // toggles back off
+        expect((await agent.put('/api/char/me/primary/toggle').send({charID: owned._id.toString()})).statusCode).toBe(200)
+        expect((await Character.findById(owned._id)).primary).toBe(false)
+        // cannot touch someone else's character
+        expect((await agent.put('/api/char/me/primary/toggle').send({charID: foreign._id.toString()})).statusCode).toBe(401)
+        expect((await Character.findById(foreign._id)).primary).toBe(false)
+        // missing id → 400
+        expect((await agent.put('/api/char/me/primary/toggle').send({})).statusCode).toBe(400)
+    })
+})
+
 describe('export / import / reassign', () => {
     test('exportCharacters resolves owner (or null when unowned)', async () => {
         await seedActors()

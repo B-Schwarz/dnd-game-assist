@@ -75,7 +75,7 @@
 4. [x] NPC should not be reassignable
 5. [x] Export singular characters
 6. [x] Mark a character as a primary
-7. [ ] Marking should be done in the character sheet by the player
+7. [x] Marking should be done in the character sheet by the player
 
 ## Books
 
@@ -88,4 +88,4 @@
 3. [x] Update dependencies
 4. [x] Update displayed version
 5. [x] Create github actions to require PRs to pass the unit and acceptance tests
-6. [ ] Create a python migration script to download all data from the prod DB and upload it again after migrating to 2.0
+6. [x] Create a python migration script to download all data from the prod DB and upload it again after migrating to 2.0

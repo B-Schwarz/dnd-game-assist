@@ -41,6 +41,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/char/me/:id     | `DELETE` |                  `none`                  |        `user`        | Deletes one of my character sheets              | `none`                              |
 | /api/char/npc/toggle |  `PUT`   |            `charID:ObjectID`             |       `master`       | Toggle whether the character is an NPC or not   | `none`                              |
 | /api/char/primary/toggle | `PUT` |           `charID:ObjectID`             |  `master` or `admin` | Toggle whether the character is a primary       | `none`                              |
+| /api/char/me/primary/toggle | `PUT` |        `charID:ObjectID`             |        `user`        | Toggle whether one of my characters is a primary| `none`                              |
 
 ## Account
 
