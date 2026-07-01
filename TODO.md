@@ -102,3 +102,5 @@
 5. [x] Create github actions to require PRs to pass the unit and acceptance tests
 6. [x] Create a python migration script to download all data from the prod DB and upload it again after migrating to 2.0
 7. [x] Completely rewrite the Readme to be modern and says more about the tool
+8. [x] Add a screenshot from a filled out Character sheet (only top half of each page)
+9. [x] Add a screenshot from an in progress initiative board

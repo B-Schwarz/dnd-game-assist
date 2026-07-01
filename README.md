@@ -31,6 +31,22 @@ serves the group's rulebooks — all from one place.
 
 ---
 
+## Screenshots
+
+**2024 character sheet** — the top of each page (the full sheet spans two pages):
+
+| Page 1 — combat & abilities | Page 2 — spells & profile |
+|:---:|:---:|
+| ![Character sheet, page 1](assets/character-sheet-page1.png) | ![Character sheet, page 2](assets/character-sheet-page2.png) |
+
+**Initiative tracker** — an encounter mid-combat (round 3): colour markers, live
+HP bars, concentration/rage badges, a shield bonus shown as `AC 14 (+2)`, hidden
+and dead-combatant handling, with the active turn highlighted.
+
+![Initiative board in progress](assets/initiative-board.png)
+
+---
+
 ## Tech stack
 
 | Layer    | Stack                                                            |
