@@ -101,3 +101,4 @@
 4. [x] Update displayed version
 5. [x] Create github actions to require PRs to pass the unit and acceptance tests
 6. [x] Create a python migration script to download all data from the prod DB and upload it again after migrating to 2.0
+7. [x] Completely rewrite the Readme to be modern and says more about the tool
