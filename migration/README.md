@@ -1,54 +1,55 @@
-# 2.0 character migration
+# 2.0 database migration
 
-`migrate_to_2_0.py` copies characters from an old deployment into a 2.0 one
-**entirely through the HTTP API** — it never talks to MongoDB directly, so it
-works against a remote/hosted instance with only an admin login.
+Copies the whole database from the old (1.x) deployment into a fresh 2.0 one,
+using a throwaway container that reaches MongoDB **directly** over the compose
+network. Data is handed over on a shared `./migration/dump` volume.
 
-The app stores each character sheet as an **opaque** sub-document, so the 2024
-sheet redesign needs no data migration (removed fields become orphan data, added
-fields fall back to their defaults). The only structural changes are on the
-character document — `npc` and the new `primary` flag — both of which the
-`/api/char/import` endpoint already coerces to booleans.
+Two collections' worth of nuance:
 
-Endpoints used (an **admin** account is required on both ends):
-`POST /api/auth/login`, `GET /api/char/export`, `POST /api/char/import`,
-`GET /api/user`, `PUT /api/char/reassign`.
+- The character sheet is stored as an **opaque** sub-document, so the 2024 sheet
+  redesign needs no data migration (removed fields become orphan data, added
+  fields fall back to their defaults). The only structural change is on the
+  `characters` collection: `npc` and the new `primary` flag are backfilled to
+  booleans at restore time.
+- Users (with their bcrypt password hashes and roles), monsters and encounters
+  are carried over verbatim. Ephemeral express-session tokens are skipped.
 
-## Setup
+The migration services live in the root `docker-compose.yml` behind a
+`migration` profile, so a normal `docker compose up` never starts them.
 
-```sh
-cd migration
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-```
+## Flow
 
-## Usage
-
-One-shot copy from the old deployment to the new one, restoring owners:
+**1. On the OLD (1.x) deployment** — dump the running database:
 
 ```sh
-export SOURCE_API_URL="https://old.example.com" SOURCE_ADMIN_USER=admin SOURCE_ADMIN_PASS=...
-export TARGET_API_URL="http://localhost:5000"   TARGET_ADMIN_USER=admin TARGET_ADMIN_PASS=...
-python migrate_to_2_0.py run --reassign
+docker compose --profile migration run --rm migration-dump
 ```
 
-Or in stages, keeping an on-disk backup between steps:
+This writes `./migration/dump/dump.json` (MongoDB extended JSON, so ObjectIds
+and dates round-trip losslessly).
+
+**2. Move the dump** to the 2.0 host — copy `./migration/dump/dump.json` over
+(same host? nothing to do). The file is the entire hand-off.
+
+**3. On the NEW (2.0) deployment** — bring the stack up so the fresh `db` exists,
+then restore into it:
 
 ```sh
-python migrate_to_2_0.py download --url "$SOURCE_API_URL" --user admin --pass "$SOURCE_ADMIN_PASS" --out prod.json
-python migrate_to_2_0.py migrate  --in prod.json --out prod-2.0.json
-python migrate_to_2_0.py upload   --url "$TARGET_API_URL" --user admin --pass "$TARGET_ADMIN_PASS" --in prod-2.0.json --reassign
+docker compose up -d db
+docker compose --profile migration run --rm migration-restore
 ```
 
-Any flag can be supplied via the matching env var (`SOURCE_API_URL`,
-`SOURCE_ADMIN_USER`, `SOURCE_ADMIN_PASS`, and the `TARGET_*` equivalents).
+`migration-restore` applies the 2.0 transforms and loads the data. It runs with
+`--drop`, so each target collection is emptied first — this replaces the seeded
+default admin with the real migrated users and makes the step idempotent
+(re-running produces the same result).
 
-## Ownership
+## Notes / one-offs
 
-`/api/char/import` recreates every character as an **unowned** document (by
-design). With `--reassign` the script then restores ownership best-effort: it
-matches each imported sheet back to its source owner and calls
-`/api/char/reassign` when a **target user with the same name already exists**.
-Users are *not* migrated by this script — create the accounts on the new
-deployment first (registration/seed), then run with `--reassign`. Without the
-flag, an admin can assign owners manually in the admin → characters view.
+- Both services read the connection string from `DB_URI`
+  (`mongodb://db:27017/dnd`), the same env var the app uses.
+- Run the transform on an existing dump without touching a DB:
+  `python migrate_to_2_0.py migrate --in dump.json --out dump-2.0.json`.
+- Locally (no Docker): `pip install -r requirements.txt`, then
+  `DB_URI=mongodb://127.0.0.1:27017/dnd python migrate_to_2_0.py dump --out dump.json`.
+- `migration/dump/` is git-ignored — dumps contain production data.

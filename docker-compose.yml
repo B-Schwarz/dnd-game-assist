@@ -20,3 +20,29 @@ services:
       - GLIBC_TUNABLES=glibc.cpu.hwcaps=-SHSTK
     volumes:
       - ./mongo_volume:/data/db
+
+  # ---- 2.0 migration (throwaway; only runs under the "migration" profile) ----
+  # On the OLD deployment, dump the DB to the shared ./migration/dump volume:
+  #   docker compose --profile migration run --rm migration-dump
+  # Copy ./migration/dump/dump.json to the 2.0 host, then on the NEW deployment:
+  #   docker compose --profile migration run --rm migration-restore
+  migration-dump:
+    build: ./migration
+    profiles: ["migration"]
+    depends_on:
+      - db
+    environment:
+      - DB_URI=mongodb://db:27017/dnd
+    volumes:
+      - ./migration/dump:/dump
+    command: ["dump", "--out", "/dump/dump.json"]
+  migration-restore:
+    build: ./migration
+    profiles: ["migration"]
+    depends_on:
+      - db
+    environment:
+      - DB_URI=mongodb://db:27017/dnd
+    volumes:
+      - ./migration/dump:/dump
+    command: ["restore", "--in", "/dump/dump.json", "--drop"]

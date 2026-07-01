@@ -167,3 +167,6 @@ docker.sh
 .claude/
 migration/__pycache__/
 *.pyc
+
+# Migration dumps (contain production data)
+migration/dump/
