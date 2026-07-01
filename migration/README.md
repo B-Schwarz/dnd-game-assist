@@ -6,11 +6,25 @@ network. Data is handed over on a shared `./migration/dump` volume.
 
 Two collections' worth of nuance:
 
-- The character sheet is stored as an **opaque** sub-document, so the 2024 sheet
-  redesign needs no data migration (removed fields become orphan data, added
-  fields fall back to their defaults). The only structural change is on the
-  `characters` collection: `npc` and the new `primary` flag are backfilled to
-  booleans at restore time.
+- The character sheet is stored as an **opaque** sub-document, so most of the
+  2024 sheet redesign needs no data migration (removed fields become orphan
+  data, added fields fall back to their defaults). Two structural changes are
+  applied at restore time (see `migrate_character_sheet` in
+  `migrate_to_2_0.py`):
+  - on the `characters` collection, `npc` and the new `primary` flag are
+    backfilled to booleans; and
+  - a handful of renamed/merged **sheet** fields are converted:
+    - `featuresTraits` → `feats`
+    - `height` → `size`
+    - the leveled spell lists (`cantrips` as level 0, plus
+      `lvl1Spells`..`lvl9Spells`) fold into the unified `spells` list; a
+      `prepared` spell gets `"Prepared"` in its notes
+    - the old profile fields (`personalityTraits`, `ideals`, `bonds`, `flaws`,
+      `age`, `weight`, `eyes`, `skin`, `hair`) are prepended to `backstory` as
+      labelled lines, e.g. `Personality: …`
+
+  These conversions are idempotent and unit-tested — run them with no DB:
+  `python -m unittest test_migrate` (needs `requirements.txt` installed).
 - Users (with their bcrypt password hashes and roles), monsters and encounters
   are carried over verbatim. Ephemeral express-session tokens are skipped.
 

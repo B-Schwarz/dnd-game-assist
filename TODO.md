@@ -104,3 +104,11 @@
 7. [x] Completely rewrite the Readme to be modern and says more about the tool
 8. [x] Add a screenshot from a filled out Character sheet (only top half of each page)
 9. [x] Add a screenshot from an in progress initiative board
+
+# Migration
+
+1. [x] Convert the following character properties:
+   1. featureTraits -> feats
+   2. lvlXSpells -> merge into spells and map name to name and X from the level to level; if prepared is true write "Prepared" into the notes
+   3. Write personalityTrait, ideals, bonds, flaws, age, weight, eyes, skin and hair into the beginning of backstory each one after another beginning in this schema: "Personality: personalityTrai"
+   4. height -> size

@@ -10,13 +10,17 @@ network with the `db` service and a `dump` volume (see migration/README.md):
   * `restore` — read that JSON file, apply the 2.0 transforms, and write it into
                 the NEW (2.0) deployment's DB.
 
-The 2.0 backend stores each character sheet as an opaque sub-document, so the
-2024 sheet redesign needs no data migration (removed fields become orphan data,
-added fields fall back to their defaults). The only structural change is on the
-`characters` collection:
+The 2.0 backend stores each character sheet as an opaque sub-document, so most
+of the 2024 sheet redesign needs no data migration (removed fields become orphan
+data, added fields fall back to their defaults). What does need converting:
 
-  * `npc`     — boolean, default False
-  * `primary` — boolean, default False (new in 2.0)
+  * the `characters` collection gains two booleans — `npc` (default False) and
+    `primary` (default False, new in 2.0); and
+  * a handful of renamed/merged sheet fields (see `migrate_character_sheet`):
+    `featuresTraits` -> `feats`; `height` -> `size`; the leveled spell lists
+    (`cantrips` + `lvl1Spells`..`lvl9Spells`) fold into one `spells` list; and
+    the old profile fields (personality/ideals/bonds/flaws/age/weight/eyes/
+    skin/hair) are prepended to `backstory` as labelled lines.
 
 Users (with their bcrypt password hashes / roles), monsters and encounters are
 carried over verbatim.
@@ -63,12 +67,91 @@ def dump_db(uri, db_name):
         client.close()
 
 
+# ---- character-sheet field conversions (1.x sheet shape -> 2.0 sheet shape) --
+# The character sheet is stored as an opaque sub-document, so these transforms
+# operate on plain dicts. Renamed/removed source fields are dropped; unknown
+# fields the 2.0 sheet doesn't read simply become orphan data.
+
+# Profile fields the 1.x sheet kept as separate inputs. The 2.0 sheet folds them
+# into the free-text backstory, one labelled line each, in this order.
+_BACKSTORY_FIELDS = [
+    ("personalityTraits", "Personality"),
+    ("ideals", "Ideals"),
+    ("bonds", "Bonds"),
+    ("flaws", "Flaws"),
+    ("age", "Age"),
+    ("weight", "Weight"),
+    ("eyes", "Eyes"),
+    ("skin", "Skin"),
+    ("hair", "Hair"),
+]
+
+
+def _spell_entry(level, spell):
+    """Map a 1.x spell ({name, prepared?}) onto a 2.0 spell ({level, name, notes})."""
+    spell = spell or {}
+    entry = {"level": str(level), "name": spell.get("name", "")}
+    if spell.get("prepared"):
+        entry["notes"] = "Prepared"
+    return entry
+
+
+def migrate_character_sheet(ch):
+    """Convert one opaque character sheet from the 1.x shape to the 2.0 shape.
+
+    Mutates and returns `ch`. Idempotent on already-converted sheets (the 1.x
+    source fields are gone, so a second pass is a no-op).
+    """
+    if not isinstance(ch, dict):
+        return ch
+
+    # 1. featuresTraits -> feats  (the TODO writes "featureTraits"; the real 1.x
+    #    field is "featuresTraits" — accept either, without clobbering an
+    #    existing `feats`).
+    for old_key in ("featuresTraits", "featureTraits"):
+        if old_key in ch:
+            value = ch.pop(old_key)
+            if not ch.get("feats"):
+                ch["feats"] = value
+
+    # 2. cantrips (level 0) + lvl1Spells..lvl9Spells -> one unified `spells` list.
+    #    The TODO only names lvlXSpells; cantrips are folded in as level 0 so the
+    #    1.x cantrip list isn't silently dropped.
+    merged = list(ch.get("spells") or [])
+    for spell in (ch.pop("cantrips", None) or []):
+        merged.append(_spell_entry(0, spell))
+    for lvl in range(1, 10):
+        for spell in (ch.pop(f"lvl{lvl}Spells", None) or []):
+            merged.append(_spell_entry(lvl, spell))
+    if merged:
+        ch["spells"] = merged
+
+    # 3. personalityTraits/ideals/bonds/flaws/age/weight/eyes/skin/hair ->
+    #    prepended to backstory as labelled lines (empty fields skipped).
+    lines = []
+    for key, label in _BACKSTORY_FIELDS:
+        value = ch.pop(key, None)
+        if value not in (None, ""):
+            lines.append(f"{label}: {value}")
+    if lines:
+        preamble = "\n".join(lines)
+        existing = ch.get("backstory") or ""
+        ch["backstory"] = preamble + ("\n\n" + existing if existing else "")
+
+    # 4. height -> size
+    if "height" in ch:
+        ch["size"] = ch.pop("height")
+
+    return ch
+
+
 def migrate(data):
     """Apply the in-place 2.0 transforms and return the same dict."""
     characters = data.get("characters", [])
     for doc in characters:
         doc["npc"] = bool(doc.get("npc", False))
         doc["primary"] = bool(doc.get("primary", False))
+        migrate_character_sheet(doc.get("character"))
     print(f"  migrated {len(characters)} character doc(s) to schema {MIGRATION_VERSION}")
     return data
 
