@@ -194,6 +194,34 @@ const CharacterSheet = (props: Props) => {
         reader.readAsDataURL(file)
     }
 
+    // ----- backstory attachment (pdf/docx/txt) — stored inline like the image -----
+    const uploadAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files && e.target.files[0]
+        e.target.value = '' // allow re-selecting the same file name
+        if (!file) return
+        if (file.size > 8000000) {
+            window.alert(t('File too large (max 8 MB).', 'Datei zu groß (max 8 MB).'))
+            return
+        }
+        const reader = new FileReader()
+        reader.onload = (ev) => {
+            if (ev.target && typeof ev.target.result === 'string') {
+                props.onCharacterChanged({...character, attachmentData: ev.target.result, attachmentName: file.name})
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const downloadAttachment = () => {
+        if (!character.attachmentData) return
+        const a = document.createElement('a')
+        a.href = character.attachmentData
+        a.download = character.attachmentName || 'attachment'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+    }
+
     const renderAbility = (a: AbilityDef) => (
         <div className='dnd-card dnd-ability' key={a.key}>
             <div className='dnd-title'>{german ? a.de : a.en}</div>
@@ -465,12 +493,38 @@ const CharacterSheet = (props: Props) => {
                         </div>
 
                         <div className='dnd-card'>
-                            <div className='dnd-title'>{t('Class Features', 'Klassenmerkmale')}</div>
+                            <div className='dnd-title'>{t('Equipment', 'Ausrüstung')}</div>
                             <div className='dnd-twocol'>
-                                <textarea rows={21} value={character.classFeatures || ''}
-                                          onChange={(e) => set('classFeatures', e.target.value)}/>
-                                <textarea rows={21} value={character.classFeatures2 || ''}
-                                          onChange={(e) => set('classFeatures2', e.target.value)}/>
+                                <div className='dnd-equip-col'>
+                                    <textarea rows={16} value={character.equipment || ''}
+                                              onChange={(e) => set('equipment', e.target.value)}/>
+                                    <label className='dnd-sublabel'>{t('Magic Item Attunement', 'Magische Einstimmung')}</label>
+                                    {[1, 2, 3].map((n) => (
+                                        <div className='dnd-attune' key={n}>
+                                            <div className={'pip diamond' + (character[`attunement${n}Checked`] ? ' on' : '')}
+                                                 onClick={() => set(`attunement${n}Checked`, !character[`attunement${n}Checked`])}/>
+                                            <input type='text' value={character[`attunement${n}`] || ''}
+                                                   onChange={(e) => set(`attunement${n}`, e.target.value)}/>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className='dnd-equip-col'>
+                                    <textarea rows={16} value={character.equipment2 || ''}
+                                              onChange={(e) => set('equipment2', e.target.value)}/>
+                                    <label className='dnd-sublabel'>{t('Coins', 'Münzen')}</label>
+                                    <div className='dnd-coins'>
+                                        <div><label>{t('CP', 'KM')}</label><input className='center' type='text' value={character.cp || ''}
+                                                    onChange={(e) => set('cp', e.target.value)}/></div>
+                                        <div><label>{t('SP', 'SM')}</label><input className='center' type='text' value={character.sp || ''}
+                                                    onChange={(e) => set('sp', e.target.value)}/></div>
+                                        <div><label>{t('EP', 'EM')}</label><input className='center' type='text' value={character.ep || ''}
+                                                    onChange={(e) => set('ep', e.target.value)}/></div>
+                                        <div><label>{t('GP', 'GM')}</label><input className='center' type='text' value={character.gp || ''}
+                                                    onChange={(e) => set('gp', e.target.value)}/></div>
+                                        <div><label>{t('PP', 'PM')}</label><input className='center' type='text' value={character.pp || ''}
+                                                    onChange={(e) => set('pp', e.target.value)}/></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -592,45 +646,30 @@ const CharacterSheet = (props: Props) => {
                         </div>
 
                         <div className='dnd-card'>
-                            <div className='dnd-title'>{t('Backstory & Personality', 'Hintergrund & Persönlichkeit')}</div>
-                            <textarea rows={10} value={character.backstory || ''}
-                                      onChange={(e) => set('backstory', e.target.value)}/>
-                        </div>
-
-                        <div className='dnd-card'>
                             <div className='dnd-title'>{t('Languages', 'Sprachen')}</div>
                             <textarea rows={3} value={character.languages || ''}
                                       onChange={(e) => set('languages', e.target.value)}/>
                         </div>
 
-                        <div className='dnd-card dnd-equipcard'>
-                            <div className='dnd-title'>{t('Equipment', 'Ausrüstung')}</div>
-                            <textarea rows={8} value={character.equipment || ''}
-                                      onChange={(e) => set('equipment', e.target.value)}/>
-                            <label className='dnd-sublabel' style={{marginTop: 6}}>{t('Magic Item Attunement', 'Magische Einstimmung')}</label>
-                            {[1, 2, 3].map((n) => (
-                                <div className='dnd-attune' key={n}>
-                                    <div className={'pip diamond' + (character[`attunement${n}Checked`] ? ' on' : '')}
-                                         onClick={() => set(`attunement${n}Checked`, !character[`attunement${n}Checked`])}/>
-                                    <input type='text' value={character[`attunement${n}`] || ''}
-                                           onChange={(e) => set(`attunement${n}`, e.target.value)}/>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className='dnd-card'>
-                            <div className='dnd-title'>{t('Coins', 'Münzen')}</div>
-                            <div className='dnd-coins'>
-                                <div><label>{t('CP', 'KM')}</label><input className='center' type='text' value={character.cp || ''}
-                                            onChange={(e) => set('cp', e.target.value)}/></div>
-                                <div><label>{t('SP', 'SM')}</label><input className='center' type='text' value={character.sp || ''}
-                                            onChange={(e) => set('sp', e.target.value)}/></div>
-                                <div><label>{t('EP', 'EM')}</label><input className='center' type='text' value={character.ep || ''}
-                                            onChange={(e) => set('ep', e.target.value)}/></div>
-                                <div><label>{t('GP', 'GM')}</label><input className='center' type='text' value={character.gp || ''}
-                                            onChange={(e) => set('gp', e.target.value)}/></div>
-                                <div><label>{t('PP', 'PM')}</label><input className='center' type='text' value={character.pp || ''}
-                                            onChange={(e) => set('pp', e.target.value)}/></div>
+                        <div className='dnd-card dnd-backstory'>
+                            <div className='dnd-title'>{t('Backstory & Personality', 'Hintergrund & Persönlichkeit')}</div>
+                            <textarea value={character.backstory || ''}
+                                      onChange={(e) => set('backstory', e.target.value)}/>
+                            <div className='dnd-attach'>
+                                <input id='dnd-attach-file' type='file' style={{display: 'none'}}
+                                       accept='.pdf,.doc,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain'
+                                       onChange={uploadAttachment}/>
+                                <button type='button' className='dnd-attach-btn'
+                                        onClick={() => document.getElementById('dnd-attach-file')?.click()}>
+                                    {t('Upload File', 'Datei hochladen')}
+                                </button>
+                                <span className='dnd-attach-name' title={character.attachmentName || ''}>
+                                    {character.attachmentName || t('No file attached', 'Keine Datei')}
+                                </span>
+                                <button type='button' className='dnd-attach-dl' onClick={downloadAttachment}
+                                        disabled={!character.attachmentData}
+                                        title={t('Download file', 'Datei herunterladen')}
+                                        aria-label={t('Download file', 'Datei herunterladen')}>⭳</button>
                             </div>
                         </div>
                     </div>

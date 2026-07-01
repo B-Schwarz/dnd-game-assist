@@ -19,6 +19,9 @@
 16. [x] The dnd-vitals should fill the whole card
 17. [x] Modify the visual of the level input to match the pdf
 18. [x] Examine the autosave feature. Decouple the current hit points from the remainder. This is needed for a future feature.
+20. [x] Change the attribute classFeatures & classFeatures2 to equipment & equipment2
+21. [x] Merge the attunment to the bottom of equipment box
+22. [x] Merge the coins to the bottom of the equipment2 box
 
 ## Page 2
 1. [x] The spell slots part should be like the PDF, i.e. a table with 3 columns, each having 3 spell levels, an input field for the amount of available slots and according to the number an amount of star shaped check boxes to check expended slots
@@ -34,6 +37,13 @@
 11. [x] All checkboxes should be the same shape
 12. [x] Extend the equipment box, so that the column reaches the end of the page
 13. [x] Restore the old height of the Spell entries and make up the remaining space with new lines
+14. [x] Remove the Equipment box and increase the size of the backstory box, so that the column reaches the end
+15. [x] Below the backstory box add an upload button to upload a pdf, docx or txt file and an icon the right edge to download the file
+16. [ ] Increase the upload size to 100 MB
+17. [ ] Center the titles attunement and coins
+18. [ ] Increase the height of the appearance by 20% and scale the picture accordingly
+19. [ ] Add a download icon for the image
+
 
 # Character List
 

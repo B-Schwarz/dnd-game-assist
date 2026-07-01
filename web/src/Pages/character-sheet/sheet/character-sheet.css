@@ -367,11 +367,26 @@
     flex: 1 1 auto;
 }
 
-/* two side-by-side text columns (class features) */
+/* two side-by-side text columns (equipment) */
 .dnd-twocol {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    align-items: stretch;
+}
+
+/* each equipment column: a text area that grows, with attunement / coins
+   merged onto the bottom of the column */
+.dnd-equip-col {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.dnd-equip-col > textarea {
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 /* combined vitals box: hit points | hit dice | death saves side by side,
@@ -844,16 +859,75 @@
     flex-direction: column;
 }
 
-/* equipment card grows so the right column reaches the bottom of the page,
-   pushing the coins card to the very bottom */
-.dnd-equipcard {
+/* backstory card grows so the right column reaches the bottom of the page */
+.dnd-backstory {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
 }
 
-.dnd-equipcard > textarea {
+.dnd-backstory > textarea {
     flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* upload button + file name + download icon, pinned below the backstory text */
+.dnd-attach {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.dnd-attach-btn {
+    flex: 0 0 auto;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--card-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dnd-attach-btn:hover {
+    background: var(--card);
+}
+
+.dnd-attach-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.dnd-attach-dl {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--ink);
+    background: var(--card-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dnd-attach-dl:hover:not(:disabled) {
+    background: var(--card);
+}
+
+.dnd-attach-dl:disabled {
+    opacity: 0.4;
+    cursor: default;
 }
 
 .dnd-spellhdr {

@@ -139,8 +139,6 @@ export interface DnDCharacter {
     attacks?: Attack[] // Weapons & Damage Cantrips
 
     // Features
-    classFeatures?: string
-    classFeatures2?: string
     speciesTraits?: string
     feats?: string
 
@@ -149,7 +147,13 @@ export interface DnDCharacter {
     backstory?: string
     languages?: string
 
+    // Backstory attachment (pdf/docx/txt) stored inline as a data URL, like `appearance`
+    attachmentData?: string
+    attachmentName?: string
+
+    // Equipment & Inventory (page 1, two columns)
     equipment?: string
+    equipment2?: string
     attunement1?: string
     attunement2?: string
     attunement3?: string
