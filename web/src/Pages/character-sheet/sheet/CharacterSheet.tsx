@@ -522,7 +522,6 @@ const CharacterSheet = (props: Props) => {
                                 <div className='dnd-equip-col'>
                                     <textarea rows={16} value={character.equipment2 || ''}
                                               onChange={(e) => set('equipment2', e.target.value)}/>
-                                    <label className='dnd-sublabel'>{t('Coins', 'Münzen')}</label>
                                     <div className='dnd-coins'>
                                         <div><label>{t('CP', 'KM')}</label><input className='center' type='text' value={character.cp || ''}
                                                     onChange={(e) => set('cp', e.target.value)}/></div>

@@ -407,6 +407,11 @@
     min-height: 0;
 }
 
+/* the attunement heading sits centered over its column */
+.dnd-equip-col > .dnd-sublabel {
+    text-align: center;
+}
+
 /* combined vitals box: hit points | hit dice | death saves side by side,
    with a current-HP bar across the bottom */
 .dnd-vitals {
@@ -856,7 +861,8 @@
     height: 252px;
     border: 1px dashed var(--line-strong);
     border-radius: 5px;
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
     background-position: center;
     background-color: #fafafa;
     cursor: pointer;

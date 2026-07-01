@@ -22,8 +22,8 @@
 20. [x] Change the attribute classFeatures & classFeatures2 to equipment & equipment2
 21. [x] Merge the attunment to the bottom of equipment box
 22. [x] Merge the coins to the bottom of the equipment2 box
-23. [ ] Remove the coin title
-24. [ ] Center the titles attunement and coins
+23. [x] Remove the coin title
+24. [x] Center the titles attunement and coins
 
 ## Page 2
 1. [x] The spell slots part should be like the PDF, i.e. a table with 3 columns, each having 3 spell levels, an input field for the amount of available slots and according to the number an amount of star shaped check boxes to check expended slots
@@ -44,6 +44,7 @@
 16. [x] Increase the upload size to 100 MB
 18. [x] Increase the height of the appearance by 20% and scale the picture accordingly
 19. [x] Add a download icon for the image
+20. [x] The image should be scaled, so that it is fully visible
 
 
 # Character List

@@ -11,6 +11,12 @@ const Harness = (props: {initial: DnDCharacter}) => {
 };
 
 describe('CharacterSheet', () => {
+    // The language choice persists to localStorage; reset it so each test
+    // starts in English regardless of order (the DE test sets it to 'de').
+    beforeEach(() => {
+        localStorage.removeItem('dnd-character-language');
+    });
+
     it('renders ability modifiers derived from the scores', () => {
         render(<Harness initial={{str: '16', dex: '8'}}/>);
         // 16 -> +3, 8 -> -1 (both shown in readonly modifier inputs)
@@ -71,5 +77,59 @@ describe('CharacterSheet', () => {
         const {container} = render(<Harness initial={{color: Color.RED}}/>);
         const select = container.querySelector('select') as HTMLSelectElement;
         expect(select.value).toBe(String(Color.RED));
+    });
+
+    it('renders and edits the two page-1 equipment columns', () => {
+        render(<Harness initial={{equipment: 'Longsword', equipment2: 'Backpack'}}/>);
+        expect(screen.getByDisplayValue('Longsword')).toBeInTheDocument();
+        const eq2 = screen.getByDisplayValue('Backpack');
+        fireEvent.change(eq2, {target: {value: 'Rope'}});
+        expect(screen.getByDisplayValue('Rope')).toBeInTheDocument();
+    });
+
+    it('keeps the coins inputs in the equipment column but drops the "Coins" heading', () => {
+        render(<Harness initial={{gp: '15'}}/>);
+        expect(screen.getByDisplayValue('15')).toBeInTheDocument();
+        expect(screen.getByText('GP')).toBeInTheDocument();     // per-coin label stays
+        expect(screen.queryByText('Coins')).not.toBeInTheDocument(); // heading removed
+    });
+
+    it('disables the file and image download buttons until data is present', () => {
+        render(<Harness initial={{}}/>);
+        expect(screen.getByRole('button', {name: 'Download file'})).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Download image'})).toBeDisabled();
+    });
+
+    it('enables downloads and shows the file name when data is present', () => {
+        render(<Harness initial={{
+            attachmentData: 'data:text/plain;base64,aGk=',
+            attachmentName: 'lore.txt',
+            appearance: 'data:image/png;base64,iVBORw0KGgo=',
+        }}/>);
+        expect(screen.getByRole('button', {name: 'Download file'})).toBeEnabled();
+        expect(screen.getByRole('button', {name: 'Download image'})).toBeEnabled();
+        expect(screen.getByText('lore.txt')).toBeInTheDocument();
+    });
+
+    it('stores an uploaded backstory file as name + inline data', async () => {
+        const {container} = render(<Harness initial={{}}/>);
+        const input = container.querySelector('#dnd-attach-file') as HTMLInputElement;
+        const file = new File(['hello world'], 'notes.txt', {type: 'text/plain'});
+        fireEvent.change(input, {target: {files: [file]}});
+        // FileReader resolves asynchronously; the name appears and download enables
+        expect(await screen.findByText('notes.txt')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Download file'})).toBeEnabled();
+    });
+
+    it('rejects an attachment larger than the 100 MB cap', () => {
+        const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+        const {container} = render(<Harness initial={{}}/>);
+        const input = container.querySelector('#dnd-attach-file') as HTMLInputElement;
+        const big = new File(['x'], 'huge.pdf', {type: 'application/pdf'});
+        Object.defineProperty(big, 'size', {value: 100000001});
+        fireEvent.change(input, {target: {files: [big]}});
+        expect(alertSpy).toHaveBeenCalled();
+        expect(screen.getByText('No file attached')).toBeInTheDocument(); // nothing stored
+        alertSpy.mockRestore();
     });
 });
