@@ -2,6 +2,8 @@ const {connect, getApp, clear, disconnect, makeUser, makeCharacter, loginAgent, 
 const {User} = require('../db/models/user.model')
 const {Character} = require('../db/models/character.model')
 const mongoose = require('mongoose')
+const fs = require('fs')
+const path = require('path')
 
 let app, gm, player, other
 beforeAll(async () => {
@@ -282,5 +284,99 @@ describe('export / import / reassign', () => {
         expect(ok.statusCode).toBe(200)
         expect((await reload('player')).character.map(String)).toContain(pc._id.toString())
         expect((await reload('other')).character.map(String)).not.toContain(pc._id.toString())
+    })
+})
+
+describe('backstory attachment', () => {
+    const ATTACH_DIR = path.resolve('attachments')
+    const storedFile = (id) => path.join(ATTACH_DIR, id)
+    // Uploads land on disk under attachments/<id>; wipe them between tests.
+    afterEach(() => {
+        if (fs.existsSync(ATTACH_DIR)) {
+            for (const f of fs.readdirSync(ATTACH_DIR)) fs.unlinkSync(path.join(ATTACH_DIR, f))
+        }
+    })
+
+    test('gm uploads, downloads and deletes any character document', async () => {
+        await seedActors()
+        const doc = await makeCharacter({character: {name: 'Hero'}})
+        const id = doc._id.toString()
+
+        const up = await gm.post(`/api/char/${id}/attachment`)
+            .attach('file', Buffer.from('backstory text'), {filename: 'lore.txt', contentType: 'text/plain'})
+        expect(up.statusCode).toBe(200)
+        const stored = await Character.findById(id)
+        expect(stored.attachment.name).toBe('lore.txt')
+        expect(stored.attachment.mime).toBe('text/plain')
+        expect(fs.existsSync(storedFile(id))).toBe(true)
+
+        const dl = await gm.get(`/api/char/${id}/attachment`)
+        expect(dl.statusCode).toBe(200)
+        expect(dl.headers['content-disposition']).toContain('lore.txt')
+        expect(dl.text).toBe('backstory text')
+
+        // the metadata rides along on the character GET
+        const got = await gm.get(`/api/char/get/${id}`)
+        expect(got.body.attachment.name).toBe('lore.txt')
+
+        const del = await gm.delete(`/api/char/${id}/attachment`)
+        expect(del.statusCode).toBe(200)
+        expect((await Character.findById(id)).attachment.name).toBeFalsy()
+        expect(fs.existsSync(storedFile(id))).toBe(false)
+    })
+
+    test('owner manages their own document via /me; a non-owner is blocked (401)', async () => {
+        await seedActors()
+        const mine = await makeCharacter({owner: player, character: {name: 'Mine'}})
+        const id = mine._id.toString()
+        const agent = await loginAgent(app, 'player')
+
+        expect((await agent.post(`/api/char/me/${id}/attachment`)
+            .attach('file', Buffer.from('x'), {filename: 'mine.txt', contentType: 'text/plain'})).statusCode).toBe(200)
+        expect((await agent.get(`/api/char/me/${id}/attachment`)).statusCode).toBe(200)
+
+        const outsider = await loginAgent(app, 'other')
+        expect((await outsider.post(`/api/char/me/${id}/attachment`)
+            .attach('file', Buffer.from('x'), {filename: 'hack.txt', contentType: 'text/plain'})).statusCode).toBe(401)
+        expect((await outsider.get(`/api/char/me/${id}/attachment`)).statusCode).toBe(401)
+        expect((await outsider.delete(`/api/char/me/${id}/attachment`)).statusCode).toBe(401)
+        // the owner's file is untouched
+        expect((await Character.findById(id)).attachment.name).toBe('mine.txt')
+    })
+
+    test('a plain user cannot use the privileged upload (401)', async () => {
+        await seedActors()
+        const doc = await makeCharacter({character: {name: 'X'}})
+        const agent = await loginAgent(app, 'player')
+        expect((await agent.post(`/api/char/${doc._id}/attachment`)
+            .attach('file', Buffer.from('x'), {filename: 'a.txt', contentType: 'text/plain'})).statusCode).toBe(401)
+    })
+
+    test('rejects a disallowed file type (nothing stored → 400)', async () => {
+        await seedActors()
+        const doc = await makeCharacter({character: {name: 'X'}})
+        const id = doc._id.toString()
+        const res = await gm.post(`/api/char/${id}/attachment`)
+            .attach('file', Buffer.from('PNG'), {filename: 'pic.png', contentType: 'image/png'})
+        expect(res.statusCode).toBe(400)
+        expect((await Character.findById(id)).attachment.name).toBeFalsy()
+        expect(fs.existsSync(storedFile(id))).toBe(false)
+    })
+
+    test('invalid id → 400; download with no attachment → 404', async () => {
+        await seedActors()
+        expect((await gm.post('/api/char/not-an-id/attachment')
+            .attach('file', Buffer.from('x'), {filename: 'a.txt', contentType: 'text/plain'})).statusCode).toBe(400)
+        const doc = await makeCharacter({character: {name: 'X'}})
+        expect((await gm.get(`/api/char/${doc._id}/attachment`)).statusCode).toBe(404)
+    })
+
+    test('uploading to a valid but non-existent id → 404 and leaves no orphan file', async () => {
+        await seedActors()
+        const ghost = new mongoose.Types.ObjectId().toString()
+        const res = await gm.post(`/api/char/${ghost}/attachment`)
+            .attach('file', Buffer.from('x'), {filename: 'a.txt', contentType: 'text/plain'})
+        expect(res.statusCode).toBe(404)
+        expect(fs.existsSync(storedFile(ghost))).toBe(false)
     })
 })

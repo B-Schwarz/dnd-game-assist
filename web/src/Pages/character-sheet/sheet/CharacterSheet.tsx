@@ -10,6 +10,12 @@ interface Props {
     // sheet sub-doc, so it is passed in separately. Omit both to hide the toggle.
     primary?: boolean
     onPrimaryChanged?: () => void
+    // The backstory document attachment is stored server-side (not in the sheet
+    // sub-doc), so its name and the upload/download actions are supplied by the
+    // page. Omit the callbacks to make the controls inert.
+    attachmentName?: string
+    onUploadAttachment?: (file: File) => void
+    onDownloadAttachment?: () => void
 }
 
 interface SkillDef {
@@ -194,8 +200,8 @@ const CharacterSheet = (props: Props) => {
         reader.readAsDataURL(file)
     }
 
-    // ----- backstory attachment (pdf/docx/txt) — stored inline like the image -----
-    const uploadAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ----- backstory document attachment (uploaded to / served by the API) -----
+    const onAttachmentSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files && e.target.files[0]
         e.target.value = '' // allow re-selecting the same file name
         if (!file) return
@@ -203,23 +209,7 @@ const CharacterSheet = (props: Props) => {
             window.alert(t('File too large (max 100 MB).', 'Datei zu groß (max 100 MB).'))
             return
         }
-        const reader = new FileReader()
-        reader.onload = (ev) => {
-            if (ev.target && typeof ev.target.result === 'string') {
-                props.onCharacterChanged({...character, attachmentData: ev.target.result, attachmentName: file.name})
-            }
-        }
-        reader.readAsDataURL(file)
-    }
-
-    const downloadAttachment = () => {
-        if (!character.attachmentData) return
-        const a = document.createElement('a')
-        a.href = character.attachmentData
-        a.download = character.attachmentName || 'attachment'
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
+        props.onUploadAttachment && props.onUploadAttachment(file)
     }
 
     const downloadImage = () => {
@@ -674,16 +664,17 @@ const CharacterSheet = (props: Props) => {
                             <div className='dnd-attach'>
                                 <input id='dnd-attach-file' type='file' style={{display: 'none'}}
                                        accept='.pdf,.doc,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain'
-                                       onChange={uploadAttachment}/>
+                                       onChange={onAttachmentSelected}/>
                                 <button type='button' className='dnd-attach-btn'
                                         onClick={() => document.getElementById('dnd-attach-file')?.click()}>
                                     {t('Upload File', 'Datei hochladen')}
                                 </button>
-                                <span className='dnd-attach-name' title={character.attachmentName || ''}>
-                                    {character.attachmentName || t('No file attached', 'Keine Datei')}
+                                <span className='dnd-attach-name' title={props.attachmentName || ''}>
+                                    {props.attachmentName || t('No file attached', 'Keine Datei')}
                                 </span>
-                                <button type='button' className='dnd-attach-dl' onClick={downloadAttachment}
-                                        disabled={!character.attachmentData}
+                                <button type='button' className='dnd-attach-dl'
+                                        onClick={() => props.onDownloadAttachment && props.onDownloadAttachment()}
+                                        disabled={!props.attachmentName}
                                         title={t('Download file', 'Datei herunterladen')}
                                         aria-label={t('Download file', 'Datei herunterladen')}>⭳</button>
                             </div>

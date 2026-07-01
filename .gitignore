@@ -151,9 +151,10 @@ Temporary Items
 node_modules
 
 api/build
+api/attachments
 web/build
 *.pdf
-mongo_volume
+mongo_volume*
 web/src/dnd-character-sheets/*
 !web/src/dnd-character-sheets/.gitkeep
 .vscode

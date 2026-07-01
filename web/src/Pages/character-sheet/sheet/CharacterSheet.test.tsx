@@ -4,10 +4,20 @@ import CharacterSheet from './CharacterSheet';
 import {Color, DnDCharacter} from './dnd-character';
 
 // Renders the sheet as a controlled component, mirroring how the page wires it:
-// onCharacterChanged feeds the next character straight back in as props.
-const Harness = (props: {initial: DnDCharacter}) => {
+// onCharacterChanged feeds the next character straight back in as props. The
+// backstory attachment is a server-side concern, so its name/callbacks are
+// passed through here just like the real page does.
+const Harness = (props: {
+    initial: DnDCharacter
+    attachmentName?: string
+    onUploadAttachment?: (file: File) => void
+    onDownloadAttachment?: () => void
+}) => {
     const [character, setCharacter] = useState<DnDCharacter>(props.initial);
-    return <CharacterSheet character={character} onCharacterChanged={setCharacter}/>;
+    return <CharacterSheet character={character} onCharacterChanged={setCharacter}
+                           attachmentName={props.attachmentName}
+                           onUploadAttachment={props.onUploadAttachment}
+                           onDownloadAttachment={props.onDownloadAttachment}/>;
 };
 
 describe('CharacterSheet', () => {
@@ -94,42 +104,52 @@ describe('CharacterSheet', () => {
         expect(screen.queryByText('Coins')).not.toBeInTheDocument(); // heading removed
     });
 
-    it('disables the file and image download buttons until data is present', () => {
+    it('disables the file download until an attachment name is provided', () => {
         render(<Harness initial={{}}/>);
         expect(screen.getByRole('button', {name: 'Download file'})).toBeDisabled();
-        expect(screen.getByRole('button', {name: 'Download image'})).toBeDisabled();
+        expect(screen.getByText('No file attached')).toBeInTheDocument();
     });
 
-    it('enables downloads and shows the file name when data is present', () => {
-        render(<Harness initial={{
-            attachmentData: 'data:text/plain;base64,aGk=',
-            attachmentName: 'lore.txt',
-            appearance: 'data:image/png;base64,iVBORw0KGgo=',
-        }}/>);
-        expect(screen.getByRole('button', {name: 'Download file'})).toBeEnabled();
-        expect(screen.getByRole('button', {name: 'Download image'})).toBeEnabled();
+    it('shows the attachment name and enables its download when present', () => {
+        const onDownloadAttachment = vi.fn();
+        render(<Harness initial={{}} attachmentName='lore.txt' onDownloadAttachment={onDownloadAttachment}/>);
         expect(screen.getByText('lore.txt')).toBeInTheDocument();
+        const dl = screen.getByRole('button', {name: 'Download file'});
+        expect(dl).toBeEnabled();
+        fireEvent.click(dl);
+        expect(onDownloadAttachment).toHaveBeenCalledTimes(1);
     });
 
-    it('stores an uploaded backstory file as name + inline data', async () => {
-        const {container} = render(<Harness initial={{}}/>);
+    it('forwards a selected backstory file to onUploadAttachment', () => {
+        const onUploadAttachment = vi.fn();
+        const {container} = render(<Harness initial={{}} onUploadAttachment={onUploadAttachment}/>);
         const input = container.querySelector('#dnd-attach-file') as HTMLInputElement;
         const file = new File(['hello world'], 'notes.txt', {type: 'text/plain'});
         fireEvent.change(input, {target: {files: [file]}});
-        // FileReader resolves asynchronously; the name appears and download enables
-        expect(await screen.findByText('notes.txt')).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Download file'})).toBeEnabled();
+        expect(onUploadAttachment).toHaveBeenCalledTimes(1);
+        expect(onUploadAttachment.mock.calls[0][0]).toBe(file);
     });
 
-    it('rejects an attachment larger than the 100 MB cap', () => {
+    it('rejects an attachment larger than the 100 MB cap without uploading', () => {
         const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-        const {container} = render(<Harness initial={{}}/>);
+        const onUploadAttachment = vi.fn();
+        const {container} = render(<Harness initial={{}} onUploadAttachment={onUploadAttachment}/>);
         const input = container.querySelector('#dnd-attach-file') as HTMLInputElement;
         const big = new File(['x'], 'huge.pdf', {type: 'application/pdf'});
         Object.defineProperty(big, 'size', {value: 100000001});
         fireEvent.change(input, {target: {files: [big]}});
         expect(alertSpy).toHaveBeenCalled();
-        expect(screen.getByText('No file attached')).toBeInTheDocument(); // nothing stored
+        expect(onUploadAttachment).not.toHaveBeenCalled();
         alertSpy.mockRestore();
+    });
+
+    it('disables the image download when there is no appearance image', () => {
+        render(<Harness initial={{}}/>);
+        expect(screen.getByRole('button', {name: 'Download image'})).toBeDisabled();
+    });
+
+    it('enables the image download when an appearance image is present', () => {
+        render(<Harness initial={{appearance: 'data:image/png;base64,iVBORw0KGgo='}}/>);
+        expect(screen.getByRole('button', {name: 'Download image'})).toBeEnabled();
     });
 });

@@ -2,6 +2,108 @@ const {User} = require('../db/models/user.model')
 const {Character} = require('../db/models/character.model')
 const _ = require('lodash')
 const mongoose = require('mongoose')
+const fs = require('fs')
+const path = require('path')
+const multer = require('multer')
+
+// ----- backstory document attachment (one file per character) --------------
+// Files are stored on disk under attachments/<charID>; only the metadata
+// (original name + mime) is kept on the Character document. Storing the file
+// out-of-band keeps large uploads clear of MongoDB's 16 MB document limit.
+const ATTACH_DIR = path.resolve('attachments')
+if (!fs.existsSync(ATTACH_DIR)) {
+    fs.mkdirSync(ATTACH_DIR, {recursive: true})
+}
+
+const ALLOWED_MIME = new Set([
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain'
+])
+const ALLOWED_EXT = ['.pdf', '.doc', '.docx', '.txt']
+
+const attachUpload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, ATTACH_DIR),
+        // one attachment per character, named by its (validated) id
+        filename: (req, file, cb) => cb(null, path.basename(req.params.id))
+    }),
+    limits: {fileSize: 100 * 1024 * 1024},
+    fileFilter: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase()
+        cb(null, ALLOWED_MIME.has(file.mimetype) || ALLOWED_EXT.includes(ext))
+    }
+})
+
+const attachmentPath = (id) => path.join(ATTACH_DIR, path.basename(id))
+
+const removeAttachmentFile = (id) => {
+    try {
+        const p = attachmentPath(id)
+        if (fs.existsSync(p)) fs.unlinkSync(p)
+    } catch (_) {
+    }
+}
+
+// Guard middlewares (run before multer so an unauthorized upload never touches
+// disk): reject a malformed id, and — for the /me routes — enforce ownership.
+const validCharParam = (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.sendStatus(400)
+    next()
+}
+
+const requireOwnChar = (req, res, next) => {
+    if (!isOwnedByUser(req.user.character, req.params.id)) return res.sendStatus(401)
+    next()
+}
+
+// Role/ownership are enforced by the route middleware, so a single handler
+// serves both the privileged and the self-scoped route of each pair.
+const uploadAttachment = async (req, res) => {
+    if (!req.file) return res.sendStatus(400)
+    try {
+        const updated = await Character.findByIdAndUpdate(req.params.id, {
+            attachment: {name: req.file.originalname, mime: req.file.mimetype}
+        })
+        if (!updated) {
+            removeAttachmentFile(req.params.id) // no such character — drop the orphan file
+            return res.sendStatus(404)
+        }
+        res.sendStatus(200)
+    } catch (_) {
+        removeAttachmentFile(req.params.id)
+        res.sendStatus(404)
+    }
+}
+
+const getAttachment = async (req, res) => {
+    try {
+        const char = await Character.findById(req.params.id)
+        if (!char || !char.attachment || !char.attachment.name) return res.sendStatus(404)
+        const filePath = attachmentPath(req.params.id)
+        if (!fs.existsSync(filePath)) return res.sendStatus(404)
+        const safeName = char.attachment.name.replace(/["\r\n]/g, '')
+        res.setHeader('Content-Type', char.attachment.mime || 'application/octet-stream')
+        res.setHeader('Content-Disposition', `attachment; filename="${safeName}"`)
+        res.sendFile(filePath)
+    } catch (_) {
+        res.sendStatus(404)
+    }
+}
+
+const deleteAttachment = async (req, res) => {
+    try {
+        const char = await Character.findById(req.params.id)
+        if (!char) return res.sendStatus(404)
+        removeAttachmentFile(req.params.id)
+        char.attachment = undefined
+        await char.save()
+        res.sendStatus(200)
+    } catch (_) {
+        res.sendStatus(404)
+    }
+}
 
 // Current hit points are managed on their own channel (see *CharacterHp below)
 // so the initiative tracker can push HP without a bulk save clobbering it, and an
@@ -306,6 +408,7 @@ const deleteCharacter = async (req, res) => {
     })
 
     await Character.deleteOne({_id: charID})
+    removeAttachmentFile(charID)
 
     res.sendStatus(200)
 }
@@ -320,18 +423,21 @@ const deleteOwnCharacter = async (req, res) => {
     })
 
     await Character.deleteOne({_id: charID})
+    removeAttachmentFile(charID)
 
     res.sendStatus(200)
 }
 
+// List views don't need the attachment metadata, so keep their (leaner) shape;
+// only the single-character sheet GET carries `attachment`.
 const filterCharacterListe = (liste) => {
     return _.map(liste, (item) => {
-        return filterCharacter(item)
+        return _.pick(item, ['_id', 'character', 'npc', 'primary'])
     })
 }
 
 const filterCharacter = (char) => {
-    return _.pick(char, ['_id', 'character', 'npc', 'primary'])
+    return _.pick(char, ['_id', 'character', 'npc', 'primary', 'attachment'])
 }
 
 const isOwnedByUser = (character, id) => {
@@ -448,5 +554,11 @@ module.exports = {
     getNPCList,
     exportCharacters,
     importCharacters,
-    reassignCharacter
+    reassignCharacter,
+    attachUpload,
+    validCharParam,
+    requireOwnChar,
+    uploadAttachment,
+    getAttachment,
+    deleteAttachment
 }

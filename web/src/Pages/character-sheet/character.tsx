@@ -29,6 +29,9 @@ const App = () => {
     // `primary` lives on the Character document (not the sheet sub-doc), so it is
     // tracked separately from `character` and toggled through its own endpoint.
     const [primary, setPrimary] = useState(false)
+    // The backstory document attachment is stored server-side; we only keep its
+    // name here to drive the sheet's upload/download controls.
+    const [attachmentName, setAttachmentName] = useState<string | undefined>(undefined)
 
     const toast = useToast()
 
@@ -97,6 +100,7 @@ const App = () => {
         hpRef.current = (doc.character as any)?.hp
         setCharacter(doc.character)
         setPrimary(Boolean(doc.primary))
+        setAttachmentName(doc.attachment?.name)
     }
 
     async function recv() {
@@ -141,6 +145,51 @@ const App = () => {
                     setIsMaster(false)
                     own()
                 })
+        } else {
+            own()
+        }
+    }
+
+    // Upload/replace the backstory document. Mirrors send(): try the privileged
+    // endpoint first, fall back to the self-scoped one for a plain owner.
+    function uploadAttachment(file: File) {
+        const form = new FormData()
+        form.append('file', file)
+
+        const onOk = () => setAttachmentName(file.name)
+        const onError = () => toast({title: 'Fehler', description: 'Datei konnte nicht hochgeladen werden.', status: 'error', duration: 3000, isClosable: true})
+        const own = () => axios.post(API + `/api/char/me/${id}/attachment`, form).then(onOk).catch(onError)
+
+        if (isMaster) {
+            axios.post(API + `/api/char/${id}/attachment`, form).then(onOk).catch(() => {
+                setIsMaster(false)
+                own()
+            })
+        } else {
+            own()
+        }
+    }
+
+    // Download the stored backstory document as a blob and save it locally.
+    function downloadAttachment() {
+        const save = (blob: Blob) => {
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = attachmentName || 'attachment'
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(url)
+        }
+        const onError = () => toast({title: 'Fehler', description: 'Datei konnte nicht heruntergeladen werden.', status: 'error', duration: 3000, isClosable: true})
+        const own = () => axios.get(API + `/api/char/me/${id}/attachment`, {responseType: 'blob'}).then((r) => save(r.data)).catch(onError)
+
+        if (isMaster) {
+            axios.get(API + `/api/char/${id}/attachment`, {responseType: 'blob'}).then((r) => save(r.data)).catch(() => {
+                setIsMaster(false)
+                own()
+            })
         } else {
             own()
         }
@@ -196,7 +245,10 @@ const App = () => {
             <TitleService title={character.name || ''}/>
             <div style={{"marginLeft": "auto", "marginRight": "auto", maxWidth: "1200px"}}>
                 <CharacterSheet character={character} onCharacterChanged={updateCharacter}
-                                primary={primary} onPrimaryChanged={togglePrimary}/>
+                                primary={primary} onPrimaryChanged={togglePrimary}
+                                attachmentName={attachmentName}
+                                onUploadAttachment={uploadAttachment}
+                                onDownloadAttachment={downloadAttachment}/>
             </div>
         </>
     )

@@ -42,6 +42,12 @@ Start the server by first installing all modules with ``npm install`` and then r
 | /api/char/npc/toggle |  `PUT`   |            `charID:ObjectID`             |       `master`       | Toggle whether the character is an NPC or not   | `none`                              |
 | /api/char/primary/toggle | `PUT` |           `charID:ObjectID`             |  `master` or `admin` | Toggle whether the character is a primary       | `none`                              |
 | /api/char/me/primary/toggle | `PUT` |        `charID:ObjectID`             |        `user`        | Toggle whether one of my characters is a primary| `none`                              |
+| /api/char/:id/attachment    | `POST`   | `file:file` (multipart pdf/doc/docx/txt) | `admin`<br/>`master` | Uploads/replaces someones backstory document (≤100 MB) | `none` |
+| /api/char/me/:id/attachment | `POST`   | `file:file` (multipart pdf/doc/docx/txt) |        `user`        | Uploads/replaces the backstory document of one of my characters | `none` |
+| /api/char/:id/attachment    | `GET`    |                  `none`                  | `admin`<br/>`master` | Downloads someones backstory document           | `file`                              |
+| /api/char/me/:id/attachment | `GET`    |                  `none`                  |        `user`        | Downloads the backstory document of one of my characters | `file`                     |
+| /api/char/:id/attachment    | `DELETE` |                  `none`                  | `admin`<br/>`master` | Removes someones backstory document             | `none`                              |
+| /api/char/me/:id/attachment | `DELETE` |                  `none`                  |        `user`        | Removes the backstory document of one of my characters | `none`                       |
 
 ## Account
 

@@ -11,7 +11,8 @@ const {
     getOwnCharacter, saveCharacter, saveOwnCharacter, createCharacter, deleteCharacter,
     deleteOwnCharacter, setNPC, setPrimary, setOwnPrimary, getNPCList,
     saveCharacterHp, saveOwnCharacterHp, saveCharacterHpBulk, getCharacterHp, getOwnCharacterHp,
-    exportCharacters, importCharacters, reassignCharacter
+    exportCharacters, importCharacters, reassignCharacter,
+    attachUpload, validCharParam, requireOwnChar, uploadAttachment, getAttachment, deleteAttachment
 } = require("./character");
 const {deleteOwnAccount, deleteAccount, changeOwnPassword} = require("./settings");
 const {
@@ -112,6 +113,16 @@ app.get('/api/char/hp/:id', isAuth, isMasterOrAdmin, getCharacterHp)
 app.get('/api/char/me/hp/:id', isAuth, getOwnCharacterHp)
 app.delete('/api/char/:id', isAuth, isMasterOrAdmin, deleteCharacter)
 app.delete('/api/char/me/:id', isAuth, deleteOwnCharacter)
+
+// Backstory document attachment (one file per character). Guards run before
+// multer so an unauthorized upload never lands on disk; the /me variants add an
+// ownership check on top of validating the id.
+app.post('/api/char/:id/attachment', isAuth, isMasterOrAdmin, validCharParam, attachUpload.single('file'), uploadAttachment)
+app.post('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar, attachUpload.single('file'), uploadAttachment)
+app.get('/api/char/:id/attachment', isAuth, isMasterOrAdmin, validCharParam, getAttachment)
+app.get('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar, getAttachment)
+app.delete('/api/char/:id/attachment', isAuth, isMasterOrAdmin, validCharParam, deleteAttachment)
+app.delete('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar, deleteAttachment)
 
 //
 //  AUTH
