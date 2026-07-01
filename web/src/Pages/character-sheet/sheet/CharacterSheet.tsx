@@ -199,8 +199,8 @@ const CharacterSheet = (props: Props) => {
         const file = e.target.files && e.target.files[0]
         e.target.value = '' // allow re-selecting the same file name
         if (!file) return
-        if (file.size > 8000000) {
-            window.alert(t('File too large (max 8 MB).', 'Datei zu groß (max 8 MB).'))
+        if (file.size > 100000000) {
+            window.alert(t('File too large (max 100 MB).', 'Datei zu groß (max 100 MB).'))
             return
         }
         const reader = new FileReader()
@@ -217,6 +217,17 @@ const CharacterSheet = (props: Props) => {
         const a = document.createElement('a')
         a.href = character.attachmentData
         a.download = character.attachmentName || 'attachment'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+    }
+
+    const downloadImage = () => {
+        if (!character.appearance) return
+        const ext = (/^data:image\/([a-zA-Z0-9.+-]+)/.exec(character.appearance) || [])[1] || 'png'
+        const a = document.createElement('a')
+        a.href = character.appearance
+        a.download = `${character.name || 'appearance'}.${ext}`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
@@ -638,7 +649,13 @@ const CharacterSheet = (props: Props) => {
                     {/* --- profile --- */}
                     <div className='dnd-col'>
                         <div className='dnd-card'>
-                            <div className='dnd-title'>{t('Appearance', 'Aussehen')}</div>
+                            <div className='dnd-title dnd-title-row'>
+                                <span>{t('Appearance', 'Aussehen')}</span>
+                                <button type='button' className='dnd-attach-dl' onClick={downloadImage}
+                                        disabled={!character.appearance}
+                                        title={t('Download image', 'Bild herunterladen')}
+                                        aria-label={t('Download image', 'Bild herunterladen')}>⭳</button>
+                            </div>
                             <div className='dnd-image' style={{backgroundImage: character.appearance ? `url(${character.appearance})` : ''}}
                                  onClick={() => document.getElementById('dnd-appearance-file')?.click()}/>
                             <input id='dnd-appearance-file' type='file' accept='image/*' style={{display: 'none'}}
