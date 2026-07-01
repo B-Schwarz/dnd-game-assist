@@ -10,6 +10,13 @@ services:
       - DB_URI=mongodb://db:27017/dnd
       - DND_COOKIE_SECRET="asdasdasd"
       - CORS_URL="localhost:5000"
+    # Runtime-writable data that must survive image rebuilds: admin-uploaded
+    # books and per-character backstory attachments. Named volumes (not bind
+    # mounts) so the `books` volume is seeded from the PDFs baked into the image
+    # on first run; once the volume exists a rebuild will not re-seed it.
+    volumes:
+      - books:/app/books/pdf
+      - attachments:/app/attachments
   db:
     image: mongo:8.0
     # SERVER-121912: MongoDB 8.0's vendored TCMalloc violates the rseq ABI on
@@ -46,3 +53,7 @@ services:
     volumes:
       - ./migration/dump:/dump
     command: ["restore", "--in", "/dump/dump.json", "--drop"]
+
+volumes:
+  books:
+  attachments:
