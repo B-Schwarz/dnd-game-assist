@@ -1,15 +1,12 @@
-import React from 'react'
-import {Helmet, HelmetProvider} from "react-helmet-async";
+import {useEffect} from 'react'
 
 const TitleService = (props: { title: string }) => {
 
-    return (
-        <HelmetProvider>
-            <Helmet>
-                <title>{props.title} | D&D Companion</title>
-            </Helmet>
-        </HelmetProvider>
-    )
+    useEffect(() => {
+        document.title = `${props.title} | D&D Companion`
+    }, [props.title])
+
+    return null
 }
 
 export default TitleService

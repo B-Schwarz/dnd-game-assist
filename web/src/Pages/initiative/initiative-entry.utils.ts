@@ -101,6 +101,20 @@ export const isRowHiddenFromPlayer = (isMaster: boolean, hidden: boolean): boole
 export const canSeeHp = (npc: boolean, isMaster: boolean, shareHp: boolean): boolean =>
     !npc || isMaster || shareHp
 
+// Order-insensitive deep equality for the JSON-shaped Player entries the board
+// polls (replacing lodash _.isEqual). Key order must not matter: an entry the
+// master rewrites can serialize its keys in a different order without changing
+// values, and a plain JSON.stringify compare would flag that as a change and
+// flicker the board.
+export const deepEqual = (a: any, b: any): boolean => {
+    if (a === b) return true
+    if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false
+    const ka = Object.keys(a)
+    const kb = Object.keys(b)
+    if (ka.length !== kb.length) return false
+    return ka.every(k => Object.prototype.hasOwnProperty.call(b, k) && deepEqual(a[k], b[k]))
+}
+
 // CSS colour for a marker enum; NONE / out-of-range → '' (no marker shown).
 export const markerColor = (color: ColorMarkerEnum): string => {
     switch (color) {

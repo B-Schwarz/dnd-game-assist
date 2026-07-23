@@ -1,4 +1,3 @@
-const _ = require("lodash");
 const {Monster} = require("../db/models/monster.model");
 const {Character} = require("../db/models/character.model");
 
@@ -51,13 +50,12 @@ const getMonster = async (req, res) => {
 //
 
 const filterMonsterListe = (liste) => {
-    return _.map(liste, (item) => {
-        return filterMonster(item)
-    })
+    return liste.map((item) => filterMonster(item))
 }
 
 const filterMonster = (char) => {
-    return _.omit(char.toObject(), ['__v'])
+    const {__v, ...rest} = char.toObject()
+    return rest
 }
 
 module.exports = {

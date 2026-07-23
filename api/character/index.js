@@ -1,6 +1,5 @@
 const {User} = require('../db/models/user.model')
 const {Character} = require('../db/models/character.model')
-const _ = require('lodash')
 const mongoose = require('mongoose')
 const fs = require('fs')
 const path = require('path')
@@ -431,13 +430,16 @@ const deleteOwnCharacter = async (req, res) => {
 // List views don't need the attachment metadata, so keep their (leaner) shape;
 // only the single-character sheet GET carries `attachment`.
 const filterCharacterListe = (liste) => {
-    return _.map(liste, (item) => {
-        return _.pick(item, ['_id', 'character', 'npc', 'primary'])
-    })
+    return liste.map((item) => ({
+        _id: item._id, character: item.character, npc: item.npc, primary: item.primary
+    }))
 }
 
 const filterCharacter = (char) => {
-    return _.pick(char, ['_id', 'character', 'npc', 'primary', 'attachment'])
+    return {
+        _id: char._id, character: char.character, npc: char.npc,
+        primary: char.primary, attachment: char.attachment
+    }
 }
 
 const isOwnedByUser = (character, id) => {
