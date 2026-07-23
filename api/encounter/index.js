@@ -1,4 +1,3 @@
-const _ = require("lodash");
 const {Monster} = require("../db/models/monster.model");
 const {Encounter} = require("../db/models/encounter.model");
 const mongoose = require("mongoose");

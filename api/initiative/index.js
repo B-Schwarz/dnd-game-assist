@@ -1,5 +1,3 @@
-const _ = require('lodash')
-
 let master = []
 let player = []
 let round = 1
@@ -66,7 +64,10 @@ const deleteAllMaster = (req, res) => {
     playerTurn = 0
     round = 1
     colorMarkerIndex = 0
-    colorMarkers = _.shuffle(colorMarkers)
+    for (let i = colorMarkers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [colorMarkers[i], colorMarkers[j]] = [colorMarkers[j], colorMarkers[i]]
+    }
     res.sendStatus(200)
 }
 
@@ -272,7 +273,7 @@ const prevTurn = (req, res) => {
 }
 
 const updatePlayerData = () => {
-    const temp = _.cloneDeep(master)
+    const temp = structuredClone(master)
     playerTurn = turn
     // Set whos turn it is + master to false
     for (let i = 0; i < temp.length; i++) {
@@ -288,7 +289,7 @@ const updatePlayerData = () => {
             }
         }
     }
-    player = _.cloneDeep(temp)
+    player = structuredClone(temp)
 }
 
 module.exports = {

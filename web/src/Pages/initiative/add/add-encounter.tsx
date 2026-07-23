@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Center, Input, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
 import "../initiative.css";
-import _ from "lodash";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
 import {buildEncounterInstances, monsterBoardEntry} from "./add.utils";
@@ -14,7 +13,7 @@ const App = (props: {u: () => void}) => {
 
     const search = (val: string) => {
         // @ts-ignore — encounter rows carry a `name`, not a `character.name`
-        setValue(_.cloneDeep(data.filter(d => (d.name || '').toLowerCase().includes(val.toLowerCase()))))
+        setValue(structuredClone(data.filter(d => (d.name || '').toLowerCase().includes(val.toLowerCase()))))
     }
 
     const getMonster = () => {

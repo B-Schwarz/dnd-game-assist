@@ -3,7 +3,6 @@
 // roll, colour mapping and encounter expansion can be unit-tested without
 // rendering the axios-driven modal components.
 
-import _ from "lodash";
 import {Player} from "../player.type";
 import {EncounterType} from "../../encounter/encounter.type";
 
@@ -89,7 +88,7 @@ export const buildEncounterInstances = (encounter: EncounterType, roll: () => nu
     const out: Player[] = []
     encounter.encounter.forEach(group => {
         for (let i = 0; i < group.amount; i++) {
-            const data: Player | undefined = group.data ? _.cloneDeep(group.data) : undefined
+            const data: Player | undefined = group.data ? structuredClone(group.data) : undefined
             if (data && data.character && data.character.dex) {
                 data.initiative = abilityModifier(data.character.dex) + roll()
             }

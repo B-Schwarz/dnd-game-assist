@@ -19,9 +19,9 @@ import {DndContext, DragEndEvent, PointerSensor, closestCenter, useSensor, useSe
 import {SortableContext, arrayMove, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import "./initiative.css";
 import { flushSync } from "react-dom";
+import {deepEqual} from "./initiative-entry.utils";
 import {Player} from "./player.type";
 import axios from "axios";
-import _ from "lodash";
 import Add from "./add/add";
 import TitleService from "../../Service/titleService";
 import {accordionIndexOnTurn} from "./initiative-entry.utils";
@@ -73,7 +73,7 @@ const App = () => {
                 flushSync(() => setPlayer(newPlayer))
             } else {
                 for (let i = 0; i < player.length; i++) {
-                    if (!_.isEqual(player[i], newPlayer[i])) {
+                    if (!deepEqual(player[i], newPlayer[i])) {
                         flushSync(() => setPlayer([]))
                         flushSync(() => setPlayer(newPlayer))
                         break

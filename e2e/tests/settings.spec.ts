@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test'
 import {apiContext, login} from './helpers'
+import {version} from '../../web/package.json'
 
 // Mint a throwaway user (via the admin API) so password / account changes don't
 // pollute the shared fixtures.
@@ -80,6 +81,6 @@ test.describe('settings (account self-service)', () => {
     test('shows the current app version', async ({page}) => {
         await login(page)
         await page.goto('/settings')
-        await expect(page.getByText(/Version:\s*2\.0/)).toBeVisible()
+        await expect(page.getByText(`Version: ${version}`)).toBeVisible()
     })
 })

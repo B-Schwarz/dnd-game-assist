@@ -1,14 +1,12 @@
 const {User} = require('../db/models/user.model')
-const _ = require("lodash");
 
 // REQUIRES ADMIN
 const getUserList = async (req, res) => {
     const u = await User.find()
 
-    const filtered = []
-    _.forEach(u, function (val) {
-        filtered.push(_.pick(val, ['_id', 'name', 'master', 'admin', 'character']))
-    })
+    const filtered = u.map((val) => ({
+        _id: val._id, name: val.name, master: val.master, admin: val.admin, character: val.character
+    }))
 
     res.send(filtered)
 }

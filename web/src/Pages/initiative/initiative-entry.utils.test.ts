@@ -6,6 +6,7 @@ import {
     calcHp,
     calcMaxHp,
     canSeeHp,
+    deepEqual,
     formatSave,
     isDead,
     isRowHiddenFromPlayer,
@@ -176,5 +177,22 @@ describe('markerColor', () => {
     it('returns empty string for NONE and out-of-range values', () => {
         expect(markerColor(ColorMarkerEnum.NONE)).toBe('')
         expect(markerColor(999 as ColorMarkerEnum)).toBe('')
+    })
+})
+
+describe('deepEqual', () => {
+    it('treats value-identical entries as equal regardless of key order', () => {
+        expect(deepEqual({name: 'Aria', hp: '10'}, {hp: '10', name: 'Aria'})).toBe(true)
+    })
+
+    it('recurses into nested objects', () => {
+        expect(deepEqual({s: {dex: 3}}, {s: {dex: 3}})).toBe(true)
+        expect(deepEqual({s: {dex: 3}}, {s: {dex: 4}})).toBe(false)
+    })
+
+    it('detects differing values, extra keys, and missing keys', () => {
+        expect(deepEqual({hp: '10'}, {hp: '9'})).toBe(false)
+        expect(deepEqual({hp: '10'}, {hp: '10', temp: '2'})).toBe(false)
+        expect(deepEqual({hp: '10', temp: '2'}, {hp: '10'})).toBe(false)
     })
 })
