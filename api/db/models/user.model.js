@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-const {v4: uuidv4} = require('uuid');
+const {randomUUID} = require('crypto');
 
 //Define a schema
 const UserSchema = new mongoose.Schema({
@@ -48,7 +48,7 @@ UserSchema.pre('save', function (next) {
 UserSchema.methods.generateSession = async function () {
     const user = this
 
-    const id = uuidv4()
+    const id = randomUUID()
 
     user.session.push({token: id})
     await user.save()

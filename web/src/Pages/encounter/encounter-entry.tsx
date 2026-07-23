@@ -27,7 +27,6 @@ import {
     Tr,
     useToast
 } from "@chakra-ui/react"
-import _ from "lodash";
 import {AddIcon, DeleteIcon, EditIcon, ViewOffIcon} from "@chakra-ui/icons";
 import {IoSaveSharp} from "react-icons/io5";
 import axios from "axios";
@@ -59,7 +58,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
 
     const addMonster = () => {
         if (monster !== "") {
-            let temp: EncounterType = _.cloneDeep(encounter)
+            let temp: EncounterType = structuredClone(encounter)
             temp.encounter.push(newEncounterRow(monster, monsterList, hide, amount))
             setEncounter(temp)
         }

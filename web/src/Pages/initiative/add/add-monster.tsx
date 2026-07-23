@@ -3,7 +3,6 @@ import {Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@cha
 import {AddIcon} from "@chakra-ui/icons";
 import "../initiative.css";
 import {Player} from "../player.type";
-import _ from "lodash";
 import axios from "axios";
 import {Monster} from "../../monster/monster.type";
 import {abilityModifier, applyHidden, filterByName, monsterBoardEntry, rollD20} from "./add.utils";
@@ -14,7 +13,7 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        setValue(_.cloneDeep(filterByName(data, val)))
+        setValue(structuredClone(filterByName(data, val)))
     }
 
     const getMonster = () => {

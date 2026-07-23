@@ -33,7 +33,6 @@ import {
     Tr,
     useToast
 } from "@chakra-ui/react"
-import _ from "lodash";
 import {DeleteIcon, EditIcon} from "@chakra-ui/icons";
 import {IoSaveSharp} from "react-icons/io5";
 import axios from "axios";
@@ -77,8 +76,8 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const updateEntryStat = (key: number, val: number) => {
-        const temp = _.cloneDeep(entry)
-        const tempMon = _.cloneDeep(monster)
+        const temp = structuredClone(entry)
+        const tempMon = structuredClone(monster)
 
         // @ts-ignore
         tempMon.monster.stats[temp[key].stat.toLowerCase()] = val
@@ -92,8 +91,8 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const updateEntrySave = (key: number, val: number) => {
-        const temp = _.cloneDeep(entry)
-        const tempMon = _.cloneDeep(monster)
+        const temp = structuredClone(entry)
+        const tempMon = structuredClone(monster)
 
         // @ts-ignore
         tempMon.monster.saving[temp[key].stat.toLowerCase()] = val
@@ -104,7 +103,7 @@ const App = (props: { m: Monster, u: () => void, e: boolean }) => {
     }
 
     const updateMonster = (key: string, val: string) => {
-        const tempMon = _.cloneDeep(monster)
+        const tempMon = structuredClone(monster)
 
         // @ts-ignore
         tempMon.monster[key] = val

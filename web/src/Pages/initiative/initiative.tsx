@@ -21,7 +21,6 @@ import "./initiative.css";
 import { flushSync } from "react-dom";
 import {Player} from "./player.type";
 import axios from "axios";
-import _ from "lodash";
 import Add from "./add/add";
 import TitleService from "../../Service/titleService";
 import {accordionIndexOnTurn} from "./initiative-entry.utils";
@@ -73,7 +72,7 @@ const App = () => {
                 flushSync(() => setPlayer(newPlayer))
             } else {
                 for (let i = 0; i < player.length; i++) {
-                    if (!_.isEqual(player[i], newPlayer[i])) {
+                    if (JSON.stringify(player[i]) !== JSON.stringify(newPlayer[i])) {
                         flushSync(() => setPlayer([]))
                         flushSync(() => setPlayer(newPlayer))
                         break

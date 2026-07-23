@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Center, Input, Switch, Table, Tbody, Td, Text, Th, Thead, Tr} from "@chakra-ui/react"
 import {AddIcon} from "@chakra-ui/icons";
 import "../initiative.css";
-import _ from "lodash";
 import {Player} from "../player.type";
 import axios from "axios";
 import {abilityModifier, applyHidden, colorToMarker, filterByName, npcEntries, rollD20} from "./add.utils";
@@ -13,7 +12,7 @@ const App = (props: {u: () => void}) => {
     const [values, setValue] = useState<Player[]>([])
 
     const search = (val: string) => {
-        setValue(_.cloneDeep(filterByName(data, val)))
+        setValue(structuredClone(filterByName(data, val)))
     }
 
     const getPlayer = () => {

@@ -5,8 +5,7 @@ import axios from "axios";
 import {AddIcon} from "@chakra-ui/icons";
 import TitleService from "../../Service/titleService";
 import {Text} from "@chakra-ui/react";
-import {AiOutlineArrowLeft} from "@react-icons/all-files/ai/AiOutlineArrowLeft";
-import {AiOutlineArrowRight} from "@react-icons/all-files/ai/AiOutlineArrowRight";
+import {AiOutlineArrowLeft, AiOutlineArrowRight} from "react-icons/ai";
 import {EncounterType} from "./encounter.type";
 import EncounterEntry from "./encounter-entry";
 
