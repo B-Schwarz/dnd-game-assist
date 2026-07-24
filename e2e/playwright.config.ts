@@ -35,6 +35,9 @@ export default defineConfig({
             command: 'npm run dev',
             cwd: '../api',
             port: 4000,
+            // The suite logs in on nearly every spec; bypass the strict login
+            // rate limiter so it doesn't 429 mid-run.
+            env: {DISABLE_AUTH_RATE_LIMIT: '1'},
             reuseExistingServer: reuse,
             timeout: 120_000,
             stdout: 'pipe',

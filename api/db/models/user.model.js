@@ -36,7 +36,7 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre('save', function (next) {
     let user = this
-    let costFactor = 10
+    let costFactor = 12
 
     if (user.isModified('password')) {
         user.password = bcrypt.hashSync(user.password, costFactor)
@@ -58,10 +58,10 @@ UserSchema.methods.generateSession = async function () {
 
 UserSchema.statics.findByCredentials = function (name, password) {
     let User = this;
-    return User.findOne({
-        name: {
-            $regex : new RegExp(name, "i") }
-    }).then((user) => {
+    // Exact, case-insensitive match via collation — never build a RegExp from
+    // the raw username (that was a ReDoS sink and matched unanchored, e.g.
+    // "admin" also hitting "administrator").
+    return User.findOne({name: name}).collation({locale: 'en', strength: 2}).then((user) => {
         if (!user)
             return Promise.reject();
 

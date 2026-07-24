@@ -1,5 +1,6 @@
 const {User} = require('../db/models/user.model')
 const {Character} = require('../db/models/character.model')
+const {isAcceptablePassword} = require('../auth/password-policy')
 
 const deleteOwnAccount = async (req, res) => {
     const chars = req.user.character
@@ -57,7 +58,7 @@ const changeOwnPassword = (req, res) => {
     const currPass = req.body.currPass
     const newPass = req.body.newPass
 
-    if (currPass && newPass && String(newPass).length >= 8) {
+    if (currPass && isAcceptablePassword(newPass)) {
         User.findByCredentials(req.user.name, currPass)
             .then(async (u) => {
                 u.password = newPass

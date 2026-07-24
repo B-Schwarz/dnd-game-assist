@@ -1,4 +1,5 @@
 const { User } = require('../db/models/user.model')
+const { isAcceptablePassword } = require('./password-policy')
 
 const login = (req, res) => {
     let username = req.body.username
@@ -27,6 +28,9 @@ const login = (req, res) => {
 }
 
 const register = async (req, res) => {
+    if (req.body.username && !isAcceptablePassword(req.body.password)) {
+        return res.sendStatus(400)
+    }
     if (req.body.username && req.body.password) {
         let newUser = new User({
             name: req.body.username,

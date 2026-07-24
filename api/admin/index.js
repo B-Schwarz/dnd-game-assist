@@ -1,4 +1,5 @@
 const {User} = require('../db/models/user.model')
+const {isAcceptablePassword} = require('../auth/password-policy')
 
 // REQUIRES ADMIN
 const getUserList = async (req, res) => {
@@ -57,7 +58,7 @@ const setPassword = async (req, res) => {
     const userID = req.body.userID
     const password = req.body.password
 
-    if (!userID || !password || String(password).length < 8) {
+    if (!userID || !isAcceptablePassword(password)) {
         return res.sendStatus(400)
     }
 

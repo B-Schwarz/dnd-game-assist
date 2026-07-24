@@ -6,7 +6,7 @@ import {version} from '../../web/package.json'
 // pollute the shared fixtures.
 async function freshUser(): Promise<{ username: string; password: string }> {
     const username = `settings_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-    const password = 'origPassword1'
+    const password = 'Str0ng!Pass2026'
     const ctx = await apiContext()
     await ctx.post('/api/auth/register', {data: {username, password}})
     await ctx.dispose()
@@ -20,15 +20,15 @@ test.describe('settings (account self-service)', () => {
         await page.goto('/settings')
 
         await page.locator('#pass').fill(user.password)
-        await page.locator('#newPass').fill('changedPassword2')
-        await page.locator('#newPassRep').fill('changedPassword2')
+        await page.locator('#newPass').fill('Ch4nged!Pass2027')
+        await page.locator('#newPassRep').fill('Ch4nged!Pass2027')
         await page.getByRole('button', {name: 'Ändern'}).click()
         await expect(page.getByText('Passwort wurde geändert')).toBeVisible()
 
         // new password works
         const ok = await browser.newContext()
         const p2 = await ok.newPage()
-        await login(p2, {username: user.username, password: 'changedPassword2'})
+        await login(p2, {username: user.username, password: 'Ch4nged!Pass2027'})
         await expect(p2).toHaveURL(/\/character/)
         await ok.close()
 
@@ -49,8 +49,8 @@ test.describe('settings (account self-service)', () => {
         await page.goto('/settings')
 
         await page.locator('#pass').fill('totallyWrong9')
-        await page.locator('#newPass').fill('whatever12345')
-        await page.locator('#newPassRep').fill('whatever12345')
+        await page.locator('#newPass').fill('Str0ng!Pass2026')
+        await page.locator('#newPassRep').fill('Str0ng!Pass2026')
         await page.getByRole('button', {name: 'Ändern'}).click()
         await expect(page.getByText('Das Passwort ist Falsch!')).toBeVisible()
 
