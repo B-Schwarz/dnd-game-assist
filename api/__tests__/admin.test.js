@@ -50,9 +50,9 @@ describe('setPassword', () => {
     test('sets a new password (login works with new, fails with old)', async () => {
         await seedAdmin()
         const u = await makeUser({name: 'victim', password: 'oldpassword'})
-        const res = await admin.put('/api/user/password').send({userID: u._id.toString(), password: 'brandnew1'})
+        const res = await admin.put('/api/user/password').send({userID: u._id.toString(), password: 'Str0ngPass2026'})
         expect(res.statusCode).toBe(200)
-        expect((await request(app).post('/api/auth/login').send({username: 'victim', password: 'brandnew1'})).statusCode).toBe(200)
+        expect((await request(app).post('/api/auth/login').send({username: 'victim', password: 'Str0ngPass2026'})).statusCode).toBe(200)
         expect((await request(app).post('/api/auth/login').send({username: 'victim', password: 'oldpassword'})).statusCode).toBe(401)
     })
 

@@ -90,17 +90,24 @@ describe('register (admin-gated)', () => {
     test('admin creates a user with master:false, admin:false', async () => {
         await makeUser({name: 'root', admin: true})
         const admin = await loginAgent(app, 'root')
-        const res = await admin.post('/api/auth/register').send({username: 'newbie', password: 'password123'})
+        const res = await admin.post('/api/auth/register').send({username: 'newbie', password: 'Str0ngPass2026'})
         expect(res.statusCode).toBe(200)
         const u = await User.findOne({name: 'newbie'})
         expect(u.master).toBe(false)
         expect(u.admin).toBe(false)
     })
 
+    test('a weak or common password is rejected (400)', async () => {
+        await makeUser({name: 'root', admin: true})
+        const admin = await loginAgent(app, 'root')
+        expect((await admin.post('/api/auth/register').send({username: 'wk', password: 'short'})).statusCode).toBe(400)      // too short
+        expect((await admin.post('/api/auth/register').send({username: 'wk', password: 'password123'})).statusCode).toBe(400) // common
+    })
+
     test('a non-admin cannot register users (401)', async () => {
         await makeUser({name: 'plain'})
         const agent = await loginAgent(app, 'plain')
-        const res = await agent.post('/api/auth/register').send({username: 'x2', password: 'password123'})
+        const res = await agent.post('/api/auth/register').send({username: 'x2', password: 'Str0ngPass2026'})
         expect(res.statusCode).toBe(401)
     })
 
@@ -113,7 +120,7 @@ describe('register (admin-gated)', () => {
     test('username shorter than 3 chars → 400', async () => {
         await makeUser({name: 'root', admin: true})
         const admin = await loginAgent(app, 'root')
-        const res = await admin.post('/api/auth/register').send({username: 'ab', password: 'password123'})
+        const res = await admin.post('/api/auth/register').send({username: 'ab', password: 'Str0ngPass2026'})
         expect(res.statusCode).toBe(400)
     })
 
@@ -121,7 +128,7 @@ describe('register (admin-gated)', () => {
         await makeUser({name: 'root', admin: true})
         await makeUser({name: 'taken'})
         const admin = await loginAgent(app, 'root')
-        const res = await admin.post('/api/auth/register').send({username: 'taken', password: 'password123'})
+        const res = await admin.post('/api/auth/register').send({username: 'taken', password: 'Str0ngPass2026'})
         expect(res.statusCode).toBe(400)
     })
 })

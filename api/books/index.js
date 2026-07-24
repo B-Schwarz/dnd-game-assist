@@ -12,9 +12,17 @@ if (!fs.existsSync(BOOK_DIR)) {
 
 // Upload PDFs straight into the book directory, keeping the original file name
 // (basename only, to prevent path traversal). Only PDFs are accepted.
+// Keep the original name (basename only → no path traversal) but strip it to a
+// safe character set so a crafted filename can't carry markup into any future
+// HTML sink (the list is returned as JSON today, so this is defence-in-depth).
+const safeBookName = (original) => {
+  const base = path.basename(original).replace(/[^\w.\- ]+/g, '_')
+  return base.toLowerCase().endsWith('.pdf') ? base : base + '.pdf'
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, BOOK_DIR),
-  filename: (req, file, cb) => cb(null, path.basename(file.originalname))
+  filename: (req, file, cb) => cb(null, safeBookName(file.originalname))
 })
 
 const bookUpload = multer({

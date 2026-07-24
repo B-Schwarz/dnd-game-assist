@@ -10,8 +10,8 @@ async function gotoAdminUsers(page: Page) {
 // Register a user via the admin form; returns its accordion item locator.
 async function registerUser(page: Page, name: string): Promise<Locator> {
     await page.getByPlaceholder('Username').fill(name)
-    await page.getByPlaceholder('Password', {exact: true}).fill('password123')
-    await page.getByPlaceholder('Password Wiederholen').fill('password123')
+    await page.getByPlaceholder('Password', {exact: true}).fill('Str0ngPass2026')
+    await page.getByPlaceholder('Password Wiederholen').fill('Str0ngPass2026')
     await page.getByRole('button', {name: 'Register', exact: true}).click()
     const item = page.locator('.chakra-accordion__item', {hasText: name})
     await expect(item).toBeVisible()

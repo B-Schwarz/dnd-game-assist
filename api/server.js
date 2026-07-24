@@ -29,15 +29,33 @@ const path = require("path");
 
 const port = 4000;
 
-app.use(express.json({limit: '20mb'}));
+// A single character sheet (with its ≤2 MB base64 image) is a few MB; 5 MB
+// covers it with margin. The admin bulk-import is the one legitimately large
+// body, so it gets its own bigger parser (jsonLarge) below.
+const jsonSmall = express.json({limit: '5mb'})
+const jsonLarge = express.json({limit: '60mb'})
+app.use((req, res, next) => req.path === '/api/char/import' ? next() : jsonSmall(req, res, next))
 app.use(express.urlencoded({extended: false}));
 
 app.disable('x-powered-by');
 
-// Security headers (HSTS, nosniff, frameguard, referrer-policy, …). CSP is left
-// off here: the served SPA would need a tailored policy, so enabling a default
-// CSP would break it — track that as a follow-up rather than ship a broken one.
-app.use(helmet({contentSecurityPolicy: false}));
+// Security headers (HSTS, nosniff, frameguard, referrer-policy, …) plus a CSP
+// tailored to the served SPA on top of helmet's secure defaults:
+//  - style-src 'unsafe-inline': Chakra/emotion inject runtime <style> tags and
+//    inline style attributes (no nonce is possible with the static build).
+//  - img-src/font-src data:: the character sheet's `appearance` image is a
+//    base64 data URL.
+// The built index.html loads a single external module script, so script-src
+// stays 'self'. (Verify against the prod bundle if you change the UI stack.)
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            'img-src': ["'self'", 'data:'],
+            'style-src': ["'self'", "'unsafe-inline'"],
+            'font-src': ["'self'", 'data:'],
+        }
+    }
+}));
 
 // CORS Header
 app.use((req, res, next) => {
@@ -77,7 +95,11 @@ const sess = session({
     cookie: {
         httpOnly: true,
         maxAge: 30*24*60*60*1000, // 30 days
-        sameSite: 'lax',
+        // 'strict' is the CSRF control here: the session cookie is never sent on
+        // a cross-site request, closing even the mutating GET routes. The app is
+        // same-origin, so the only cost is that an inbound link from another site
+        // won't carry the session on first hit.
+        sameSite: 'strict',
         secure: (process.env.NODE_ENV === 'production'),
     }
 })
@@ -117,7 +139,7 @@ app.get('/api/charlist/npc', isAuth, isMaster, getNPCList)
 //
 app.get('/api/char/new', isAuth, createCharacter)
 app.get('/api/char/export', isAuth, isAdmin, exportCharacters)
-app.post('/api/char/import', isAuth, isAdmin, importCharacters)
+app.post('/api/char/import', isAuth, isAdmin, jsonLarge, importCharacters)
 app.put('/api/char/reassign', isAuth, isAdmin, reassignCharacter)
 app.get('/api/char/get/:id', isAuth, isMasterOrAdmin, getCharacter)
 app.get('/api/char/me/get/:id', isAuth, getOwnCharacter)
