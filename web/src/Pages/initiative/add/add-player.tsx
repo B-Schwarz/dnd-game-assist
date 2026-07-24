@@ -19,11 +19,13 @@ import "../initiative.css";
 import {Player} from "../player.type";
 import axios from "axios";
 import {colorToMarker, filterByName, playableEntries} from "./add.utils";
+import AddSkeletonRows from "./add-skeleton";
 
 const App = (props: {u: () => void}) => {
 
     const [data, setData] = useState<Player[]>([])
     const [values, setValue] = useState<Player[]>([])
+    const [loading, setLoading] = useState(true)
 
     const search = (val: string) => {
         setValue(structuredClone(filterByName(data, val)))
@@ -38,6 +40,7 @@ const App = (props: {u: () => void}) => {
             })
             .catch(() => {
             })
+            .finally(() => setLoading(false))
     }
 
     const onAdd = (p: Player) => {
@@ -69,8 +72,9 @@ const App = (props: {u: () => void}) => {
                     </Tr>
                 </Thead>
                 <Tbody>
+                    {loading && <AddSkeletonRows cols={3}/>}
                     {
-                        values.map((item, index) => (
+                        !loading && values.map((item, index) => (
                             <Tr key={index}>
                                 <Td>
                                     <HStack spacing='0.4rem'>

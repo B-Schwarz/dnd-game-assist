@@ -14,7 +14,7 @@ const App = (props: {u: () => void}) => {
             </ModalHeader>
             <ModalCloseButton/>
             <ModalBody>
-                <Tabs>
+                <Tabs isLazy lazyBehavior='keepMounted'>
                     <TabList>
                         <Tab>Spieler</Tab>
                         <Tab>Monster</Tab>

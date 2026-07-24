@@ -6,18 +6,20 @@ import {Player} from "../player.type";
 import axios from "axios";
 import {Monster} from "../../monster/monster.type";
 import {abilityModifier, applyHidden, filterByName, monsterBoardEntry, rollD20} from "./add.utils";
+import AddSkeletonRows from "./add-skeleton";
 
 const App = (props: {u: () => void}) => {
 
     const [data, setData] = useState<Player[]>([])
     const [values, setValue] = useState<Player[]>([])
+    const [loading, setLoading] = useState(true)
 
     const search = (val: string) => {
         setValue(structuredClone(filterByName(data, val)))
     }
 
     const getMonster = () => {
-        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list/lean')
             .then((d) => {
                 setValue([])
                 let monsters: Player[] = []
@@ -29,6 +31,7 @@ const App = (props: {u: () => void}) => {
             })
             .catch(() => {
             })
+            .finally(() => setLoading(false))
     }
 
     const onAdd = (m: Player) => {
@@ -62,8 +65,9 @@ const App = (props: {u: () => void}) => {
                     </Tr>
                 </Thead>
                 <Tbody>
+                    {loading && <AddSkeletonRows cols={3}/>}
                     {
-                        values.map((item, index) => (
+                        !loading && values.map((item, index) => (
                             <Tr key={index}>
                                 <Td><Text isTruncated maxW='11rem'>{item.character.name}</Text></Td>
                                 <Td><Switch onChange={(evt) => onHide(item, evt.currentTarget.checked)}/></Td>

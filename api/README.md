@@ -93,6 +93,7 @@ Start the server by first installing all modules with ``npm install`` and then r
 |-------------------|:--------:|:---------------------------------------:|:--------------------:|--------------------------------|-------------------------------------|
 | /api/monster/new  |  `GET`   |                 `none`                  | `master` | Creates a new monster          | `none`                              |
 | /api/monster/list |  `GET`   |                 `none`                  | `master` | Returns a list of all monsters | `[{_id:ObjectID, monster:Monster}]` |
+| /api/monster/list/lean |  `GET`   |                 `none`                  | `master` | Like `/list` but only the board subset (name, ac, hp, speed, stats.dex, saving) — for the add-monster modal & encounter picker | `[{_id:ObjectID, monster:{name,ac,hp,speed,stats:{dex},saving}}]` |
 | /api/monster      |  `PUT`   | `charID:ObjectID`<br/>`monster:Monster` | `master` | Updates a monster              | `none`                              |
 | /api/monster/:id  | `DELETE` |                 `none`                  | `master` | Deletes a monster              | `none`                              |
 | /api/monster/:id  |  `GET`   |                 `none`                  | `master` | Returns the specified monster  | `[{_id:ObjectID, monster:Monster}]` |

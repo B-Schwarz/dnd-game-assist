@@ -52,6 +52,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     const [monsterList, setMonsterList] = useState<Monster[]>([])
 
     const cancelRef = React.useRef(null)
+    const didMount = React.useRef(false)
     const toast = useToast()
 
     const closePopup = () => setIsOpen(false)
@@ -76,7 +77,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list/lean')
             .then((data) => {
                 setMonsterList(data.data)
             })
@@ -86,6 +87,10 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }, []);
 
     useEffect(() => {
+        if (!didMount.current) {
+            didMount.current = true
+            return
+        }
         save()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [encounter]);
