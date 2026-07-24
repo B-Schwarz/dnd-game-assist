@@ -8,8 +8,8 @@ import {request} from '@playwright/test'
 // the spec files as config-imported and breaks test.describe collection).
 const API_URL = process.env.E2E_API_URL || 'http://localhost:4000'
 const ADMIN = {username: 'admin', password: 'asdasdasd'}
-const NORMAL_USER = {username: 'e2e_user', password: 'e2euserpass'}
-const MASTER_USER = {username: 'e2e_master', password: 'e2emasterpass'}
+const NORMAL_USER = {username: 'e2e_user', password: 'E2eUser!Pass1'}
+const MASTER_USER = {username: 'e2e_master', password: 'E2eMaster!Pass1'}
 
 export default async function globalSetup() {
     const ctx = await request.newContext({baseURL: API_URL})
