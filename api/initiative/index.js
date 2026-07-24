@@ -7,6 +7,27 @@ let playerTurn = 0
 let colorMarkerIndex = 0
 let colorMarkers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
+// The board only ever reads this combat subset of a character (see the
+// initiative note in CLAUDE.md). Full sheets carry `appearance` — a base64
+// image up to 2 MB — which otherwise gets stored in `master` and re-shipped on
+// every board GET (~1.7 MB) and PUT (~575 KB). Trim on the way in so an entry
+// never drags its image onto the board.
+const BOARD_CHAR_FIELDS = [
+    'name', 'ac', 'hp', 'maxHp', 'tempHp', 'dex', 'speed', 'color',
+    'strSave', 'dexSave', 'conSave', 'intSave', 'wisSave', 'chaSave'
+]
+const trimBoardCharacter = (character) => {
+    const out = {}
+    for (const k of BOARD_CHAR_FIELDS) if (character && k in character) out[k] = character[k]
+    return out
+}
+// Trim the `character` of a single board entry in place (leaves non-character
+// board fields — turnId, initiative, colorMarker, hidden, … — untouched).
+const trimEntry = (p) => {
+    if (p && p.character) p.character = trimBoardCharacter(p.character)
+    return p
+}
+
 // A monster (not a player character or plain NPC) counts as dead once its HP
 // hits 0. Dead monsters are pushed to the bottom of the order and skipped.
 const isDeadMonster = (p) => {
@@ -38,7 +59,7 @@ const reorderDeadMonsters = () => {
 // set master
 // REQUIRES MASTER
 const setPlayer = (req, res) => {
-    master = req.body.player
+    master = Array.isArray(req.body.player) ? req.body.player.map(trimEntry) : req.body.player
     setTurn()
     updatePlayerData()
     res.sendStatus(200)
@@ -97,7 +118,7 @@ const updateMaster = (req, res) => {
             try {
                 for (let i = 0; i < master.length; i++) {
                     if (master[i].turnId === p.turnId) {
-                        master[i] = p
+                        master[i] = trimEntry(p)
                         master[i].isMaster = true
                         break
                     }
@@ -124,7 +145,7 @@ const addMaster = (req, res) => {
                 colorMarkerIndex = (colorMarkerIndex + 1) % colorMarkers.length
             }
 
-            master.push(p)
+            master.push(trimEntry(p))
             setTurn()
             updatePlayerData()
         } catch (_) {

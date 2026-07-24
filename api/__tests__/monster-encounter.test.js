@@ -58,6 +58,23 @@ describe('monster', () => {
         expect(names).toEqual([...names].sort())
     })
 
+    test('lean list keeps the board subset but drops the heavy text fields', async () => {
+        await seed()
+        await Monster.create({monster: {
+            name: 'Beholder', ac: '18', hp: '180', speed: '0 ft., fly 20 ft.',
+            stats: {dex: 14, str: 10}, saving: {dex: 5, con: 6},
+            actions: 'a very long block of action text '.repeat(50),
+            senses: 'darkvision 120 ft.', languages: 'Deep Speech, Undercommon'
+        }})
+        const m = (await gm.get('/api/monster/list/lean')).body.find(x => x.monster.name === 'Beholder')
+        expect(m.monster.hp).toBe('180')
+        expect(m.monster.stats.dex).toBe(14)
+        expect(m.monster.saving.dex).toBe(5)
+        expect(m.monster).not.toHaveProperty('actions')
+        expect(m.monster).not.toHaveProperty('senses')
+        expect(m.monster).not.toHaveProperty('languages')
+    })
+
     // Monster is a master-only tab: every route (including list) requires the
     // master flag — a plain user and an admin-without-master are both rejected.
     test('non-masters cannot use any monster route (401)', async () => {

@@ -29,6 +29,19 @@ const getMonsterList = async (req, res) => {
     res.send(filterMonsterListe(monList))
 }
 
+// Lean list for the initiative "add monster" modal and the encounter monster
+// picker: those only read the name + combat subset (monsterToCharacter) and a
+// name search. The full doc carries long text blobs (actions, senses,
+// languages, …) that made 400 monsters a heavy payload. Project at the DB so
+// the weight never leaves Mongo. The editor still uses the full /list.
+const getMonsterListLean = async (req, res) => {
+    const monList = await Monster.find({}, {
+        'monster.name': 1, 'monster.ac': 1, 'monster.hp': 1,
+        'monster.speed': 1, 'monster.stats.dex': 1, 'monster.saving': 1
+    }).sort({'monster.name': 1})
+    res.send(monList)
+}
+
 // REQUIRES MASTER OR ADMIN
 const deleteMonster = async (req, res) => {
     const charID = req.params.id
@@ -61,6 +74,7 @@ const filterMonster = (char) => {
 module.exports = {
     createMonster,
     getMonsterList,
+    getMonsterListLean,
     deleteMonster,
     saveMonster,
     getMonster
