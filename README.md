@@ -151,14 +151,11 @@ MongoDB persists to the `./mongo_volume` bind mount.
 ## Roles & first login
 
 Auth is **session-based**. On first connect to an empty database the API seeds a
-default admin:
-
-```
-username: admin
-password: asdasdasd
-```
-
-**Change this immediately** on any real deployment (Settings → password).
+default `admin` user. In production the initial password must be supplied via the
+`ADMIN_INITIAL_PASSWORD` environment variable — if it is unset, no admin is
+created. For local development a built-in fallback password is used (see
+`api/db/index.js`). Either way, change it immediately after first login
+(Settings → password).
 
 There are three role flags that compose on top of a normal user:
 

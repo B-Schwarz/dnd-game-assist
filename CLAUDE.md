@@ -51,14 +51,14 @@ Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter
 - **Mongoose 8** (driver v6): queries take **no callbacks** — `await` them (a query with no callback and no `await`/`.then`/`.exec` never runs), and construct ids with **`new mongoose.Types.ObjectId(x)`** (the constructor throws if called without `new`).
 
 ### Bootstrap behavior
-`api/db/index.js` seeds a default admin (`name: admin`, `password: asdasdasd`) on first connect if the users collection is empty. The MongoDB connection is configured via `DB_URI`.
+`api/db/index.js` seeds a default `admin` user on first connect if the users collection is empty. In production the initial password comes from `ADMIN_INITIAL_PASSWORD` (no admin is seeded if it is unset); off-prod a built-in fallback password (defined in that file) is used. The MongoDB connection is configured via `DB_URI`.
 
 ### Frontend structure
 - Routing in `web/src/App.tsx`; each route renders `<Menu selected={...}/>` plus the page. Role/auth-gating on the client uses `web/src/Pages/login/withAuth.tsx` (HOC that pings `/api/me` and redirects to `/login` on 401) and `/api/me/master` · `/api/me/admin` probes to show/hide features.
 - All API calls go through `axios` with base `process.env.REACT_APP_API_PREFIX` and must send credentials (cookies) for the session to work.
 - The character sheet page (`web/src/Pages/character-sheet/character.tsx`) renders `<CharacterSheet>` from `sheet/` and autosaves on change. The initiative board imports the **same** `DnDCharacter` type from `sheet/dnd-character.ts`, so the sheet model and the combat tracker are coupled through that type — but the tracker only *reads* a subset (`name`, `hp`/`maxHp`/`tempHp`, `ac`, `dex`, the six `*Save` fields, `speed`, `color`), and monster/encounter "add" flows in `initiative/add/` synthesize that same subset.
 - The initiative tracker is the most complex feature: `web/src/Pages/initiative/initiave-entry.tsx` (note the misspelled filename) is the largest component, with master-only controls (turn/round, reordering, hidden players, adding players/monsters/encounters/NPCs from `initiative/add/`).
-- To verify sheet/UI changes visually, the app can be driven with Playwright against a running stack (log in at `/login` with the seeded `admin`/`asdasdasd`, then create/open a character).
+- To verify sheet/UI changes visually, the app can be driven with Playwright against a running stack (log in at `/login` with the seeded `admin` account — dev fallback password in `api/db/index.js` — then create/open a character).
 
 ### Testing (API)
 - Suites live in `api/__tests__/*.test.js` (Jest, `jest.config.js` runs serially). Two styles:
@@ -78,7 +78,7 @@ Mongoose schemas in `api/db/models/`: `user`, `character`, `monster`, `encounter
 
 ### Testing (Acceptance / e2e)
 - `e2e/` is a standalone Playwright package (its own `package.json`, like `api`/`web`) that drives the **real** stack through a browser. Setup: `cd e2e && npm install && npx playwright install chromium`; run with `npm test`.
-- Prerequisite: a **MongoDB on 127.0.0.1:27017** (start it with `./mongo.sh` at the repo root, or any local `mongod`) and the seeded `admin`/`asdasdasd`. Playwright's `webServer` starts the API (`:4000`) and web (`:3000`) itself (reusing them if already up); point at a running stack instead with `E2E_BASE_URL=http://localhost:3000 npm test`.
+- Prerequisite: a **MongoDB on 127.0.0.1:27017** (start it with `./mongo.sh` at the repo root, or any local `mongod`) and the seeded `admin` account (dev fallback password in `api/db/index.js`). Playwright's `webServer` starts the API (`:4000`) and web (`:3000`) itself (reusing them if already up); point at a running stack instead with `E2E_BASE_URL=http://localhost:3000 npm test`.
 - Tests create timestamp-named characters and clean up, so they're safe to re-run against the same DB. Selectors lean on stable hooks: login `#name`/`#password`, the sheet's `Character Name` placeholder, and `.dnd-ability`/`.dnd-hpbar-fill` classes. See `e2e/README.md`.
 
 ### Conventions to match

@@ -10,8 +10,9 @@ standalone package (the monorepo has no root package manager), mirroring how
 - A **MongoDB on `127.0.0.1:27017`** (the API dev env in `api/nodemon.json`
   points there). From the repo root you can start one with `./mongo.sh`
   (Docker), or run any local `mongod`.
-- The tests assume the seeded default admin (`admin` / `asdasdasd`), which the
-  API bootstraps into an empty `users` collection on first connect.
+- The tests assume the seeded default `admin` account, which the API bootstraps
+  into an empty `users` collection on first connect (dev fallback password in
+  `api/db/index.js`; in production it comes from `ADMIN_INITIAL_PASSWORD`).
 
 ## Install
 
