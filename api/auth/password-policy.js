@@ -11,10 +11,16 @@ const COMMON = new Set([
     'football12', 'dragon1234', 'sunshine12', 'trustno123', 'monkey1234'
 ])
 
+// Require a mix of character classes so length alone can't hide a weak
+// password. A "symbol" is any non-alphanumeric character.
 const isAcceptablePassword = (pw) => {
     if (typeof pw !== 'string') return false
     if (pw.length < MIN_LENGTH) return false
     if (COMMON.has(pw.toLowerCase())) return false
+    if (!/[a-z]/.test(pw)) return false          // lower
+    if (!/[A-Z]/.test(pw)) return false          // upper
+    if (!/[0-9]/.test(pw)) return false          // number
+    if (!/[^A-Za-z0-9]/.test(pw)) return false   // symbol
     return true
 }
 

@@ -10,8 +10,8 @@ async function gotoAdminUsers(page: Page) {
 // Register a user via the admin form; returns its accordion item locator.
 async function registerUser(page: Page, name: string): Promise<Locator> {
     await page.getByPlaceholder('Username').fill(name)
-    await page.getByPlaceholder('Password', {exact: true}).fill('Str0ngPass2026')
-    await page.getByPlaceholder('Password Wiederholen').fill('Str0ngPass2026')
+    await page.getByPlaceholder('Password', {exact: true}).fill('Str0ng!Pass2026')
+    await page.getByPlaceholder('Password Wiederholen').fill('Str0ng!Pass2026')
     await page.getByRole('button', {name: 'Register', exact: true}).click()
     const item = page.locator('.chakra-accordion__item', {hasText: name})
     await expect(item).toBeVisible()
@@ -48,14 +48,14 @@ test.describe('admin – users', () => {
         const item = await registerUser(page, name)
 
         await item.getByRole('button', {name}).click()
-        await item.getByPlaceholder('Neues Passwort').fill('brandNewPass1')
+        await item.getByPlaceholder('Neues Passwort').fill('Ch4nged!Pass2027')
         await item.getByRole('button', {name: 'Setzen'}).click()
         await expect(page.getByText('Passwort gesetzt')).toBeVisible()
 
         // new password works in a fresh context
         const ctx = await browser.newContext()
         const p2 = await ctx.newPage()
-        await login(p2, {username: name, password: 'brandNewPass1'})
+        await login(p2, {username: name, password: 'Ch4nged!Pass2027'})
         await expect(p2).toHaveURL(/\/character/)
         await ctx.close()
 
@@ -64,7 +64,7 @@ test.describe('admin – users', () => {
         const p3 = await ctx2.newPage()
         await p3.goto('/login')
         await p3.locator('#name').fill(name)
-        await p3.locator('#password').fill('password123')
+        await p3.locator('#password').fill('Str0ng!Pass2026')
         await p3.getByRole('button', {name: 'Login'}).click()
         await expect(p3.getByText('Falsches Passwort oder unbekannter Benutzer').first()).toBeVisible()
         await ctx2.close()

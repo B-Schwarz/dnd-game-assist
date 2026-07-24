@@ -50,9 +50,9 @@ describe('setPassword', () => {
     test('sets a new password (login works with new, fails with old)', async () => {
         await seedAdmin()
         const u = await makeUser({name: 'victim', password: 'oldpassword'})
-        const res = await admin.put('/api/user/password').send({userID: u._id.toString(), password: 'Str0ngPass2026'})
+        const res = await admin.put('/api/user/password').send({userID: u._id.toString(), password: 'Str0ng!Pass2026'})
         expect(res.statusCode).toBe(200)
-        expect((await request(app).post('/api/auth/login').send({username: 'victim', password: 'Str0ngPass2026'})).statusCode).toBe(200)
+        expect((await request(app).post('/api/auth/login').send({username: 'victim', password: 'Str0ng!Pass2026'})).statusCode).toBe(200)
         expect((await request(app).post('/api/auth/login').send({username: 'victim', password: 'oldpassword'})).statusCode).toBe(401)
     })
 
@@ -61,7 +61,7 @@ describe('setPassword', () => {
         const u = await makeUser({name: 'victim'})
         expect((await admin.put('/api/user/password').send({userID: u._id.toString(), password: 'short'})).statusCode).toBe(400)
         expect((await admin.put('/api/user/password').send({userID: u._id.toString()})).statusCode).toBe(400)
-        expect((await admin.put('/api/user/password').send({password: 'longenough1'})).statusCode).toBe(400)
-        expect((await admin.put('/api/user/password').send({userID: new mongoose.Types.ObjectId().toString(), password: 'longenough1'})).statusCode).toBe(404)
+        expect((await admin.put('/api/user/password').send({password: 'Str0ng!Pass2026'})).statusCode).toBe(400)
+        expect((await admin.put('/api/user/password').send({userID: new mongoose.Types.ObjectId().toString(), password: 'Str0ng!Pass2026'})).statusCode).toBe(404)
     })
 })

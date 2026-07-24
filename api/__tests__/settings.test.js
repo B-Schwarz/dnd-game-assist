@@ -19,15 +19,15 @@ describe('changeOwnPassword', () => {
     test('correct current password → 200 and the new password works', async () => {
         await makeUser({name: 'user1', password: 'currentpw1'})
         const agent = await loginAgent(app, 'user1', 'currentpw1')
-        const res = await agent.put('/api/me/password').send({currPass: 'currentpw1', newPass: 'Str0ngPass2026'})
+        const res = await agent.put('/api/me/password').send({currPass: 'currentpw1', newPass: 'Str0ng!Pass2026'})
         expect(res.statusCode).toBe(200)
-        expect((await request(app).post('/api/auth/login').send({username: 'user1', password: 'Str0ngPass2026'})).statusCode).toBe(200)
+        expect((await request(app).post('/api/auth/login').send({username: 'user1', password: 'Str0ng!Pass2026'})).statusCode).toBe(200)
     })
 
     test('wrong current password → 401', async () => {
         await makeUser({name: 'user1', password: 'currentpw1'})
         const agent = await loginAgent(app, 'user1', 'currentpw1')
-        expect((await agent.put('/api/me/password').send({currPass: 'wrong', newPass: 'Str0ngPass2026'})).statusCode).toBe(401)
+        expect((await agent.put('/api/me/password').send({currPass: 'wrong', newPass: 'Str0ng!Pass2026'})).statusCode).toBe(401)
     })
 
     test('missing fields → 400; a new password shorter than 8 chars → 400', async () => {
