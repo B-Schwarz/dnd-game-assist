@@ -20,7 +20,7 @@ const {
     setRound, getRound, deleteMaster, updateMaster, addMaster, deleteAllMaster,
     nextTurn, prevTurn
 } = require("./initiative");
-const {createMonster, getMonsterList, saveMonster, deleteMonster, getMonster} = require("./monster");
+const {createMonster, getMonsterList, getMonsterListLean, saveMonster, deleteMonster, getMonster} = require("./monster");
 const {createEncounter, getEncounterList, saveEncounter, deleteEncounter} = require("./encounter");
 const {getUserList, setAdmin, setMaster, setPassword} = require("./admin");
 const {getBookList, uploadBook, deleteBook, bookUpload} = require("./books");
@@ -183,6 +183,7 @@ app.get('/api/initiative/turn/prev', isAuth, isMaster, prevTurn)
 //
 app.get('/api/monster/new', isAuth, isMaster, createMonster)
 app.get('/api/monster/list', isAuth, isMaster, getMonsterList)
+app.get('/api/monster/list/lean', isAuth, isMaster, getMonsterListLean)
 app.put('/api/monster', isAuth, isMaster, saveMonster)
 app.delete('/api/monster/:id', isAuth, isMaster, deleteMonster)
 app.get('/api/monster/:id', isAuth, isMaster, getMonster)

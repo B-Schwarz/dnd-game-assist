@@ -5,11 +5,13 @@ import "../initiative.css";
 import axios from "axios";
 import {EncounterMonster, EncounterType} from "../../encounter/encounter.type";
 import {buildEncounterInstances, monsterBoardEntry} from "./add.utils";
+import AddSkeletonRows from "./add-skeleton";
 
 const App = (props: {u: () => void}) => {
 
     const [data, setData] = useState<EncounterType[]>([]);
     const [values, setValue] = useState<EncounterType[]>([])
+    const [loading, setLoading] = useState(true)
 
     const search = (val: string) => {
         // @ts-ignore — encounter rows carry a `name`, not a `character.name`
@@ -50,6 +52,7 @@ const App = (props: {u: () => void}) => {
             })
             .catch(() => {
             })
+            .finally(() => setLoading(false))
     }
 
     const onAdd = (m: EncounterType) => {
@@ -80,8 +83,9 @@ const App = (props: {u: () => void}) => {
                     </Tr>
                 </Thead>
                 <Tbody>
+                    {loading && <AddSkeletonRows cols={2}/>}
                     {
-                        values.map((item, index) => (
+                        !loading && values.map((item, index) => (
                             <Tr key={index}>
                                 <Td><Text isTruncated maxW='11rem'>{item.name}</Text></Td>
                                 <Td>

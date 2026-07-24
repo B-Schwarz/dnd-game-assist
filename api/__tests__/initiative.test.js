@@ -83,6 +83,21 @@ describe('addMaster', () => {
         expect(markers[10]).toBe(1) // wrapped
     })
 
+    test('strips the base64 image (and other non-board fields) from the stored entry', () => {
+        init.addMaster({body: {player: mkPlayer({
+            character: {name: 'Hero', hp: 12, ac: '15', dexSave: '3',
+                appearance: 'data:image/png;base64,' + 'A'.repeat(50000),
+                spells: ['a', 'b'], inventory: 'lots'}
+        })}}, mockRes())
+        const {character} = masterView().player[0]
+        expect(character.name).toBe('Hero')
+        expect(character.hp).toBe(12)
+        expect(character.dexSave).toBe('3')
+        expect(character).not.toHaveProperty('appearance')
+        expect(character).not.toHaveProperty('spells')
+        expect(character).not.toHaveProperty('inventory')
+    })
+
     test('missing player is a silent no-op (still 200)', () => {
         const res = mockRes()
         init.addMaster({body: {}}, res)

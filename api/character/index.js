@@ -427,11 +427,23 @@ const deleteOwnCharacter = async (req, res) => {
     res.sendStatus(200)
 }
 
-// List views don't need the attachment metadata, so keep their (leaner) shape;
-// only the single-character sheet GET carries `attachment`.
+// List views only render the name and (for the initiative board) the combat
+// subset of the sheet. Shipping the whole opaque `character` here drags along
+// `appearance` — a base64 image data URL up to 2 MB per character — which
+// bloated /api/charlist and, once added, every initiative board poll. Trim to
+// the fields the list + board actually read (see CLAUDE.md board subset).
+const BOARD_CHAR_FIELDS = [
+    'name', 'ac', 'hp', 'maxHp', 'tempHp', 'dex', 'speed', 'color',
+    'strSave', 'dexSave', 'conSave', 'intSave', 'wisSave', 'chaSave'
+]
+const trimCharacter = (character) => {
+    const out = {}
+    for (const k of BOARD_CHAR_FIELDS) if (character && k in character) out[k] = character[k]
+    return out
+}
 const filterCharacterListe = (liste) => {
     return liste.map((item) => ({
-        _id: item._id, character: item.character, npc: item.npc, primary: item.primary
+        _id: item._id, character: trimCharacter(item.character), npc: item.npc, primary: item.primary
     }))
 }
 

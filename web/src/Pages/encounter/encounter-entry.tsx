@@ -77,7 +77,7 @@ const App = (props: { m: EncounterType, u: () => void, e: boolean }) => {
     }
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list')
+        axios.get(process.env.REACT_APP_API_PREFIX + '/api/monster/list/lean')
             .then((data) => {
                 setMonsterList(data.data)
             })
