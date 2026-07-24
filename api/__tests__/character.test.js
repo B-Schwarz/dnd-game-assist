@@ -132,7 +132,7 @@ describe('HP endpoints', () => {
 describe('character lists', () => {
     test('getCharacterList excludes the requester’s own; getOwnCharacterList returns only theirs', async () => {
         await seedActors()
-        const mine = await makeCharacter({owner: player, character: {name: 'Mine', hp: 12, appearance: 'data:image/png;base64,AAAA'}})
+        const mine = await makeCharacter({owner: player, character: {name: 'Mine', hp: 12, playerName: 'Owner', appearance: 'data:image/png;base64,AAAA'}})
         const theirs = await makeCharacter({owner: other, character: {name: 'Theirs'}})
         const agent = await loginAgent(app, 'player')
         // player is a plain user, so use gm (master/admin) for the privileged list,
@@ -146,9 +146,11 @@ describe('character lists', () => {
         expect(names).toContain('Theirs')
         expect(names).not.toContain('GMs') // requester's own excluded
         list.forEach(c => expect(Object.keys(c).sort()).toEqual(['_id', 'character', 'npc', 'primary']))
-        // list ships only the board subset, never the heavy base64 image
+        // list keeps the board subset + the list-view display fields, but never
+        // the heavy base64 image
         const mineOut = list.find(c => c.character.name === 'Mine')
         expect(mineOut.character.hp).toBe(12)
+        expect(mineOut.character.playerName).toBe('Owner') // character-list "Spieler" column
         expect(mineOut.character).not.toHaveProperty('appearance')
 
         const own = (await agent.get('/api/charlist/me')).body
