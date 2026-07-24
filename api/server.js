@@ -85,6 +85,17 @@ const limiter = RateLimit({
 
 app.use('/api', limiter)
 
+// The global limiter (10000/min) is generous by design; login is the one
+// unauthenticated, brute-forceable route, so gate it far tighter.
+const authLimiter = RateLimit({
+    windowMs: 15*60*1000,
+    limit: 10,
+    standardHeaders: 'draft-6',
+    // The test suites log in many times from one IP; jest sets NODE_ENV=test,
+    // the e2e API server sets DISABLE_AUTH_RATE_LIMIT (see e2e webServer env).
+    skip: () => process.env.NODE_ENV === 'test' || process.env.DISABLE_AUTH_RATE_LIMIT === '1'
+})
+
 //
 //  CHARACTER LIST
 //
@@ -128,7 +139,7 @@ app.delete('/api/char/me/:id/attachment', isAuth, validCharParam, requireOwnChar
 //  AUTH
 //
 app.post('/api/auth/register', isAuth, isAdmin, register)
-app.post('/api/auth/login', login)
+app.post('/api/auth/login', authLimiter, login)
 app.get('/api/auth/logout', isAuth, logout)
 
 //

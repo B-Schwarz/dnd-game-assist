@@ -47,6 +47,17 @@ describe('login', () => {
         expect(res.statusCode).toBe(200)
     })
 
+    test('username is matched literally, not as a regex (no ReDoS / wildcard match)', async () => {
+        await makeUser({name: 'Carol'})
+        // Regex metacharacters must match nothing rather than being interpreted:
+        // ".*"/"Ca.ol"/"^Carol$" would all have matched "Carol" via the old
+        // new RegExp(name) sink.
+        for (const username of ['.*', 'Ca.ol', '^Carol$', '(a+)+']) {
+            const res = await request(app).post('/api/auth/login').send({username, password: 'password123'})
+            expect(res.statusCode).toBe(401)
+        }
+    })
+
     test('a second login adds a second token (multiple active sessions)', async () => {
         await makeUser({name: 'dora'})
         await loginAgent(app, 'dora')
