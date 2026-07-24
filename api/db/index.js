@@ -10,9 +10,18 @@ const connectDB = async () => {
         User.find()
             .then(u => {
                 if (u.length === 0) {
+                    // Never seed a publicly-known password in production. Take it
+                    // from ADMIN_INITIAL_PASSWORD; only fall back to the dev
+                    // default off-prod (the e2e suite logs in as admin/asdasdasd).
+                    const seedPassword = process.env.ADMIN_INITIAL_PASSWORD
+                        || (process.env.NODE_ENV === 'production' ? null : 'asdasdasd')
+                    if (!seedPassword) {
+                        console.error('No default admin seeded: set ADMIN_INITIAL_PASSWORD to bootstrap the first admin.')
+                        return
+                    }
                     User({
                         name: 'admin',
-                        password: 'asdasdasd',
+                        password: seedPassword,
                         master: false,
                         admin: true
                     }).save()

@@ -4,6 +4,7 @@ const {connectDB} = require('./db')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 const RateLimit = require('express-rate-limit')
+const helmet = require('helmet')
 
 const {login, logout, isAuth, register, isMaster, isMasterOrAdmin, isAdmin} = require('./auth')
 const {
@@ -32,6 +33,11 @@ app.use(express.json({limit: '20mb'}));
 app.use(express.urlencoded({extended: false}));
 
 app.disable('x-powered-by');
+
+// Security headers (HSTS, nosniff, frameguard, referrer-policy, …). CSP is left
+// off here: the served SPA would need a tailored policy, so enabling a default
+// CSP would break it — track that as a follow-up rather than ship a broken one.
+app.use(helmet({contentSecurityPolicy: false}));
 
 // CORS Header
 app.use((req, res, next) => {
@@ -63,11 +69,14 @@ const sess = session({
     secret: process.env.DND_COOKIE_SECRET,
     saveUninitialized: false,
     resave: true,
+    // Refresh the expiry on each request, so an active session stays alive but
+    // a leaked/idle cookie dies after the window rather than lasting forever.
+    rolling: true,
     store: store,
     proxy: (process.env.NODE_ENV === 'production'),
     cookie: {
         httpOnly: true,
-        maxAge: 99999999999999,
+        maxAge: 30*24*60*60*1000, // 30 days
         sameSite: 'lax',
         secure: (process.env.NODE_ENV === 'production'),
     }
